@@ -9,7 +9,7 @@ data class PuzzleSolution(
 )
 
 data class PuzzlePartSolution(
-    @JsonProperty("Part") var part: Int = 1,
+    @JsonProperty("Part") var part: Int = 0,
     @JsonProperty("Result") var result: String = "",
     @JsonProperty("Elapsed Time (msec)") var elapsedTime: Long = 0
 )

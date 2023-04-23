@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test
 
 class Day01Test {
 
-    private val day = 1
+    private val day = 1                      ///////// Update this for a new dayN test
+    private val puzzleSolver = Day01()       ///////// Update this for a new dayN test
     private val inputDataReader = InputDataReader("src/test/resources/inputdata/input")
     private val inputLines: List<String> = inputDataReader.read(day)
-    private val puzzleSolver = Day01()
 
     /*
     The first Elf is carrying food with 1000, 2000, and 3000 Calories, a total of 6000 Calories.

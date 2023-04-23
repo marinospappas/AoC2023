@@ -10,11 +10,11 @@ import kotlin.system.measureTimeMillis
 @Order(1)
 class Day01: PuzzleSolver() {
 
-    private lateinit var calories: List<List<Int>>
-
     init {
-        day = 1
+        day = 1         ////// update this when a puzzle solver for a new day is implemented
     }
+
+    private lateinit var calories: List<List<Int>>
 
     override fun part1(): PuzzlePartSolution {
         calories = processInput(inputData)
