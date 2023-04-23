@@ -34,7 +34,7 @@ class Day01: PuzzleSolver() {
         return PuzzlePartSolution(2, result.toString(), elapsed)
     }
 
-    private fun processInput(inputLines: List<String>): List<List<Int>> {
+    fun processInput(inputLines: List<String>): List<List<Int>> {
         val result = mutableListOf<List<Int>>()
         var elfList = mutableListOf<Int>()
         inputLines.forEach { line ->

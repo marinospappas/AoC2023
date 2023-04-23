@@ -5,10 +5,7 @@ import org.springframework.stereotype.Component
 import java.io.File
 
 @Component
-class InputDataReader {
-
-    @Value("\${input.filename.pattern}")
-    lateinit var inputFileNamePattern: String
+class InputDataReader(@Value("\${input.filename.pattern}") var inputFileNamePattern: String) {
 
     fun read(day: Int): List<String> {
         val filename = "$inputFileNamePattern${String.format("%02d",day)}.txt"

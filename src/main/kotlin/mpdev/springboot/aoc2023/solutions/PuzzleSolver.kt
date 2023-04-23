@@ -7,7 +7,7 @@ abstract class PuzzleSolver {
 
     lateinit var inputData: List<String>
 
-    protected var day: Int = 0
+    var day: Int = 0
 
     fun solve(): PuzzleSolution = PuzzleSolution(day = day, solution = setOf(part1(), part2()))
 

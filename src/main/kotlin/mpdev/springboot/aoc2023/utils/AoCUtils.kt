@@ -8,4 +8,5 @@ object AoCUtils {
     )
 
     fun getIndexOfDay(day: Int) = indexMap[day] ?: (day - 1)
+
 }
