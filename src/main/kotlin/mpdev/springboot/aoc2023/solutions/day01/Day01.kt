@@ -36,16 +36,16 @@ class Day01: PuzzleSolver() {
 
     fun processInput(inputLines: List<String>): List<List<Int>> {
         val result = mutableListOf<List<Int>>()
-        var elfList = mutableListOf<Int>()
+        var calorieList = mutableListOf<Int>()
         inputLines.forEach { line ->
             if (line.isNotEmpty())
-                elfList.add(line.toInt())
+                calorieList.add(line.toInt())
             else {
-                result.add(elfList)
-                elfList = mutableListOf()
+                result.add(calorieList)
+                calorieList = mutableListOf()
             }
         }
-        result.add(elfList)
+        result.add(calorieList)
         return result
     }
 }
