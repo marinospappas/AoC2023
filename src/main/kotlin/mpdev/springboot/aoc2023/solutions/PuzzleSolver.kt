@@ -15,11 +15,15 @@ abstract class PuzzleSolver {
     var day: Int = 0
 
     fun solve(): PuzzleSolution {
+        setDay()
         inputData = inputDataReader.read(day)
-        return PuzzleSolution(day = day, solution = setOf(part1(), part2()))
+        initSolver()
+        return PuzzleSolution(day = day, solution = setOf(solvePart1(), solvePart2()))
     }
 
-    abstract fun part1(): PuzzlePartSolution
-    abstract fun part2(): PuzzlePartSolution
+    abstract fun setDay()
+    abstract fun initSolver()
+    abstract fun solvePart1(): PuzzlePartSolution
+    abstract fun solvePart2(): PuzzlePartSolution
 
 }

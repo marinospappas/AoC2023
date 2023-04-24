@@ -7,8 +7,7 @@ import java.io.File
 @Component
 class InputDataReader(@Value("\${input.filename.pattern}") var inputFileNamePattern: String) {
 
-    fun read(day: Int): List<String> {
-        val filename = "$inputFileNamePattern${String.format("%02d",day)}.txt"
-        return File(filename).readLines()
-    }
+    fun read(day: Int): List<String>  =
+        File("$inputFileNamePattern${String.format("%02d",day)}.txt").readLines()
+
 }
