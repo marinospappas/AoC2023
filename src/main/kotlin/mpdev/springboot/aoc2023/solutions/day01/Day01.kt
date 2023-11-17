@@ -2,38 +2,55 @@ package mpdev.springboot.aoc2023.solutions.day01
 
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
-import kotlin.system.measureTimeMillis
+import kotlin.system.measureNanoTime
 
 @Component
-@Order(1)
-class Day01(@Autowired var inputProcessor: InputProcessor01): PuzzleSolver() {
+class Day01: PuzzleSolver() {
 
-    override fun setDay() {
-        day = 1         ////// update this when a puzzle solver for a new day is implemented
+    final override fun setDay() {
+        day = 1
     }
 
-    private lateinit var calories: List<List<Int>>
-    var result = 0
+    init {
+        setDay()
+    }
 
-    override fun initSolver() {
-        calories = inputProcessor.process(inputData)
+    var result = 0
+    lateinit var intList: IntArray
+
+    override fun initSolver(): Pair<Long,String> {
+        val elapsed = measureNanoTime {
+            intList = IntArray(inputData.size) { Integer.parseInt(inputData[it]) }
+        }
+        return Pair(elapsed/1000, "micro-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
-        val elapsed = measureTimeMillis {
-            result = calories.maxByOrNull { it.sum() }!!.sum()
+        val elapsed = measureNanoTime {
+            result = intList.sum()
         }
-        return PuzzlePartSolution(1, result.toString(), elapsed)
+        return PuzzlePartSolution(1, result.toString(), elapsed/1000, "micro-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
-        val elapsed = measureTimeMillis {
-            result = calories.sortedBy { it.sum() }.reversed().subList(0,3).sumOf { it.sum() }
+        val elapsed = measureNanoTime {
+            result = applyChangeAndFindDuplicate()
         }
-        return PuzzlePartSolution(2, result.toString(), elapsed)
+        return PuzzlePartSolution(2, result.toString(), elapsed/1000, "micro-sec")
     }
 
+    fun applyChangeAndFindDuplicate(): Int {
+        val freqSet = mutableSetOf<Int>()
+        var freq = 0
+        var index = 0
+        while (true) {
+            freq += intList[index++]
+            if (freqSet.contains(freq))
+                return freq
+            freqSet.add(freq)
+            if (index > intList.lastIndex)
+                index = 0
+        }
+    }
 }
