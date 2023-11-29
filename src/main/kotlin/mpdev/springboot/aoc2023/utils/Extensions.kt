@@ -2,6 +2,7 @@ package mpdev.springboot.aoc2023.utils
 
 import java.lang.StringBuilder
 import kotlin.math.abs
+import kotlin.math.min
 
 fun String.splitRepeatedChars(): List<String> {
     if (isEmpty())
@@ -38,3 +39,14 @@ fun Array<IntRange>.allValues(): Set<MutableList<Int>> {
         result
     }
 }
+
+fun min(a1: Int, a2: Int, a3: Int, a4: Int): Int {
+    return min(min(a1,a2), min(a3,a4))
+}
+
+fun min(a1: Long, a2: Long, a3: Long, a4: Long): Long {
+    return min(min(a1,a2), min(a3,a4))
+}
+
+fun String.isAnagram(other: String): Boolean =
+    this.toCharArray().toList().sorted() == other.toCharArray().toList().sorted()

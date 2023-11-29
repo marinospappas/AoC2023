@@ -40,6 +40,13 @@ class Graph<T>(var getConnections: (id: T) -> List<GraphNode<T>>? = { null } ) {
 
     fun getNodes() = nodes
 
+    fun getRootId(): T {
+        val root = nodes.keys - nodes.keys.map { getNeighbours(it) ?: setOf() }.flatten().map { it.nodeId }.toSet()
+        if (root.size > 1)
+            throw AocException("could not determine root node of the graph")
+        return root.first()
+    }
+
     private fun getNeighbours(id: T) = nodes[id]?.getConnectedNodes()
 
     /*override fun toString(): String {

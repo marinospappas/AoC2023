@@ -66,6 +66,22 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
         data.remove(p)
     }
 
+    fun getAdjacentArea(p: Point): Set<Point> {
+        val area = mutableSetOf<Point>()
+        val value = data[p] ?: return area
+        val visited = mutableSetOf<Point>()
+        val queue = ArrayDeque<Point>().also { q -> q.add(p) }
+        while (queue.isNotEmpty()) {
+            val point = queue.removeFirst().also { visited.add(it) }
+            area.add(point)
+            point.adjacent(false).filter { data[it] == value }.forEach { adj ->
+                if (!visited.contains(adj))
+                    queue.add(adj)
+            }
+        }
+        return area
+    }
+
     fun getDimensions() = Pair(maxX-minX+1, maxY-minY+1)
     fun getMinMaxXY() = FourComponents(minX, maxX, minY, maxY)
     fun countOf(item: T) = data.values.count { it == item }

@@ -6,6 +6,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 class Day01Test {
 
@@ -29,13 +31,25 @@ class Day01Test {
 
     @Test
     @Order(2)
-    fun `Solves Part 1`() {
-        assertThat(puzzleSolver.solvePart1().result).isEqualTo("3")
+    fun `Reads Input ans sets Integer List`() {
+
     }
 
     @Test
     @Order(3)
+    fun `Executes`() {
+
+    }
+
+    @Test
+    @Order(4)
+    fun `Solves Part 1`() {
+        assertThat(puzzleSolver.solvePart1().result).isEqualTo("")
+    }
+
+    @Test
+    @Order(6)
     fun `Solves Part 2`() {
-        assertThat(puzzleSolver.solvePart2().result).isEqualTo("2")
+        assertThat(puzzleSolver.solvePart2().result).isEqualTo("")
     }
 }
