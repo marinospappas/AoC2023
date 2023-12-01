@@ -18,13 +18,10 @@ class Day01: PuzzleSolver() {
     }
 
     var result = 0
-    lateinit var x: String
 
     override fun initSolver(): Pair<Long,String> {
         result = 0
-        val elapsed = measureNanoTime {
-            x = ""
-        }
+        val elapsed = measureNanoTime {}
         return Pair(elapsed/1000, "micro-sec")
     }
 
