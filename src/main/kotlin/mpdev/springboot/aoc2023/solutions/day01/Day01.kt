@@ -34,25 +34,19 @@ class Day01: PuzzleSolver() {
     }
 
     override fun solvePart2(): PuzzlePartSolution {
-        val nums = listOf( "one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+        val nums = mapOf("one" to 1, "two" to 2, "three" to 3, "four" to 4, "five" to 5, "six" to 6, "seven" to 7, "eight" to 8, "nine" to 9,
+            "1" to 1, "2" to 2, "3" to 3, "4" to 4, "5" to 5, "6" to 6, "7" to 7, "8" to 8, "9" to 9)
+        val numsReversed = nums.entries.associate { e -> e.key.reversed() to e.value }
         val elapsed = measureNanoTime {
-            result = inputData
-                .sumOf { s -> findFirstNumber(s, nums) * 10 + findFirstNumber(s.reversed(), nums.map { n -> n.reversed() }) }
+            result = inputData.sumOf { s -> firstNumber(s, nums) * 10 + firstNumber(s.reversed(), numsReversed) }
         }
         return PuzzlePartSolution(2, result.toString(), elapsed/1000, "micro-sec")
     }
 
-    fun findFirstNumber(input: String, nums: List<String>): Int {
+    fun firstNumber(input: String, nums: Map<String,Int>): Int {
         var s = input
         while (s.isNotEmpty()) {
-            if (s.first().isDigit())
-                return s.first().digitToInt()
-            else {
-                for (n in nums) {
-                    if (s.startsWith(n))
-                        return nums.indexOf(n) + 1
-                }
-            }
+            nums.forEach { (n, i) -> if (s.startsWith(n)) return i }
             s = s.substring(1, s.length)
         }
         throw AocException("no number was found in [$input]")
