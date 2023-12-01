@@ -43,13 +43,16 @@ class Day01: PuzzleSolver() {
         return PuzzlePartSolution(2, result.toString(), elapsed/1000, "micro-sec")
     }
 
-    fun firstNumber(input: String, nums: Map<String,Int>): Int {
+    fun firstNumber(input: String, numbers: Map<String,Int>): Int {
         var s = input
         while (s.isNotEmpty()) {
-            nums.forEach { (n, i) -> if (s.startsWith(n)) return i }
+            numbers.forEach { (n, i) -> if (s.startsWith(n)) return i }
             s = s.substring(1, s.length)
         }
         throw AocException("no number was found in [$input]")
+        //  more compact but slower
+        //  return numbers.entries.associate { e -> s.indexOf(e.key) to e.value }
+        //            .entries.sortedBy { it.key }.first { e -> e.key >= 0 }.value
     }
 
 }
