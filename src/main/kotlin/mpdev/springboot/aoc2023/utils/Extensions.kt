@@ -50,3 +50,5 @@ fun min(a1: Long, a2: Long, a3: Long, a4: Long): Long {
 
 fun String.isAnagram(other: String): Boolean =
     this.toCharArray().toList().sorted() == other.toCharArray().toList().sorted()
+
+fun Any?.println() = println(this)

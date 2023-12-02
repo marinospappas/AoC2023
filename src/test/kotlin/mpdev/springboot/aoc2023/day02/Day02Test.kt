@@ -4,6 +4,7 @@ import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day02.Cube
 import mpdev.springboot.aoc2023.solutions.day02.CubeGame
 import mpdev.springboot.aoc2023.solutions.day02.Day02
+import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
@@ -34,7 +35,7 @@ class Day02Test {
     fun `Reads Input ans sets Games List`() {
         val cubeGame = CubeGame(inputLines)
         println(cubeGame.gameCubes)
-        cubeGame.games.forEach { println(it) }
+        cubeGame.games.forEach { it.println() }
         assertThat(cubeGame.games.size).isEqualTo(5)
         assertThat(cubeGame.gameCubes).isEqualTo(setOf(
             Pair(12, Cube.red), Pair(13, Cube.green), Pair(14, Cube.blue)
@@ -46,7 +47,7 @@ class Day02Test {
     fun `Identifies Valid Games`() {
         val cubeGame = CubeGame(inputLines)
         val validGames = cubeGame.games.filter { cubeGame.isGameValid(it.value) }
-        validGames.forEach { println(it) }
+        validGames.forEach { it.println() }
         val result = cubeGame.games.entries.filter { e -> cubeGame.isGameValid(e.value) }
             .sumOf { e -> e.key }
         println("sum of ids: $result")
