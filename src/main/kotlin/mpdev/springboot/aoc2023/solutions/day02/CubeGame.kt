@@ -16,10 +16,9 @@ class CubeGame(input: List<String>) {
         game.map { it.cubes }.flatten().all { cube -> cube.first <= gameCubes.first { it.second == cube.second }.first }
 
     fun minCubesForGame(game: Set<CubeSet>) =
-        CubeSet(
-            Cube.values()
-                .associateWith { c -> game.map { it.cubes }.flatten().filter { it.second == c }.maxOf { it.first } }
-                .entries.map { e -> Pair(e.value, e.key) }.toMutableSet()
+        CubeSet(Cube.values()
+            .associateWith { c -> game.map { it.cubes }.flatten().filter { it.second == c }.maxOf { it.first } }
+            .entries.map { e -> Pair(e.value, e.key) }.toMutableSet()
         )
 
     fun powerOfSet(cubeSet: CubeSet) =
