@@ -33,10 +33,10 @@ class Day02Test {
     @Order(2)
     fun `Reads Input ans sets Games List`() {
         val cubeGame = CubeGame(inputLines)
-        println(cubeGame.cubesSet)
+        println(cubeGame.gameCubes)
         cubeGame.games.forEach { println(it) }
         assertThat(cubeGame.games.size).isEqualTo(5)
-        assertThat(cubeGame.cubesSet).isEqualTo(setOf(
+        assertThat(cubeGame.gameCubes).isEqualTo(setOf(
             Pair(12, Cube.red), Pair(13, Cube.green), Pair(14, Cube.blue)
         ))
     }
