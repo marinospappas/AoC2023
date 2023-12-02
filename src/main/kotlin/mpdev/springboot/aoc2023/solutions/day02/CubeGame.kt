@@ -6,9 +6,7 @@ import mpdev.springboot.aoc2023.utils.AocException
 class CubeGame(input: List<String>) {
 
     val games = mutableMapOf<Int, MutableSet<Pair<Int, Cube>>>()
-    val cubesSet = setOf(
-        Pair(12, red), Pair(13, green), Pair(14, blue)
-    )
+    val cubesSet = setOf(Pair(12, red), Pair(13, green), Pair(14, blue))
 
     init {
         processInput(input)
