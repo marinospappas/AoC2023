@@ -1,6 +1,8 @@
 package mpdev.springboot.aoc2023.day02
 
 import mpdev.springboot.aoc2023.input.InputDataReader
+import mpdev.springboot.aoc2023.solutions.day02.Cube
+import mpdev.springboot.aoc2023.solutions.day02.CubeGame
 import mpdev.springboot.aoc2023.solutions.day02.Day02
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -29,19 +31,52 @@ class Day02Test {
 
     @Test
     @Order(2)
-    fun `Reads Input ans sets Integer List`() {
-        assertThat(puzzleSolver.inputData.size).isEqualTo(4)
+    fun `Reads Input ans sets Games List`() {
+        val cubeGame = CubeGame(inputLines)
+        println(cubeGame.cubesSet)
+        cubeGame.games.forEach { println(it) }
+        assertThat(cubeGame.games.size).isEqualTo(5)
+        assertThat(cubeGame.cubesSet).isEqualTo(setOf(
+            Pair(12, Cube.red), Pair(13, Cube.green), Pair(14, Cube.blue)
+        ))
+    }
+
+    @Test
+    @Order(3)
+    fun `Identifies Valid Games`() {
+        val cubeGame = CubeGame(inputLines)
+        val validGames = cubeGame.games.filter { cubeGame.isGameValid(it.value) }
+        validGames.forEach { println(it) }
+        val result = cubeGame.games.entries.filter { e -> cubeGame.isGameValid(e.value) }
+            .sumOf { e -> e.key }
+        println("sum of ids: $result")
+        assertThat(validGames.keys).isEqualTo(setOf(1,2,5))
+        assertThat(result).isEqualTo(8)
     }
 
     @Test
     @Order(4)
     fun `Solves Part 1`() {
-        assertThat(puzzleSolver.solvePart1().result).isEqualTo("")
+        assertThat(puzzleSolver.solvePart1().result).isEqualTo("8")
     }
 
     @Test
-    @Order(6)
+    @Order(5)
+    fun `Calculates Minimum Cubes Set and Power of Set of Cubes`() {
+        val expected = listOf(48, 12, 1560, 630, 36)
+        val cubeGame = CubeGame(inputLines)
+        cubeGame.games.entries
+            .forEach { e ->
+                println("id ${e.key}: min cubes ${cubeGame.minCubesForGame(e.value)}")
+                val power = cubeGame.powerOfSet(cubeGame.minCubesForGame(e.value))
+                println("pwr: $power")
+                assertThat(power).isEqualTo(expected[e.key - 1])
+            }
+    }
+
+    @Test
+    @Order(8)
     fun `Solves Part 2`() {
-        assertThat(puzzleSolver.solvePart2().result).isEqualTo("")
+        assertThat(puzzleSolver.solvePart2().result).isEqualTo("2286")
     }
 }
