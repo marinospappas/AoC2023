@@ -43,9 +43,9 @@ class CubeGame(input: List<String>) {
 
         private fun processGame(id: Int, input: String, games: MutableMap<Int, MutableSet<CubeSet>>) {
             input.split(Regex("; ")).forEach { g ->
-                // 1 red, 2 green, 6 blue
                 val cubeSet = CubeSet()
                 g.split(Regex(", ")).forEach { c ->
+                    // 1 red, 2 green, 6 blue
                     val match = Regex("""(\d+) ([a-z]+)""").find(c)
                     try {
                         val (count, cube) = match!!.destructured
