@@ -5,7 +5,6 @@ import mpdev.springboot.aoc2023.utils.Point
 
 class Engine(input: List<String>) {
 
-    private val GEAR = '*'
     val grid = Grid(input, Grid.allCharsDefMapper, 0)
 
     fun findSumOfNumsAdjToSymbol(): Int {
@@ -15,7 +14,7 @@ class Engine(input: List<String>) {
             val n = getNextNumber(current)
             if (isAdjacentToSymbol(n.second))
                 result += n.first.toInt()
-            current = advanceToNextNumber(grid.nextPoint(current+ Point(n.first.length,0)))
+            current = advanceToNextNumber(grid.nextPoint(current + Point(n.first.length,0)))
         }
         return result
     }
@@ -80,4 +79,8 @@ class Engine(input: List<String>) {
     private fun Char?.isDigit() = if (this == null) false else this in '0'..'9'
     private fun Char?.isSymbol() = if (this == null) false
         else setOf('+','@','#','%','/','$','-','=','&','*').contains(this)
+
+    companion object {
+        const val GEAR = '*'
+    }
 }
