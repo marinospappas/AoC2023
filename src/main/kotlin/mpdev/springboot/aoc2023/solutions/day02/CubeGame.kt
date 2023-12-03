@@ -1,7 +1,9 @@
 package mpdev.springboot.aoc2023.solutions.day02
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.solutions.day02.Cube.*
-import mpdev.springboot.aoc2023.utils.AocException
 
 class CubeGame(input: List<String>) {
 
@@ -27,32 +29,25 @@ class CubeGame(input: List<String>) {
         private fun processInput(input: List<String>): Map<Int,Set<CubeSet>> {
             val games = mutableMapOf<Int,Set<CubeSet>>()
             input.forEach { line ->
-                try {
-                    // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-                    val (id, remaining) = Regex("""Game (\d+): (.+)""").find(line)!!.destructured
-                    games[id.toInt()] = processGame(remaining)
-                } catch (e: Exception) {
-                    throw AocException("bad input line [$line], ${e.message}")
+                // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+                // {1:[{"cubes":[{"first":3,"second":"blue"},{"first":4,"second":"red"}]},{"cubes":[{"first":1,"second":"red"},
+                // {"first":2,"second":"green"},{"first":6,"second":"blue"}]},{"cubes":[{"first":2,"second":"green"}]}]}
+                val inputJson = line.replace("Game ", """{""")
+                    .replace(": ", """:[{"cubes":[{"first":""")
+                    .replace(Regex("""$"""), """"}]}]}""")
+                    .replace(Regex(", "), """"},{"first":""")
+                    .replace(Regex("; "), """"}]},{"cubes":[{"first":""")
+                    .replace(Regex(" "), ""","second":"""")
+                Json.decodeFromString<Map<Int,Set<CubeSet>>>(inputJson).also {
+                    games[it.entries.first().key] = it.entries.first().value
                 }
             }
             return games
         }
-
-        private fun processGame(input: String): Set<CubeSet> {
-            val setOfCubeSet = mutableSetOf<CubeSet>()
-            input.split(Regex("; ")).forEach { g ->
-                val cubeSet = mutableSetOf<Pair<Int,Cube>>()
-                g.split(Regex(", ")).forEach { c ->
-                    val s = c.split(" ")
-                    cubeSet.add(Pair(s[0].toInt(), Cube.valueOf(s[1])))
-                }
-                setOfCubeSet.add(CubeSet(cubeSet))
-            }
-            return setOfCubeSet
-        }
     }
 }
 
+@Serializable
 data class CubeSet(val cubes: Set<Pair<Int,Cube>> = setOf())
 
 enum class Cube { green, red, blue }
