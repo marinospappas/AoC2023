@@ -22,12 +22,11 @@ class CubeGame(input: List<String>) {
     fun powerOfSet(cubeSet: CubeSet) =
         cubeSet.cubes.map{ it.first }.fold(1) { acc, x -> acc * x }
 
-
     companion object {
         fun String.toJson() =
             // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-            // {1:[{"cubes":[{"first":3,"second":"blue"},{"first":4,"second":"red"}]},{"cubes":[{"first":1,"second":"red"},
-            // {"first":2,"second":"green"},{"first":6,"second":"blue"}]},{"cubes":[{"first":2,"second":"green"}]}]}
+            // 1:[{"cubes":[{"first":3,"second":"blue"},{"first":4,"second":"red"}]},{"cubes":[{"first":1,"second":"red"},
+            // {"first":2,"second":"green"},{"first":6,"second":"blue"}]},{"cubes":[{"first":2,"second":"green"}]}]
             this.replace("Game ", """""")
                 .replace(": ", """:[{"cubes":[{"first":""")
                 .replace(Regex("""$"""), """"}]}]""")
