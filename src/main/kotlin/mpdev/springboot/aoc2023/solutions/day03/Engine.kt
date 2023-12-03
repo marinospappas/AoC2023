@@ -26,11 +26,10 @@ class Engine(input: List<String>) {
         while (grid.isInsideGrid(current)) {
             val n = getNextNumber(current)
             isAdjacentToGear(n.second).let {
-                if (it.first) {
+                if (it.first)
                     it.second.forEach { gear ->
                         gearMap.getOrPut(gear) { mutableListOf() }.add(n.first.toInt())
                     }
-                }
             }
             current = advanceToNextNumber(grid.nextPoint(current+ Point(n.first.length,0)))
         }
