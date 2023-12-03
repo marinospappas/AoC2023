@@ -35,7 +35,7 @@ class Engine(input: List<String>) {
         return gearMap.values.filter { it.size == 2 }.sumOf { it.first() * it.last() }
     }
 
-    // return the next number as a string ald also the set of points that this number lives in
+    // return the next number as a string and also the set of points that this number lives in
     fun getNextNumber(p: Point): Pair<String,Set<Point>> {
         var resNum = ""
         val resPts = mutableSetOf<Point>()
