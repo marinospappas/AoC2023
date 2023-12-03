@@ -38,7 +38,7 @@ class CubeGame(input: List<String>) {
                     .replace(Regex(", "), """"},{"first":""")
                     .replace(Regex("; "), """"}]},{"cubes":[{"first":""")
                     .replace(Regex(" "), ""","second":"""")
-                Json.decodeFromString<Map<Int,Set<CubeSet>>>(inputJson).also {
+                Json.decodeFromString<Map<Int,Set<CubeSet>>>(inputJson).let {
                     games[it.entries.first().key] = it.entries.first().value
                 }
             }
