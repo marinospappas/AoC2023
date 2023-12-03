@@ -86,6 +86,12 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
     fun getMinMaxXY() = FourComponents(minX, maxX, minY, maxY)
     fun countOf(item: T) = data.values.count { it == item }
 
+    fun firstPoint() = Point(minX,minY)
+
+    fun nextPoint(p: Point) = if (p.x < maxX) p + Point(1,0) else Point(minX,p.y+1)
+
+    fun isInsideGrid(p: Point) = p.x in minX..maxX && p.y in minY..maxY
+
     open fun updateDimensions() {
        updateXYDimensions(border)
     }
@@ -100,6 +106,7 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
             .fold(0) { acc, i -> acc + i }
 
     companion object {
+        val allCharsDefMapper = (' '..'~').associateWith { it }
         private val bitToInt = intArrayOf( 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
             65536, 131072, 262144, 524288, 1_048_576, 2_097_152, 4_194_304, 8_388_608,
             16_777_216, 33_554_432, 67_108_864, 134_217_728, 268_435_456, 536_870_912, 1_073_741_824 )
@@ -145,16 +152,16 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
             print("${String.format("%2d",i%100)} ")
             for (j in grid.first().indices)
                 print(grid[i][j])
-            println()
+            println("")
         }
         print("   ")
         for (i in grid.first().indices)
             print(if (i%10 == 0) (i/10)%10 else " ")
-        println()
+        println("")
         print("   ")
         for (i in grid.first().indices)
             print(i%10)
-        println()
+        println("")
     }
 
 }

@@ -1,4 +1,4 @@
-package mpdev.springboot.aoc2023.solutions.dayxxexample
+package mpdev.springboot.aoc2023.solutions.day03
 
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component
 import kotlin.system.measureTimeMillis
 
 @Component
-class DayXX: PuzzleSolver() {
+class Day03: PuzzleSolver() {
 
     final override fun setDay() {
-        day = 99
+        day = 3
     }
 
     init {
@@ -17,27 +17,27 @@ class DayXX: PuzzleSolver() {
     }
 
     var result = 0
-    lateinit var fabric: Fabric
+    lateinit var engine: Engine
 
     override fun initSolver(): Pair<Long,String> {
+        result = 0
         val elapsed = measureTimeMillis {
-            fabric = Fabric(inputData)
+            engine = Engine(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = fabric.findOverlappingPoints().size
+            result = engine.findSumOfNumsAdjToSymbol()
         }
-        return PuzzlePartSolution(1, result.toString(), elapsed)
+        return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = fabric.findNonOverlappingClaim()
+            result = engine.findSumOfGearBoxRatios()
         }
-        return PuzzlePartSolution(2, result.toString(), elapsed)
+        return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }
-
 }

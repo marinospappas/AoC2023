@@ -41,18 +41,18 @@ class CubeGame(input: List<String>) {
         private fun processGame(input: String): Set<CubeSet> {
             val setOfCubeSet = mutableSetOf<CubeSet>()
             input.split(Regex("; ")).forEach { g ->
-                val cubeSet = CubeSet()
+                val cubeSet = mutableSetOf<Pair<Int,Cube>>()
                 g.split(Regex(", ")).forEach { c ->
                     val s = c.split(" ")
-                    cubeSet.cubes.add(Pair(s[0].toInt(), Cube.valueOf(s[1])))
+                    cubeSet.add(Pair(s[0].toInt(), Cube.valueOf(s[1])))
                 }
-                setOfCubeSet.add(cubeSet)
+                setOfCubeSet.add(CubeSet(cubeSet))
             }
             return setOfCubeSet
         }
     }
 }
 
-data class CubeSet(val cubes: MutableSet<Pair<Int,Cube>> = mutableSetOf())
+data class CubeSet(val cubes: Set<Pair<Int,Cube>> = setOf())
 
 enum class Cube { green, red, blue }
