@@ -36,6 +36,7 @@ class Day04: PuzzleSolver() {
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
+            result = scratchCardGame.playGamePart2()
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

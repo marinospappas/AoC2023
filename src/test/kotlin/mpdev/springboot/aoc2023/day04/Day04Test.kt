@@ -82,7 +82,7 @@ class Day04Test {
 
     @Test
     @Order(6)
-    fun `Identifies if a Number id Adjacent to a Gear`() {
+    fun `Identifies Card Copies Won by a Winning Card`() {
 
     }
 

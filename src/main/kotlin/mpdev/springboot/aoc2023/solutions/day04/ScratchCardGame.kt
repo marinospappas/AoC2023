@@ -38,9 +38,8 @@ class ScratchCardGame(input: List<String>) {
     companion object {
         fun String.toJson() =
             // Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
-            //
-            this
-                .replace(Regex("""Card +"""), """""")
+            // 1:{"winning":[41,48,83,86,17],"numbers":[83,86,6,31,17,9,48,53]}
+            this.replace(Regex("""Card +"""), """""")
                 .replace(Regex(" {2}"), """ """)
                 .replace(": ", """:{"winning":[""")
                 .replace(Regex("""$"""), """]}""")
