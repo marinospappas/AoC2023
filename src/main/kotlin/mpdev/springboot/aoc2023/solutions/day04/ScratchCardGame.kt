@@ -16,24 +16,23 @@ class ScratchCardGame(input: List<String>) {
 
     fun playGamePart2(): Int {
         val cardsList = cards.entries.map { Pair(it.key,it.value) }.toMutableList()
-        while (true) {
+        while (cardsList.any { !it.second.processed }) {
             val wonList = mutableListOf<Pair<Int,ScratchCard>>()
             cardsList.filter { !it.second.processed }.forEach { card ->
-                val winning = card.second.countOfWinningNums()
-                if (winning > 0) {
-                    for (i in card.first+1 .. card.first+winning) {
-                        val cardWon = cards[i] ?: throw AocException("error for card id $i")
-                        wonList.add(Pair(i,ScratchCard(cardWon.winning,cardWon.numbers)))
-                    }
-                }
-                card.second.processed = true
+                val (cardId, scratchCard) = card
+                scratchCard.processed = true
+                wonList.addAll(getCopiesOfCardsWon(cardId, scratchCard.winningCount))
             }
             cardsList.addAll(wonList)
-            if (cardsList.all { it.second.processed })
-                break
         }
         return cardsList.size
     }
+
+    fun getCopiesOfCardsWon(id: Int, count: Int) =
+        (id+1 .. id+count).map { i ->
+            val cardWon = cards[i] ?: throw AocException("error retrieving card id $i")
+            Pair(i,ScratchCard(cardWon.winning, cardWon.numbers, winningCount = cardWon.winningCount))
+        }
 
     companion object {
         fun String.toJson() =
@@ -49,11 +48,12 @@ class ScratchCardGame(input: List<String>) {
 }
 
 @Serializable
-data class ScratchCard(val winning: List<Int>, val numbers: List<Int>, var processed: Boolean = false) {
-    fun countOfWinningNums() = (winning.toSet() intersect numbers.toSet()).size
-    fun points(): Int {
-        val countOfWinning = countOfWinningNums()
-        return if (countOfWinning > 0) 2.toDouble().pow(countOfWinningNums() - 1).toInt()
-        else 0
+data class ScratchCard(val winning: List<Int>, val numbers: List<Int>,
+                       var processed: Boolean = false, var winningCount: Int = -1) {
+    init {
+        if (winningCount < 0)   // calculate the winning count only if it's not set in the constructor
+            winningCount = (winning.toSet() intersect numbers.toSet()).size
     }
+    fun points() = if (winningCount > 0) 2.toDouble().pow(winningCount - 1).toInt()
+    else 0
 }

@@ -64,13 +64,11 @@ class Day04Test {
         val expected = listOf(4, 2, 2, 1, 0, 0)
         val expected1 = listOf(8, 2, 2, 1, 0, 0)
         val scratchCardGame = ScratchCardGame(inputLines)
-        var i = 0
-        scratchCardGame.cards.values.forEach { card ->
-            println("card ${i+1}")
-            val countOfWinningNums = card.countOfWinningNums().also { it.println() }
+        scratchCardGame.cards.forEach { (id, card) ->
+            val countOfWinningNums = card.winningCount.also { it.println() }
             val points = card.points().also { it.println() }
-            assertThat(countOfWinningNums).isEqualTo(expected[i])
-            assertThat(points).isEqualTo(expected1[i++])
+            assertThat(countOfWinningNums).isEqualTo(expected[id-1])
+            assertThat(points).isEqualTo(expected1[id-1])
         }
     }
 
@@ -83,7 +81,15 @@ class Day04Test {
     @Test
     @Order(6)
     fun `Identifies Card Copies Won by a Winning Card`() {
-
+        val expected = listOf(
+            listOf(2,3,4,5), listOf(3,4), listOf(4,5), listOf(5), emptyList(), emptyList()
+        )
+        val scratchCardGame = ScratchCardGame(inputLines)
+        scratchCardGame.cards.forEach { (id, card) ->
+            println("card $id")
+            val copiesWon = scratchCardGame.getCopiesOfCardsWon(id, card.winningCount).also { it.map { l -> l.first }.println() }
+            assertThat(copiesWon.map { it.first }).isEqualTo(expected[id-1])
+        }
     }
 
     @Test
