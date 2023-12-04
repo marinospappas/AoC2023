@@ -17,16 +17,19 @@ class Day04: PuzzleSolver() {
     }
 
     var result = 0
+    lateinit var scratchCardGame: ScratchCardGame
 
     override fun initSolver(): Pair<Long,String> {
         result = 0
         val elapsed = measureTimeMillis {
+            scratchCardGame = ScratchCardGame(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
+            result = scratchCardGame.playGamePart1()
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }

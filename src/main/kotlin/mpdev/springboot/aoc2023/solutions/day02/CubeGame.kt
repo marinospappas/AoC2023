@@ -17,10 +17,10 @@ class CubeGame(input: List<String>) {
 
     fun minCubesForGame(game: Set<CubeSet>) =
         CubeSet(game.map { it.cubes }.flatten().groupBy { it.second }.values
-            .map { Pair(it.maxOf { c -> c.first }, it.first().second) }.toMutableSet() )
+            .map { Pair(it.maxOf { c -> c.first }, it.first().second) }.toSet() )
 
     fun powerOfSet(cubeSet: CubeSet) =
-        cubeSet.cubes.map{ it.first }.fold(1) { acc, x -> acc * x }
+        cubeSet.cubes.map{ it.first }.reduce(Int::times)
 
     companion object {
         fun String.toJson() =

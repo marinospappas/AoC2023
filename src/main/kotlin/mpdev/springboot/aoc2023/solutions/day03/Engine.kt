@@ -32,7 +32,7 @@ class Engine(input: List<String>) {
             }
             current = advanceToNextNumber(grid.nextPoint(current+ Point(n.first.length,0)))
         }
-        return gearMap.values.filter { it.size == 2 }.sumOf { it.first() * it.last() }
+        return gearMap.values.filter { it.size == 2 }.sumOf { it.reduce(Int::times) }
     }
 
     // return the next number as a string and also the set of points that this number lives in
