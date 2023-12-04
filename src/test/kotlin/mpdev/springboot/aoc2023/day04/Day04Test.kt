@@ -10,9 +10,11 @@ import mpdev.springboot.aoc2023.solutions.day04.ScratchCard
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCardGame
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import kotlin.system.measureNanoTime
 
 class Day04Test {
 
@@ -65,6 +67,7 @@ class Day04Test {
         val expected1 = listOf(8, 2, 2, 1, 0, 0)
         val scratchCardGame = ScratchCardGame(inputLines)
         scratchCardGame.cards.forEach { (id, card) ->
+            println("card $id")
             val countOfWinningNums = card.winningCount.also { it.println() }
             val points = card.points().also { it.println() }
             assertThat(countOfWinningNums).isEqualTo(expected[id-1])
@@ -81,15 +84,27 @@ class Day04Test {
     @Test
     @Order(6)
     fun `Identifies Card Copies Won by a Winning Card`() {
-        val expected = listOf(
-            listOf(2,3,4,5), listOf(3,4), listOf(4,5), listOf(5), emptyList(), emptyList()
-        )
+        val expected = listOf(listOf(2,3,4,5), listOf(3,4), listOf(4,5), listOf(5), emptyList(), emptyList())
         val scratchCardGame = ScratchCardGame(inputLines)
-        scratchCardGame.cards.forEach { (id, card) ->
-            println("card $id")
-            val copiesWon = scratchCardGame.getCopiesOfCardsWon(id, card.winningCount).also { it.map { l -> l.first }.println() }
-            assertThat(copiesWon.map { it.first }).isEqualTo(expected[id-1])
+        val elapsedNoCache = measureNanoTime {
+            scratchCardGame.cards.forEach { (id, card) ->
+                println("card $id")
+                val copiesWon = scratchCardGame.getCopiesOfCardsWon(id, card.winningCount)
+                    .also { it.map { l -> l.first }.println() }
+                assertThat(copiesWon.map { it.first }).isEqualTo(expected[id - 1])
+            }
         }
+        println("elapsed no cache: ${elapsedNoCache/1000} microsecs")
+        val elapsedWithCache = measureNanoTime {
+            scratchCardGame.cards.forEach { (id, card) ->
+                println("card $id")
+                val copiesWon = scratchCardGame.getCopiesOfCardsWon(id, card.winningCount)
+                    .also { it.map { l -> l.first }.println() }
+                assertThat(copiesWon.map { it.first }).isEqualTo(expected[id - 1])
+            }
+        }
+        println("elapsed with cache: ${elapsedWithCache/1000} microsecs")
+        assertTrue(elapsedWithCache < elapsedNoCache)
     }
 
     @Test

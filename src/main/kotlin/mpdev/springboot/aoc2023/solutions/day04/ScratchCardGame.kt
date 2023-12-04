@@ -15,24 +15,24 @@ class ScratchCardGame(input: List<String>) {
     fun playGamePart1() = cards.values.sumOf { c -> c.points() }
 
     fun playGamePart2(): Int {
-        val cardsList = cards.entries.map { Pair(it.key,it.value) }.toMutableList()
+        val cardsList = cards.entries.map { Pair(it.key, it.value.clone()) }.toMutableList()
         while (cardsList.any { !it.second.processed }) {
             val wonList = mutableListOf<Pair<Int,ScratchCard>>()
-            cardsList.filter { !it.second.processed }.forEach { card ->
-                val (cardId, scratchCard) = card
-                scratchCard.processed = true
-                wonList.addAll(getCopiesOfCardsWon(cardId, scratchCard.winningCount))
+            cardsList.filter { !it.second.processed }.forEach { (id, card) ->
+                card.processed = true
+                wonList.addAll(getCopiesOfCardsWon(id, card.winningCount))
             }
             cardsList.addAll(wonList)
         }
         return cardsList.size
     }
 
+    private val cacheOfCardsWon = mutableMapOf<Int, List<Pair<Int,ScratchCard>>>()
+
     fun getCopiesOfCardsWon(id: Int, count: Int) =
-        (id+1 .. id+count).map { i ->
-            val cardWon = cards[i] ?: throw AocException("error retrieving card id $i")
-            Pair(i,ScratchCard(cardWon.winning, cardWon.numbers, winningCount = cardWon.winningCount))
-        }
+        cacheOfCardsWon.getOrPut(id) {
+            (id + 1..id + count).map { i -> Pair(i, cards[i] ?: throw AocException("error retrieving card id $i")) }
+        }.map { Pair(it.first, it.second.clone()) }
 
     companion object {
         fun String.toJson() =
@@ -56,4 +56,5 @@ data class ScratchCard(val winning: List<Int>, val numbers: List<Int>,
     }
     fun points() = if (winningCount > 0) 2.toDouble().pow(winningCount - 1).toInt()
     else 0
+    fun clone() = ScratchCard(this.winning, this.numbers, false, this.winningCount)
 }
