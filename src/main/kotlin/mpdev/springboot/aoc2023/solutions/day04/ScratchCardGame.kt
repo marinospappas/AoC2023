@@ -54,7 +54,6 @@ data class ScratchCard(val winning: List<Int>, val numbers: List<Int>,
         if (winningCount < 0)   // calculate the winning count only if it's not set in the constructor
             winningCount = (winning.toSet() intersect numbers.toSet()).size
     }
-    fun points() = if (winningCount > 0) 2.toDouble().pow(winningCount - 1).toInt()
-    else 0
+    fun points() = if (winningCount > 0) 2.toDouble().pow(winningCount - 1).toInt() else 0
     fun clone() = ScratchCard(this.winning, this.numbers, false, this.winningCount)
 }
