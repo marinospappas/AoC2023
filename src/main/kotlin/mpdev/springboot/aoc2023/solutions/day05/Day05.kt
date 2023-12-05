@@ -16,27 +16,25 @@ class Day05: PuzzleSolver() {
         setDay()
     }
 
-    var result = 0
-    lateinit var xxx: XXX
+    var result = 0L
+    lateinit var almanac: Almanac
 
     override fun initSolver(): Pair<Long,String> {
-        result = 0
         val elapsed = measureTimeMillis {
-            xxx = XXX(inputData)
+            almanac = Almanac(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            //result = xxx.
+            result = almanac.seedsList.minOf { almanac.getLocation(it) }
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            //result = xxx.
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }
