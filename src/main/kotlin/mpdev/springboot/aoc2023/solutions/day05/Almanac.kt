@@ -46,7 +46,7 @@ class Almanac(input: List<String>) {
         }
     }
 
-    fun getLocationFromRange(): Long {
+    fun getMinLocationFromRange(): Long {
         var result = Long.MAX_VALUE
         seedRanges.forEach { r ->
             r.forEach { seed ->
