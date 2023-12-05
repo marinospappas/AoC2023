@@ -1,7 +1,8 @@
 package mpdev.springboot.aoc2023.solutions.day05
 
 import mpdev.springboot.aoc2023.solutions.day05.Almanac.State.*
-import mpdev.springboot.aoc2023.utils.AocException
+import kotlin.math.max
+import kotlin.math.min
 
 class Almanac(input: List<String>) {
 
@@ -11,6 +12,8 @@ class Almanac(input: List<String>) {
     init {
         processInput(input)
     }
+
+    // part 1
 
     fun getLocation(seed: Long): Long {
         var current = seed
@@ -29,7 +32,9 @@ class Almanac(input: List<String>) {
         return input
     }
 
-    val seedRanges = mutableListOf<LongRange>()
+    // part 2
+
+    private val seedRanges = mutableListOf<LongRange>()
 
     fun seedToRanges() {
         var i = 0
@@ -41,30 +46,31 @@ class Almanac(input: List<String>) {
         }
     }
 
-    fun getlocationFromRange(): List<Long> {
+    fun getLocationFromRange(): Long {
         var result = Long.MAX_VALUE
         seedRanges.forEach { r ->
             r.forEach { seed ->
-                val l = getLocation(seed)
-                //locations.add(l)
-                if (l < result)
-                    result = l
+                getLocation(seed).let { if (it < result) result = it }
             }
         }
-        return listOf(result)
+        return result
     }
 
-    fun getlocationRangeFromSeedRange(): List<LongRange> {
-        val locations = mutableListOf<LongRange>()
-        seedRanges.forEach { r ->
-            locations.add(LongRange(getLocation(r.first), getLocation(r.last)))
-        }
-        return locations
-    }
-
+    // experimental to try part 2 with no brute-force
     fun findMinimumRange(rangeMap: List<Pair<LongRange, Long>>, refRanges: List<LongRange>, insideRange: Boolean): LongRange? {
         rangeMap.sortedBy { it.second }.reversed().forEach { range ->
-            // val prevRange = LongRange()
+            val start = range.first.first - range.second
+            val end = range.first.last - range.second
+            refRanges.forEach { refRange ->
+                if (insideRange) {
+                    if (start in refRange)
+                        return LongRange(max(start, refRange.first), min(end, refRange.last))
+                }
+                else {
+                    if (start !in refRange)
+                        return LongRange(start, end)
+                }
+            }
         }
         return null
     }
@@ -74,22 +80,17 @@ class Almanac(input: List<String>) {
     private fun processInput(input: List<String>) {
         var state = Seeds
         input.forEach { line ->
-            try {
-                if (line.isEmpty())
+            if (line.isEmpty())
                     state = State.values()[state.ordinal + 1]
-                else if (!line.contains("map"))
-                    if (state == Seeds && line.startsWith("seeds")) {
+            else if (!line.contains("map"))
+                if (state == Seeds && line.startsWith("seeds"))
                         seedsList.addAll(line.removePrefix("seeds:").trim().split(Regex(""" +""")).map { it.toLong() })
-                    } else {
-                        val (dest, src, len) = line.split(Regex(""" +""")).map { it.toLong() }
-                        updateMap(state, dest, src, len)
-                    }
-            } catch (e: Exception) {
-                throw AocException("bad input line $line")
-            }
+                else {
+                    val (dest, src, len) = line.split(Regex(""" +""")).map { it.toLong() }
+                    updateMap(state, dest, src, len)
+                }
         }
     }
-
     private fun updateMap(state: State, dest: Long, src: Long, len: Long) {
         maps.getOrPut(state) { mutableListOf() }.add(Pair(LongRange(src, src + len - 1), dest - src))
     }

@@ -75,28 +75,8 @@ class Day05Test {
     }
 
     @Test
-    @Order(6)
-    fun `Identifies Card Copies Won by a Winning Card`() {
-        val almanac = Almanac(inputLines)
-        almanac.seedToRanges()
-        almanac.seedRanges.forEach { it.println() }
-        almanac.getlocationFromRange().forEach { it.println() }
-        almanac.getlocationFromRange().min().println()
-    }
-
-    @Test
-    @Order(6)
-    fun `IdentifiesLocation Ranges`() {
-        val almanac = Almanac(inputLines)
-        almanac.seedToRanges()
-        almanac.seedRanges.forEach { it.println() }
-        kotlin.io.println()
-        almanac.getlocationRangeFromSeedRange().forEach { it.println() }
-    }
-
-    @Test
     @Order(8)
     fun `Solves Part 2`() {
-        assertThat(puzzleSolver.solvePart2().result).isEqualTo("30")
+        assertThat(puzzleSolver.solvePart2().result).isEqualTo("46")
     }
 }
