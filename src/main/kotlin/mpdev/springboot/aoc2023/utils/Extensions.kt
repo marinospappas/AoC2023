@@ -52,3 +52,11 @@ fun String.isAnagram(other: String): Boolean =
     this.toCharArray().toList().sorted() == other.toCharArray().toList().sorted()
 
 fun Any?.println() = println(this)
+
+fun <T>List<T>.pairWith(other: List<T>): List<Pair<T,T>> {
+    val result = mutableListOf<Pair<T,T>>()
+    val len = min(this.size, other.size)
+    for (indx in 0 until len)
+        result.add(Pair(this[indx], other[indx]))
+    return result
+}

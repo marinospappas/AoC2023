@@ -1,12 +1,13 @@
 package mpdev.springboot.aoc2023.solutions.day06
 
 import mpdev.springboot.aoc2023.utils.QuadraticEq
+import mpdev.springboot.aoc2023.utils.pairWith
 import kotlin.math.ceil
 import kotlin.math.floor
 
 class BoatRace(input: List<String>) {
 
-    val races = mutableListOf<Race>()
+    val races = processInput(input).map { Race(it.first, it.second) }
 
     init {
         processInput(input)
@@ -22,11 +23,10 @@ class BoatRace(input: List<String>) {
 
     fun setupLongRace() = races.reduce(Race::concat)
 
-    private fun processInput(input: List<String>) {
+    private fun processInput(input: List<String>): List<Pair<Long,Long>> {
         val times = input[0].removePrefix("Time:").trim().split(Regex(" +")).map { it.trim().toLong() }
         val distances = input[1].removePrefix("Distance:").trim().split(Regex(" +")).map { it.trim().toLong() }
-        for (i in times.indices)
-            races.add(Race(times[i], distances[i]))
+        return times.pairWith(distances)
     }
 }
 
