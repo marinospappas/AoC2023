@@ -42,7 +42,7 @@ class InputUtils {
         }
 
         // convert  field to json format "name": value
-        private fun fieldToJson(name: String, value: String, type: Class<*>, annotation: Annotation): String {
+        private fun fieldToJson(name: String, value: String, type: Class<*>, annotation: InputField): String {
             var result = ""
             result += """"$name": """
             result += getFieldValueForJson(value, type, annotation)
@@ -50,7 +50,7 @@ class InputUtils {
         }
 
         // get the value of a field as json-frienldy string
-        private fun getFieldValueForJson(value: String, type: Class<*>, annotation: Annotation): String {
+        private fun getFieldValueForJson(value: String, type: Class<*>, annotation: InputField): String {
             return when (type) {
                 String::class.java -> """"${toString(value)}""""
                 Int::class.java -> """"${toInt(value)}""""
@@ -65,7 +65,7 @@ class InputUtils {
             val fieldMapppings = mutableListOf<FieldMapping>()
             clazz.declaredFields.forEach { f ->
                 if (f.isAnnotationPresent(InputField::class.java)) {
-                    val annotation =  f.getAnnotation(InputField::class.java)
+                    val annotation = f.getAnnotation(InputField::class.java)
                     fieldMapppings.add(FieldMapping(f.name, annotation.fieldId, f.type, annotation))
                 }
             }
@@ -82,13 +82,13 @@ class InputUtils {
         private fun toLong(s: String): String {
             return s.trim().toLong().toString()
         }
-        private fun toList(s: String, annotation: Annotation): String {
-            val listDelim = annotation
-            return s.trim().split(Regex(" +")).map { """"$it"""" }.joinToString(", ", "[", "]")
+        private fun toList(s: String, annotation: InputField): String {
+            val listDelim = annotation.delimiter
+            return s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"$it"""" }
         }
 
         // map of field name, index in input stream and type as per annotation in input data class
-        data class FieldMapping(val name: String, val indx: Int, val type: Class<*>, val annotation: Annotation)
+        data class FieldMapping(val name: String, val indx: Int, val type: Class<*>, val annotation: InputField)
     }
 
 }
