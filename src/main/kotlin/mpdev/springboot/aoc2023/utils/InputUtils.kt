@@ -10,15 +10,16 @@ annotation class InputField(val fieldId: Int, val delimiter: String = ", ")     
 
 class InputUtils {
     companion object {
-        private var clazz: Class<*>? = null
         const val FIELD_SEPARATOR = "££££"
         private var removePrefix = ""
         private var delimiters: Array<String> = arrayOf()
         private var removeSuffix = ""
 
-        // convert a transformed input line to json string ready for deserialization
+        // transforms an input line (removes noise) and converts to json string
+        // ready for deserialization to a clazz object
         fun toJson(s: String, clazz: Class<*>): String {
-            val sArray = s.split(FIELD_SEPARATOR)
+            setDelimitersFromClass(clazz)
+            val sArray = transform(s).split(FIELD_SEPARATOR)
             val mappings = getFieldMappings(clazz)
             return mappings.indices.joinToString(", ", "{ ", " }") { i ->
                 fieldToJson(mappings[i].name, sArray[i], mappings[i].type, mappings[i].annotation)
@@ -26,8 +27,7 @@ class InputUtils {
         }
 
         // remove noise from input string and convert it to list of values
-        fun transform(s: String, clazz: Class<*>): String {
-            setDelimitersFromClass(clazz)
+        private fun transform(s: String): String {
             var s1 = s
                 .removePrefix(removePrefix)
                 .removeSuffix(removeSuffix)
@@ -42,7 +42,6 @@ class InputUtils {
         // set the prefix, field delimiters and suffix from the input class annotation
         private fun setDelimitersFromClass(clazz: Class<*>) {
             if (clazz.isAnnotationPresent(InputClass::class.java)) {
-                Companion.clazz = clazz
                 val delims = clazz.getAnnotation(InputClass::class.java).delimiters
                 delimiters = Array(delims.size) { delims[it] }
                 removePrefix = clazz.getAnnotation(InputClass::class.java).prefix
@@ -102,6 +101,4 @@ class InputUtils {
 
 }
 
-fun String.transformInput(clazz: Class<*>) = InputUtils.transform(this, clazz)
-
-fun String.toJson(clazz: Class<*>) = InputUtils.toJson(this.transformInput(clazz), clazz)
+fun String.toJson(clazz: Class<*>) = InputUtils.toJson(this, clazz)
