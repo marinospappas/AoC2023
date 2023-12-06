@@ -1,12 +1,17 @@
 package mpdev.springboot.aoc2023.utils
 
+import mpdev.springboot.aoc2023.utils.ListTypes.*
+
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class InputClass(val prefix: String = "", val delimiters: Array<String>, val suffix: String = "")
 
+// this type is used to define the type of collections
+enum class ListTypes { string, int, long, pair }
+
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD)
-annotation class InputField(val fieldId: Int, val delimiter: String = ", ")     // delimiter valid only for List
+annotation class InputField(val fieldId: Int, val delimiter: String = " *, +", val type: ListTypes = string)     // delimiter amd type valid only for List
 
 class InputUtils {
     companion object {
@@ -15,8 +20,8 @@ class InputUtils {
         private var delimiters: Array<String> = arrayOf()
         private var removeSuffix = ""
 
-        // transforms an input line (removes noise) and converts to json string
-        // ready for deserialization to a clazz object
+        // transform an input line (removes noise)
+        // and convert to json string ready for deserialization to a clazz object
         fun toJson(s: String, clazz: Class<*>): String {
             setDelimitersFromClass(clazz)
             val sArray = transform(s).split(FIELD_SEPARATOR)
@@ -64,6 +69,7 @@ class InputUtils {
                 Int::class.java -> """"${toInt(value)}""""
                 Long::class.java -> """"${toLong(value)}""""
                 List::class.java -> toList(value, annotation)
+                Pair::class.java -> toPair(value, annotation)
                 else -> throw AocException("could not recognize field type [${type.simpleName}]")
             }
         }
@@ -92,8 +98,20 @@ class InputUtils {
         }
         private fun toList(s: String, annotation: InputField): String {
             val listDelim = annotation.delimiter
-            return s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"$it"""" }
+            return when (annotation.type) {
+                string, int, long -> s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"$it"""" }
+                pair -> {
+                    val strArr = s.trim().split(Regex(listDelim))
+                    """{ "first": "${strArr[0].trim()}", "second": "${strArr[1].trim()}" }"""
+                }
+            }
         }
+        private fun toPair(s: String, annotation: InputField): String {
+            val listDelim = annotation.delimiter
+            val strArr = s.trim().split(Regex(listDelim))
+            return  """{ "first": "${strArr[0].trim()}", "second": "${strArr[1].trim()}" }"""
+        }
+
 
         // map of field name, index in input stream and type as per annotation in input data class
         data class FieldMapping(val name: String, val indx: Int, val type: Class<*>, val annotation: InputField)

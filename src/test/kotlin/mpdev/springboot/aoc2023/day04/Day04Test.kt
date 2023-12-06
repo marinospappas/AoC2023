@@ -3,7 +3,6 @@ package mpdev.springboot.aoc2023.day04
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.serialization.Card
 import mpdev.springboot.aoc2023.solutions.day04.Day04
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCard
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCardGame
