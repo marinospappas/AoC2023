@@ -53,7 +53,7 @@ class SerializationTest {
         val cubeSet4 = CubeSet(setOf(Pair(4,Cube.red), Pair(12,Cube.green), Pair(3,Cube.blue)))
         val gameMap1 = mapOf(1 to setOf(cubeSet, cubeSet1, cubeSet2),
             2 to setOf(cubeSet3, cubeSet4))
-        val map1Json1 = Json.encodeToString(gameMap1).println()
+        Json.encodeToString(gameMap1).println()
         val inputJason2 = input1.map { it
             .replace("Game ", """""")
             .replace(": ", """:[{"cubes":[{"first":""")

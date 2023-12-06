@@ -1,5 +1,13 @@
 package mpdev.springboot.aoc2023.utils
 
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class InputClass(val prefix: String = "", val delimiters: Array<String>, val suffix: String = "")
+
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FIELD)
+annotation class InputField(val fieldId: Int, val delimiter: String = ", ")     // delimiter valid only for List
+
 class InputUtils {
     companion object {
         private var clazz: Class<*>? = null
@@ -23,7 +31,8 @@ class InputUtils {
             var s1 = s
                 .removePrefix(removePrefix)
                 .removeSuffix(removeSuffix)
-            return if (delimiters.isEmpty()) s1
+            return if (delimiters.isEmpty())
+                s1
             else {
                 delimiters.forEach { d -> s1 = s1.replace(Regex(d), FIELD_SEPARATOR) }
                 s1

@@ -43,7 +43,7 @@ class Day04Test {
         inputLines.map { it.toJson(ScratchCard::class.java) }.also { it.println() }
         // convert input to json, deserialize and print
         Json.decodeFromString<List<ScratchCard>>(
-            inputLines.joinToString(",", "[", "]") {  it.toJson(Card::class.java) }
+            inputLines.joinToString(",", "[", "]") {  it.toJson(ScratchCard::class.java) }
         ).onEach { c -> c.println() }
     }
 
