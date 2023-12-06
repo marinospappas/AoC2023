@@ -1,14 +1,14 @@
 package mpdev.springboot.aoc2023.day04
 
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.solutions.day04.ScratchCardGame.Companion.toJson
+import mpdev.springboot.aoc2023.serialization.Card
 import mpdev.springboot.aoc2023.solutions.day04.Day04
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCard
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCardGame
 import mpdev.springboot.aoc2023.utils.println
+import mpdev.springboot.aoc2023.utils.toJson
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -39,16 +39,12 @@ class Day04Test {
     @Test
     @Order(2)
     fun `Deserializes Input`() {
-        val c1 = ScratchCard(listOf(1,2,3,4,5), listOf(9,10,11,12))
-        val c2 = ScratchCard(listOf(8,9,10,11), listOf(20,21,23,32))
-        val map = mapOf(1 to c1, 2 to c2)
-        Json.encodeToString(map).also { it.println() }
-        val input = listOf( "Card   3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1",
-            "Card  2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19"
-        )
-        val json = input.joinToString(",", "{", "}") { it.toJson() }
-            .also { it.println() }
-        Json.decodeFromString<Map<Int, ScratchCard>>(json).also { it.println() }
+        // generate and print json message from input
+        inputLines.map { it.toJson(ScratchCard::class.java) }.also { it.println() }
+        // convert input to json, deserialize and print
+        Json.decodeFromString<List<ScratchCard>>(
+            inputLines.joinToString(",", "[", "]") {  it.toJson(Card::class.java) }
+        ).onEach { c -> c.println() }
     }
 
     @Test

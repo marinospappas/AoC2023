@@ -7,7 +7,7 @@ import mpdev.springboot.aoc2023.solutions.day02.Cube.*
 
 class CubeGame(input: List<String>) {
 
-    val games = Json.decodeFromString<Map<Int,Set<CubeSet>>>(
+    val games = Json.decodeFromString<Map<Int, Set<CubeSet>>>(
         input.joinToString(",", "{", "}") { it.toJson() }
     )
     val gameCubes = setOf(Pair(12, red), Pair(13, green), Pair(14, blue))
