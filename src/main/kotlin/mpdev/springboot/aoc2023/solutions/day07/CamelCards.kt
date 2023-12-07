@@ -1,5 +1,7 @@
 package mpdev.springboot.aoc2023.solutions.day07
 
+import mpdev.springboot.aoc2023.solutions.day07.CamelCards.Companion.JOKER
+
 class CamelCards(input: List<String>) {
 
     val handsList = input.map {
@@ -13,8 +15,9 @@ class CamelCards(input: List<String>) {
     }
 
     companion object {
-        private val cardStrengthList = listOf("A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2").reversed()
-        val cardStrengthListJoker = listOf("A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J").reversed()
+        const val JOKER = "J"
+        private val cardStrengthList = listOf("A", "K", "Q", JOKER, "T", "9", "8", "7", "6", "5", "4", "3", "2").reversed()
+        val cardStrengthListJoker = listOf("A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", JOKER).reversed()
         private val cardStrength = (cardStrengthList.indices).associateBy { cardStrengthList[it] }
         private val cardStrengthJoker = (cardStrengthListJoker.indices).associateBy { cardStrengthListJoker[it] }
 
@@ -63,11 +66,11 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
         }
 
         private fun checkJoker(hand: Hand, type: HandType): Boolean {
-            if (!hand.cards.contains("J"))
+            if (!hand.cards.contains(JOKER))
                 return checkCondition(hand, type)
             for (i in 1 until CamelCards.cardStrengthListJoker.size) {
                 val c = CamelCards.cardStrengthListJoker[i]
-                val test = Hand(hand.cards.replace(Regex("J"), c))
+                val test = Hand(hand.cards.replace(Regex(JOKER), c))
                 if (checkCondition(test, type))
                     return true
             }
