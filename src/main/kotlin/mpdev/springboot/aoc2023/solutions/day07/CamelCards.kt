@@ -47,7 +47,7 @@ class HandComparator(var joker: Boolean = false): Comparator<Hand> {
 }
 
 enum class HandType(val test: (List<List<Char>>) -> Boolean) {
-    HC({_ -> true}),
+    HC({ _ -> true }),
     OneP({ cards -> cards.maxOf { it.size } == 2  && cards.size == 4 }),
     TwoP({ cards -> cards.maxOf { it.size } == 2 && cards.size == 3 }),
     Three({ cards -> cards.maxOf { it.size } == 3 && cards.size == 3 }),
