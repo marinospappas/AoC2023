@@ -4,7 +4,7 @@ class CamelCards(input: List<String>) {
 
     val handsList = input.map {
         val arr = it.split(Regex(""" |\\t"""))
-        Hand(arr[0], arr[1].toLong().toInt())
+        Hand(arr[0], Integer.parseInt(arr[1]))
     }
 
     fun winnings(joker: Boolean = false): Long {
@@ -14,7 +14,7 @@ class CamelCards(input: List<String>) {
 
     companion object {
         private val cardStrengthList = listOf("A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2").reversed()
-        private val cardStrengthListJoker = listOf("A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J").reversed()
+        val cardStrengthListJoker = listOf("A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J").reversed()
         private val cardStrength = (cardStrengthList.indices).associateBy { cardStrengthList[it] }
         private val cardStrengthJoker = (cardStrengthListJoker.indices).associateBy { cardStrengthListJoker[it] }
 
@@ -28,60 +28,12 @@ class CamelCards(input: List<String>) {
             }
             return 0
         }
-
-        fun isFive(hand: Hand, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, CamelCards::isFive))
-                return true
-            val cards = hand.cards.toCharArray()
-            return cards.distinct().size == 1
-        }
-        fun isFour(hand: Hand, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, CamelCards::isFour))
-                return true
-            val sortedCards = hand.cards.toCharArray().groupBy { it }.values
-            return sortedCards.maxOf { it.size } == 4
-        }
-        fun isFull(hand: Hand, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, CamelCards::isFull))
-                return true
-            val sortedCards = hand.cards.toCharArray().groupBy { it }.values
-            return sortedCards.maxOf { it.size } == 3 && sortedCards.size == 2
-        }
-        fun isThree(hand: Hand, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, CamelCards::isThree))
-                return true
-            val sortedCards = hand.cards.toCharArray().groupBy { it }.values
-            return sortedCards.maxOf { it.size } == 3 && sortedCards.size == 3
-        }
-        fun isTwoPair(hand: Hand, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, CamelCards::isTwoPair))
-                return true
-            val sortedCards = hand.cards.toCharArray().groupBy { it }.values
-            return sortedCards.maxOf { it.size } == 2 && sortedCards.size == 3
-        }
-        fun isOnePair(hand: Hand, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, CamelCards::isOnePair))
-                return true
-            val sortedCards = hand.cards.toCharArray().groupBy { it }.values
-            return sortedCards.maxOf { it.size } == 2 && sortedCards.size == 4
-        }
-        private fun checkJoker(hand: Hand, testHand: (Hand) -> Boolean): Boolean {
-            if (!hand.cards.contains("J"))
-                return testHand(hand)
-            for (i in 1 until cardStrengthListJoker.size) {
-                val c = cardStrengthListJoker[i]
-                val test = Hand(hand.cards.replace(Regex("J"), c))
-                if (testHand(test))
-                    return true
-            }
-            return testHand(hand)
-        }
     }
 }
 
 data class Hand(val cards: String, val bid: Int = 0)
 
-class HandComparator(var joker:Boolean = false): Comparator<Hand> {
+class HandComparator(var joker: Boolean = false): Comparator<Hand> {
     override fun compare(h1: Hand, h2: Hand): Int {
         if (HandType.getType(h1, joker) > HandType.getType(h2, joker))
             return 1
@@ -91,16 +43,35 @@ class HandComparator(var joker:Boolean = false): Comparator<Hand> {
     }
 }
 
-enum class HandType(val test: (Hand, Boolean) -> Boolean) {
-    HC({_,_ -> true}),
-    OneP({h,j -> CamelCards.isOnePair(h,j)}),
-    TwoP({h,j -> CamelCards.isTwoPair(h,j)}),
-    Three({h,j -> CamelCards.isThree(h,j)}),
-    Full({h,j -> CamelCards.isFull(h,j)}),
-    Four({h,j -> CamelCards.isFour(h,j)}),
-    Five({h,j -> CamelCards.isFive(h,j)});
+enum class HandType(val test: (List<List<Char>>) -> Boolean) {
+    HC({_ -> true}),
+    OneP({ cards -> cards.maxOf { it.size } == 2  && cards.size == 4 }),
+    TwoP({ cards -> cards.maxOf { it.size } == 2 && cards.size == 3 }),
+    Three({ cards -> cards.maxOf { it.size } == 3 && cards.size == 3 }),
+    Full({ cards -> cards.maxOf { it.size } == 3 && cards.size == 2 }),
+    Four({ cards -> cards.maxOf { it.size } == 4 }),
+    Five({ cards -> cards.size == 1 });
+
     companion object {
         fun getType(hand: Hand, joker: Boolean = false) =
-            values().reversed().first { it.test(hand, joker) }
+            values().reversed().first { checkCondition(hand, it, joker) }
+
+        private fun checkCondition(hand: Hand, type: HandType, joker: Boolean = false): Boolean {
+            if (joker && checkJoker(hand, type))
+                return true
+            return type.test(hand.cards.toCharArray().groupBy { it }.values.toList())
+        }
+
+        private fun checkJoker(hand: Hand, type: HandType): Boolean {
+            if (!hand.cards.contains("J"))
+                return checkCondition(hand, type)
+            for (i in 1 until CamelCards.cardStrengthListJoker.size) {
+                val c = CamelCards.cardStrengthListJoker[i]
+                val test = Hand(hand.cards.replace(Regex("J"), c))
+                if (checkCondition(test, type))
+                    return true
+            }
+            return checkCondition(hand, type)
+        }
     }
 }
