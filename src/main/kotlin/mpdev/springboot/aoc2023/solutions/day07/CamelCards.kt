@@ -54,7 +54,7 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
 
     companion object {
         fun getType(hand: Hand, joker: Boolean = false) =
-            values().reversed().first { checkCondition(hand, it, joker) }
+            values().reversed().first { type -> checkCondition(hand, type, joker) }
 
         private fun checkCondition(hand: Hand, type: HandType, joker: Boolean = false): Boolean {
             if (joker && checkJoker(hand, type))
