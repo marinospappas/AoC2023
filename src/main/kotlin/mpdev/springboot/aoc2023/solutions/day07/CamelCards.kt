@@ -69,8 +69,7 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
             if (!hand.cards.contains(JOKER))
                 return checkCondition(hand, type)
             for (i in 1 until CamelCards.cardStrengthListJoker.size) {
-                val c = CamelCards.cardStrengthListJoker[i]
-                val test = Hand(hand.cards.replace(Regex("$JOKER"), c.toString()))
+                val test = Hand(hand.cards.replace(Regex("$JOKER"), CamelCards.cardStrengthListJoker[i].toString()))
                 if (checkCondition(test, type))
                     return true
             }
