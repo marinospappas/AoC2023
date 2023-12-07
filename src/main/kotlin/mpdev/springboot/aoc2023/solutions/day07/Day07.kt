@@ -16,27 +16,26 @@ class Day07: PuzzleSolver() {
         setDay()
     }
 
-    var result = 0
-    lateinit var xxxx: Xxxx
+    var result = 0L
+    lateinit var camelCards: CamelCards
 
     override fun initSolver(): Pair<Long,String> {
-        result = 0
         val elapsed = measureTimeMillis {
-
+            camelCards = CamelCards(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-
+            result = camelCards.winnings()
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-
+            result = camelCards.winnings(joker = true)
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

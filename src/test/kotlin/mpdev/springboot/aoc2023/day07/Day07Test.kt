@@ -1,19 +1,12 @@
 package mpdev.springboot.aoc2023.day07
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.solutions.day07.Day07
-import mpdev.springboot.aoc2023.solutions.day07.InputMapped
-import mpdev.springboot.aoc2023.solutions.day07.Xxxx
+import mpdev.springboot.aoc2023.solutions.day07.*
 import mpdev.springboot.aoc2023.utils.println
-import mpdev.springboot.aoc2023.utils.toJson
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import kotlin.system.measureNanoTime
 
 class Day07Test {
 
@@ -36,46 +29,65 @@ class Day07Test {
     }
 
     @Test
-    @Order(2)
-    fun `Deserializes Input`() {
-        // generate and print json message from input
-        inputLines.map { it.toJson(InputMapped::class.java) }.also { it.println() }
-        // convert input to json, deserialize and print
-        Json.decodeFromString<List<InputMapped>>(
-            inputLines.joinToString(",", "[", "]") {  it.toJson(InputMapped::class.java) }
-        ).onEach { c -> c.println() }
+    @Order(3)
+    fun `Reads Input ans sets Hands List`() {
+        val camelCards = CamelCards(inputLines)
+        camelCards.handsList.forEach { it.println() }
+        assertThat(camelCards.handsList.size).isEqualTo(5)
+        assertThat(camelCards.handsList.sumOf { it.bid }).isEqualTo(2180)
     }
 
     @Test
     @Order(3)
-    fun `Reads Input ans sets Cards List`() {
-        val xxxx = Xxxx(inputLines)
-
+    fun `Identifies Type of each Hand`() {
+        val camelCards = CamelCards(inputLines)
+        val expected = listOf(HandType.OneP, HandType.Three, HandType.TwoP, HandType.TwoP, HandType.Three)
+        camelCards.handsList.indices.forEach { i ->
+            val type = HandType.getType(camelCards.handsList[i])
+            println("${camelCards.handsList[i].cards}  $type")
+            assertThat(type).isEqualTo(expected[i])
+        }
     }
 
     @Test
-    @Order(3)
-    fun `Identifies Winning Numbers and Points in a Card`() {
-        val xxxx = Xxxx(inputLines)
-
+    @Order(4)
+    fun `Sorts Hand - no Joker`() {
+        val camelCards = CamelCards(inputLines)
+        val expected = listOf(765, 220, 28, 684, 483)
+        val sorted = camelCards.handsList.sortedWith(HandComparator(false)).onEach { h -> h.println() }
+        assertThat(sorted.map { it.bid }).isEqualTo(expected)
     }
 
     @Test
     @Order(5)
     fun `Solves Part 1`() {
-        assertThat(puzzleSolver.solvePart1().result).isEqualTo("     ")
+        assertThat(puzzleSolver.solvePart1().result).isEqualTo("6440")
     }
 
     @Test
     @Order(6)
-    fun `Identifies Card Copies Won by a Winning Card`() {
-        val xxxx = Xxxx(inputLines)
+    fun `Identifies Type of each Hand with Joker`() {
+        val camelCards = CamelCards(inputLines)
+        val expected = listOf(HandType.OneP, HandType.Four, HandType.TwoP, HandType.Four, HandType.Four)
+        camelCards.handsList.indices.forEach { i ->
+            val type = HandType.getType(camelCards.handsList[i], true)
+            println("${camelCards.handsList[i].cards}  $type")
+            assertThat(type).isEqualTo(expected[i])
+        }
+    }
 
+    @Test
+    @Order(7)
+    fun `Sorts Hand - with Joker`() {
+        val camelCards = CamelCards(inputLines)
+        val expected = listOf(765, 28, 684, 483, 220)
+        val sorted = camelCards.handsList.sortedWith(HandComparator(true)).onEach { h -> h.println() }
+        assertThat(sorted.map { it.bid }).isEqualTo(expected)
     }
 
     @Test
     @Order(8)
     fun `Solves Part 2`() {
-        assertThat(puzzleSolver.solvePart2().result).isEqualTo("      ")
+        assertThat(puzzleSolver.solvePart2().result).isEqualTo("5905")
     }
 }

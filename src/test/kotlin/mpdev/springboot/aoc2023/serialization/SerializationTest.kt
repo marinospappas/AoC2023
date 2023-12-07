@@ -6,6 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.solutions.day02.Cube
 import mpdev.springboot.aoc2023.utils.*
+import mpdev.springboot.aoc2023.utils.ListType.*
 import org.junit.jupiter.api.Test
 
 class SerializationTest {
@@ -69,31 +70,53 @@ class SerializationTest {
     @Test
     fun test2() {
         val input = listOf(
-            "Card  1:41 48 83 86 17|83 86  6 31 17  9 48 53 / 18,alpha",
-            "Card  2:  13 32 20 16 61 | 61 30 68 82 17 32 24 19  / 21,beta",
-            "Card 3:  1 21 53 59   44 | 69 82 63 72 16 21 14  1 / 1,theta",
-            "Card 4: 41 92 73  84 69 | 59 84 76 51 58  5 54 83 / 3 , lambda",
-            "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36  /  85  , epsilon",
-            "Card 678901234567890: 31 18 13 56 72 | 74 77 10 23 35 67 36 11 / 0, pi"
+            "Card  1:41 48 83 86 17|83 86  6 31 17  9 48 53 / 18 alpha",
+            "Card  2:  13 32 20 16 61 | 61 30 68 82 17 32 24 19  / 21 beta",
+            "Card 3:  1 21 53 59   44 | 69 82 63 72 16 21 14  1 / 1 theta",
+            "Card 4: 41 92 73  84 69 | 59 84 76 51 58  5 54 83 / 3 lambda",
+            "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36  /  85 epsilon",
+            "Card 678901234567890: 31 18 13 56 72 | 74 77 10 23 35 67 36 11 / 0 pi"
         )
-        //input.forEach { it.transformInput(Card::class.java).println() }
-        //input.map { it.transformInput(Card::class.java).toJson(Card::class.java) }.forEach { it.println() }
-
         val cardsList = Json.decodeFromString<List<Card>>(
-            input.joinToString(",", "[", "]") {  it.toJson(Card::class.java) }
+            input.joinToString(",", "[", "]") {  it.toJson(Card::class.java) }.also { it.println() }
         )
         cardsList.forEach { println(it) }
+    }
+
+    @Test
+    fun test3() {
+        val input = listOf(
+            "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
+            "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
+            "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+            "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
+            "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
+        )
+        val games = Json.decodeFromString<List<Game>>(
+            input.joinToString(",", "[", "]") { it.toJson(Game::class.java) }.also { it.println() }
+        )
+        games.forEach { println(it) }
     }
 }
 
 
 @Serializable @InputClass("Card", [":", "\\|", "/"])
 data class Card(
-    //Card  1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
-    //      0  1                2
+    //Card  1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 / 35 , lambda
+    //      0  1                2                         3
     @InputField(0) val id: Long,
     @InputField(1, " +") val winning: List<Int>,
     @InputField(2, " +") val numbers: List<String>,
     @InputField(3, " *, *") val check: Pair<Int,String>
 )
 
+
+@Serializable @InputClass("Game", [":"])
+data class Game(
+    //"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
+    //      0  1
+    @InputField(0) val id: Long,
+    @InputField(1, ",|;", pair) val cubeSet: List<Pair<Int,CubeColour>>,
+)
+
+enum class CubeColour { red, green, blue }

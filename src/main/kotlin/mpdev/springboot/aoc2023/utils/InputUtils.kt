@@ -1,17 +1,17 @@
 package mpdev.springboot.aoc2023.utils
 
-import mpdev.springboot.aoc2023.utils.ListTypes.*
+import mpdev.springboot.aoc2023.utils.ListType.*
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class InputClass(val prefix: String = "", val delimiters: Array<String>, val suffix: String = "")
 
 // this type is used to define the type of collections
-enum class ListTypes { string, int, long, pair }
+enum class ListType { string, int, long, pair }
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD)
-annotation class InputField(val fieldId: Int, val delimiter: String = " *, +", val type: ListTypes = string)     // delimiter amd type valid only for List
+annotation class InputField(val fieldId: Int, val delimiter: String = " *, +", val listType: ListType = string)     // delimiter amd type valid only for List
 
 class InputUtils {
     companion object {
@@ -97,18 +97,23 @@ class InputUtils {
             return s.trim().toLong().toString()
         }
         private fun toList(s: String, annotation: InputField): String {
-            val listDelim = annotation.delimiter
-            return when (annotation.type) {
-                string, int, long -> s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"$it"""" }
-                pair -> {
-                    val strArr = s.trim().split(Regex(listDelim))
-                    """{ "first": "${strArr[0].trim()}", "second": "${strArr[1].trim()}" }"""
-                }
-            }
+            return s.trim().split(Regex(annotation.delimiter))
+                .joinToString(", ", "[", "]") { """"${
+                    when (annotation.listType) {
+                        string, int, long -> it
+                        pair -> toPair(it,annotation)
+                    }
+                }"""" }
+
+            //val listDelim = annotation.delimiter
+            //return when (annotation.listType) {
+             //   string, int, long -> s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"$it"""" }
+               // pair -> s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"${toPair(it,annotation)}"""" }
+            //}
         }
         private fun toPair(s: String, annotation: InputField): String {
             val listDelim = annotation.delimiter
-            val strArr = s.trim().split(Regex(listDelim))
+            val strArr = s.trim().split(Regex(" "))
             return  """{ "first": "${strArr[0].trim()}", "second": "${strArr[1].trim()}" }"""
         }
 
