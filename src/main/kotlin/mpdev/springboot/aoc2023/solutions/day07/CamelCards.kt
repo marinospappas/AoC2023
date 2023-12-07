@@ -15,18 +15,18 @@ class CamelCards(input: List<String>) {
     }
 
     companion object {
-        const val JOKER = "J"
-        private val cardStrengthList = listOf("A", "K", "Q", JOKER, "T", "9", "8", "7", "6", "5", "4", "3", "2").reversed()
-        val cardStrengthListJoker = listOf("A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", JOKER).reversed()
+        const val JOKER = 'J'
+        private val cardStrengthList = listOf('A', 'K', 'Q', JOKER, 'T', '9', '8', '7', '6', '5', '4', '3', '2').reversed()
+        val cardStrengthListJoker = listOf('A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', JOKER).reversed()
         private val cardStrength = (cardStrengthList.indices).associateBy { cardStrengthList[it] }
         private val cardStrengthJoker = (cardStrengthListJoker.indices).associateBy { cardStrengthListJoker[it] }
 
         fun cardStrengthCompare(c1: String, c2: String, joker: Boolean = false): Int {
             val strength = if (joker) cardStrengthJoker else cardStrength
             for (i in c1.indices) {
-                if (strength[c1.substring(i,i+1)]!! > strength[c2.substring(i,i+1)]!!)
+                if (strength[c1[i]]!! > strength[c2[i]]!!)
                     return 1
-                if (strength[c1.substring(i,i+1)]!! < strength[c2.substring(i,i+1)]!!)
+                if (strength[c1[i]]!! < strength[c2[i]]!!)
                     return -1
             }
             return 0
@@ -70,7 +70,7 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
                 return checkCondition(hand, type)
             for (i in 1 until CamelCards.cardStrengthListJoker.size) {
                 val c = CamelCards.cardStrengthListJoker[i]
-                val test = Hand(hand.cards.replace(Regex(JOKER), c))
+                val test = Hand(hand.cards.replace(Regex("$JOKER"), c.toString()))
                 if (checkCondition(test, type))
                     return true
             }
