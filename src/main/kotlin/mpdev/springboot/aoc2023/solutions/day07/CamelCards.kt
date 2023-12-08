@@ -1,7 +1,6 @@
 package mpdev.springboot.aoc2023.solutions.day07
 
 import mpdev.springboot.aoc2023.solutions.day07.CamelCards.Companion.JOKER
-import mpdev.springboot.aoc2023.utils.AocException
 
 class CamelCards(input: List<String>) {
 
@@ -67,19 +66,19 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
                 return when (hand.cards.count { it == JOKER }) {
                     4, 5 -> FiveOfaKind
                     3 -> if (groupSizes == setOf(2)) FiveOfaKind else FourOfaKind
-                    2 ->  when (groupSizes) {
+                    2 -> when (groupSizes) {
                         setOf(3) -> FiveOfaKind
                         setOf(2,1) -> FourOfaKind
                         else -> ThreeOfaKind
                     }
-                    1 -> when (groupSizes) {
+                    // 1 Joker
+                    else -> when (groupSizes) {
                         setOf(4) -> FiveOfaKind
                         setOf(3,1) -> FourOfaKind
                         setOf(2,2) -> FullHouse
                         setOf(2,1,1) -> ThreeOfaKind
                         else -> OnePair
                     }
-                    else -> throw AocException("error grouping cards $hand -> $cardsGrouped")
                 }
             }
             return values().reversed().first { type -> type.test(allCardsGrouped) }
