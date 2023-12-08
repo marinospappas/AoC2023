@@ -71,11 +71,6 @@ fun Long.divisors(): Set<Long> {
     return result
 }
 
-fun Long.factors(): Set<Long> {
-    val divisors = this.divisors()
-    return divisors - setOf(divisors.first(), divisors.last())
-}
-
 fun Int.isPrime() = this.toLong().isPrime()
 
 fun Long.isPrime() = this.divisors().size == 2
@@ -98,12 +93,16 @@ fun Long.findFirstDivisor(): Long {
     return 1
 }
 
+fun Set<Int>.gcd() = this.map { it.toLong() }.toSet().gcd().toInt()
+
 fun Set<Long>.gcd(): Long {
     for (i in this.min() downTo 1)
         if (this.all { it % i == 0L })
             return i
     return 1
 }
+
+fun Set<Int>.lcm() = this.map { it.toLong() }.toSet().lcm().toInt()
 
 fun Set<Long>.lcm(): Long {
     val gcd = this.gcd()

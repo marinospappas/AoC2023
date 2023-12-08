@@ -70,7 +70,7 @@ class Day07Test {
     @CsvSource(value = [
         // input values
         "32T3K, OnePair", "T55J5, FourOfaKind", "KK677, TwoPairs", "KTJJT, FourOfaKind", "QQQJA, FourOfaKind",
-        // 4 or 5 Jockers
+        // 4 or 5 Jokers
         "JJJJJ, FiveOfaKind", "JJ2JJ, FiveOfaKind",
         // 3 Jokers
         "3JJ3J, FiveOfaKind", "JJ24J, FourOfaKind",
