@@ -2,6 +2,7 @@ package mpdev.springboot.aoc2023.solutions.day08
 
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
+import mpdev.springboot.aoc2023.utils.lcm
 import org.springframework.stereotype.Component
 import kotlin.system.measureNanoTime
 import kotlin.system.measureTimeMillis
@@ -36,7 +37,7 @@ class Day08: PuzzleSolver() {
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = instructionMap.followStepsConcurrently()
+            result = instructionMap.followStepsConcurrently().toSet().lcm()
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

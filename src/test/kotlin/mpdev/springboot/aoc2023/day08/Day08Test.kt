@@ -3,6 +3,9 @@ package mpdev.springboot.aoc2023.day08
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day08.Day08
 import mpdev.springboot.aoc2023.solutions.day08.InstructionMap
+import mpdev.springboot.aoc2023.utils.gcd
+import mpdev.springboot.aoc2023.utils.lcm
+import mpdev.springboot.aoc2023.utils.primeFactors
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +32,6 @@ class Day08Test {
     fun `Sets Day correctly`() {
         assertThat(puzzleSolver.day).isEqualTo(day)
     }
-
 
     @Test
     @Order(3)
@@ -69,5 +71,13 @@ class Day08Test {
         puzzleSolver.inputData = File("src/test/resources/inputdata/input08_2.txt").readLines()
         puzzleSolver.initSolver()
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("6")
+    }
+
+    @Test
+    fun testx() {
+        setOf(12599,17873,21389,17287,13771,15529L).gcd().println()
+        setOf(12599,17873,21389,17287,13771,15529L).lcm().println()
+        48L.primeFactors().println()
+        180L.primeFactors().println()
     }
 }

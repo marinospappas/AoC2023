@@ -34,7 +34,7 @@ class InstructionMap(input: List<String>) {
         return count
     }
 
-    fun followStepsConcurrently(): Long {
+    fun followStepsConcurrently(): List<Long> {
         val startList = steps.keys.filter { it.last() == 'A' }
         val stepsList = mutableListOf<Long>()
         // find number of steps for each start independently
@@ -42,7 +42,7 @@ class InstructionMap(input: List<String>) {
             stepsList.add(followSteps(start) { s -> s.last() == 'Z' } )
             log.info("{} to ..Z in {} steps", start, stepsList.last())
         }
-        return stepsList.map { it.divisors() }.flatten().distinct().reduce(Long::times)
+        return stepsList
     }
 
     companion object {

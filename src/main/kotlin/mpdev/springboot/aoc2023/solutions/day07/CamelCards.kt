@@ -1,6 +1,7 @@
 package mpdev.springboot.aoc2023.solutions.day07
 
 import mpdev.springboot.aoc2023.solutions.day07.CamelCards.Companion.JOKER
+import mpdev.springboot.aoc2023.utils.AocException
 
 class CamelCards(input: List<String>) {
 
@@ -17,7 +18,7 @@ class CamelCards(input: List<String>) {
     companion object {
         const val JOKER = 'J'
         private val cardStrengthList = listOf('A', 'K', 'Q', JOKER, 'T', '9', '8', '7', '6', '5', '4', '3', '2').reversed()
-        val cardStrengthListJoker = listOf('A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', JOKER).reversed()
+        private val cardStrengthListJoker = listOf('A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', JOKER).reversed()
         private val cardStrength = (cardStrengthList.indices).associateBy { cardStrengthList[it] }
         private val cardStrengthJoker = (cardStrengthListJoker.indices).associateBy { cardStrengthListJoker[it] }
 
@@ -36,12 +37,12 @@ class CamelCards(input: List<String>) {
 
 data class Hand(val cards: String, val bid: Int = 0)
 
-class HandComparator(var joker: Boolean = false): Comparator<Hand> {
+class HandComparator(private var joker: Boolean = false): Comparator<Hand> {
     override fun compare(h1: Hand, h2: Hand): Int {
-        if (HandType.getType(h1, joker) > HandType.getType(h2, joker))
-            return 1
-        if (HandType.getType(h1, joker) < HandType.getType(h2, joker))
-            return -1
+        val t1 = HandType.getType(h1, joker)
+        val t2 = HandType.getType(h2, joker)
+        if (t1 > t2) return 1
+        if (t1 < t2) return -1
         return CamelCards.cardStrengthCompare(h1.cards, h2.cards, joker)
     }
 }
@@ -56,24 +57,31 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
     FiveOfaKind({ cards -> cards.size == 1 });
 
     companion object {
-        fun getType(hand: Hand, joker: Boolean = false) =
-            values().reversed().first { type -> checkCondition(hand, type, joker) }
-
-        private fun checkCondition(hand: Hand, type: HandType, joker: Boolean = false): Boolean {
-            if (joker && checkJoker(hand, type))
-                return true
-            return type.test(hand.cards.toCharArray().groupBy { it }.values.toList())
-        }
-
-        private fun checkJoker(hand: Hand, type: HandType): Boolean {
-            if (!hand.cards.contains(JOKER))
-                return checkCondition(hand, type)
-            for (i in 1 until CamelCards.cardStrengthListJoker.size) {
-                val test = Hand(hand.cards.replace(Regex("$JOKER"), CamelCards.cardStrengthListJoker[i].toString()))
-                if (checkCondition(test, type))
-                    return true
+        fun getType(hand: Hand, joker: Boolean = false): HandType {
+            val allCardsGrouped = hand.cards.toCharArray().groupBy { it }.values.toList().sortedBy { it.size }.reversed()
+            if (joker && hand.cards.contains(JOKER)) {
+                // remove the joker and group the rest cards
+                val cardsGrouped = hand.cards.replace(Regex(JOKER.toString()), "").toCharArray().groupBy { it }.values.toList().sortedBy { it.size }.reversed()
+                val groupSizes = cardsGrouped.map { it.size }.toSet()
+                return when (hand.cards.count { it == JOKER }) {
+                    4, 5 -> FiveOfaKind
+                    3 -> if (groupSizes == setOf(2)) FiveOfaKind else FourOfaKind
+                    2 ->  when (groupSizes) {
+                        setOf(3) -> FiveOfaKind
+                        setOf(2,1) -> FourOfaKind
+                        else -> ThreeOfaKind
+                    }
+                    1 -> when (groupSizes) {
+                        setOf(4) -> FiveOfaKind
+                        setOf(3,1) -> FourOfaKind
+                        setOf(2,2) -> FullHouse
+                        setOf(2,1,1) -> ThreeOfaKind
+                        else -> OnePair
+                    }
+                    else -> throw AocException("error grouping cards $hand -> $cardsGrouped")
+                }
             }
-            return checkCondition(hand, type)
+            return values().reversed().first { type -> type.test(allCardsGrouped) }
         }
     }
 }
