@@ -6,10 +6,12 @@ class CircularList<T>(val data: MutableList<T>) {
 
     fun size() = data.size
 
-    operator fun get(index: Int) = data[index]
+    operator fun get(index: Int) = data[index % data.size]
+
     operator fun set(index: Int, value: T) {
         data[index] = value
     }
+    fun get(index: Long) = data[(index % data.size).toInt()]
 
     fun indexOf(value: T) = data.indexOf(value)
 
@@ -20,7 +22,7 @@ class CircularList<T>(val data: MutableList<T>) {
         curPos = index
     }
 
-    fun incrCurPos(incr: Int) {
+    fun incrCurPos(incr: Int = 1) {
         curPos = (curPos + incr) % data.size
     }
 

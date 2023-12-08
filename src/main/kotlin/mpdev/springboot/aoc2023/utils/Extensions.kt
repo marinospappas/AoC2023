@@ -60,3 +60,30 @@ fun <T>List<T>.pairWith(other: List<T>): List<Pair<T,T>> {
         result.add(Pair(this[indx], other[indx]))
     return result
 }
+
+fun Int.divisors(): Set<Int> {
+    val result = mutableSetOf<Int>()
+    for (i in 1 until this)
+        if (this % i == 0)
+            result.add(i)
+    if (result.size == 1)
+        result.add(this)
+    return result
+}
+
+fun Long.divisors(): Set<Long> {
+    val result = mutableSetOf<Long>()
+    for (i in 1L until this)
+        if (this % i == 0L)
+            result.add(i)
+    if (result.size == 1)
+        result.add(this)
+    return result
+}
+
+fun Int.isPrime() = this.toLong().isPrime()
+
+fun Long.isPrime(): Boolean {
+    val divisors = this.divisors()
+    return divisors.size == 2 && divisors.last() == this
+}

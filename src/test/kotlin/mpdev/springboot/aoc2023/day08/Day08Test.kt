@@ -1,17 +1,14 @@
 package mpdev.springboot.aoc2023.day08
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day08.Day08
-import mpdev.springboot.aoc2023.solutions.day08.Xxxx
+import mpdev.springboot.aoc2023.solutions.day08.InstructionMap
 import mpdev.springboot.aoc2023.utils.println
-import mpdev.springboot.aoc2023.utils.toJson
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class Day08Test {
 
@@ -33,47 +30,44 @@ class Day08Test {
         assertThat(puzzleSolver.day).isEqualTo(day)
     }
 
-   /* @Test
-    @Order(2)
-    fun `Deserializes Input`() {
-        // generate and print json message from input
-        inputLines.map { it.toJson(ScratchCard::class.java) }.also { it.println() }
-        // convert input to json, deserialize and print
-        Json.decodeFromString<List<ScratchCard>>(
-            inputLines.joinToString(",", "[", "]") {  it.toJson(ScratchCard::class.java) }
-        ).onEach { c -> c.println() }
-    }*/
 
     @Test
     @Order(3)
     fun `Reads Input ans sets Cards List`() {
-        val xxxx = Xxxx(inputLines)
-
+        val instructionMap = InstructionMap(inputLines)
+        instructionMap.instructions.println()
+        instructionMap.steps.forEach { it.println() }
+        assertThat(instructionMap.instructions).isEqualTo(listOf('R','L'))
+        assertThat(instructionMap.steps.size).isEqualTo(7)
     }
 
     @Test
     @Order(3)
-    fun `Identifies Winning Numbers and Points in a Card`() {
-        val xxxx = Xxxx(inputLines)
-
+    fun `Follows Instructions and counts Steps`() {
+        val instructionMap = InstructionMap(inputLines)
+        instructionMap.debug = true
+        val steps1 = instructionMap.followSteps("AAA") { s -> s == "ZZZ" }.also { it.println() }
+        assertThat(steps1).isEqualTo(2)
+        val input = File("src/test/resources/inputdata/input08_1.txt").readLines()
+        val instructionMap2 = InstructionMap(input)
+        instructionMap2.debug = true
+        val steps2 = instructionMap2.followSteps("AAA") { s -> s == "ZZZ" }.also { it.println() }
+        assertThat(steps2).isEqualTo(6)
     }
 
     @Test
     @Order(5)
     fun `Solves Part 1`() {
-        assertThat(puzzleSolver.solvePart1().result).isEqualTo("13")
-    }
-
-    @Test
-    @Order(6)
-    fun `Identifies Card Copies Won by a Winning Card`() {
-        val xxxx = Xxxx(inputLines)
-
+        puzzleSolver.inputData = File("src/test/resources/inputdata/input08_1.txt").readLines()
+        puzzleSolver.initSolver()
+        assertThat(puzzleSolver.solvePart1().result).isEqualTo("6")
     }
 
     @Test
     @Order(8)
     fun `Solves Part 2`() {
-        assertThat(puzzleSolver.solvePart2().result).isEqualTo("30")
+        puzzleSolver.inputData = File("src/test/resources/inputdata/input08_2.txt").readLines()
+        puzzleSolver.initSolver()
+        assertThat(puzzleSolver.solvePart2().result).isEqualTo("6")
     }
 }
