@@ -47,13 +47,13 @@ class HandComparator(var joker: Boolean = false): Comparator<Hand> {
 }
 
 enum class HandType(val test: (List<List<Char>>) -> Boolean) {
-    HC({ _ -> true }),
-    OneP({ cards -> cards.maxOf { it.size } == 2  && cards.size == 4 }),
-    TwoP({ cards -> cards.maxOf { it.size } == 2 && cards.size == 3 }),
-    Three({ cards -> cards.maxOf { it.size } == 3 && cards.size == 3 }),
-    Full({ cards -> cards.maxOf { it.size } == 3 && cards.size == 2 }),
-    Four({ cards -> cards.maxOf { it.size } == 4 }),
-    Five({ cards -> cards.size == 1 });
+    HighCard({ _ -> true }),
+    OnePair({ cards -> cards.maxOf { it.size } == 2  && cards.size == 4 }),
+    TwoPairs({ cards -> cards.maxOf { it.size } == 2 && cards.size == 3 }),
+    ThreeOfaKind({ cards -> cards.maxOf { it.size } == 3 && cards.size == 3 }),
+    FullHouse({ cards -> cards.maxOf { it.size } == 3 && cards.size == 2 }),
+    FourOfaKind({ cards -> cards.maxOf { it.size } == 4 }),
+    FiveOfaKind({ cards -> cards.size == 1 });
 
     companion object {
         fun getType(hand: Hand, joker: Boolean = false) =

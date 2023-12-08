@@ -41,7 +41,7 @@ class Day07Test {
     @Order(3)
     fun `Identifies Type of each Hand`() {
         val camelCards = CamelCards(inputLines)
-        val expected = listOf(HandType.OneP, HandType.Three, HandType.TwoP, HandType.TwoP, HandType.Three)
+        val expected = listOf(HandType.OnePair, HandType.ThreeOfaKind, HandType.TwoPairs, HandType.TwoPairs, HandType.ThreeOfaKind)
         camelCards.handsList.indices.forEach { i ->
             val type = HandType.getType(camelCards.handsList[i])
             println("${camelCards.handsList[i].cards}  $type")
@@ -68,7 +68,7 @@ class Day07Test {
     @Order(6)
     fun `Identifies Type of each Hand with Joker`() {
         val camelCards = CamelCards(inputLines)
-        val expected = listOf(HandType.OneP, HandType.Four, HandType.TwoP, HandType.Four, HandType.Four)
+        val expected = listOf(HandType.OnePair, HandType.FourOfaKind, HandType.TwoPairs, HandType.FourOfaKind, HandType.FourOfaKind)
         camelCards.handsList.indices.forEach { i ->
             val type = HandType.getType(camelCards.handsList[i], true)
             println("${camelCards.handsList[i].cards}  $type")
