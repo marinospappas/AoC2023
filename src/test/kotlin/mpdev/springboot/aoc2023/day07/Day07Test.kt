@@ -100,25 +100,4 @@ class Day07Test {
     fun `Solves Part 2`() {
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("5905")
     }
-
-    @Test
-    fun testx() {
-        HandType.getType(Hand("1233J"), true).println()
-
-
-        HandType.getType(Hand("JJAK2"), true).println()
-        HandType.getType(Hand("JJAA2"), true).println()
-
-        HandType.getType(Hand("J2JJK"), true).println()
-        HandType.getType(Hand("JAJJK"), true).println()
-
-        HandType.getType(Hand("JJ2JJ"), true).println()
-        HandType.getType(Hand("J2JJJ"), true).println()
-        HandType.getType(Hand("JJ2JJ"), true).println()
-        HandType.getType(Hand("QJJJT"), true).println()
-        HandType.getType(Hand("JJJJJ"), true).println()
-        HandType.getType(Hand("AKKJJ"), true).println()
-        HandType.getType(Hand("JJJJ2"), true).println()
-        HandComparator().compare(Hand("KK677"), Hand("T55J5")).println()
-    }
 }
