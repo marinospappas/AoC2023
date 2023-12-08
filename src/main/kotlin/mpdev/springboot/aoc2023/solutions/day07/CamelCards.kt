@@ -58,10 +58,11 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
 
     companion object {
         fun getType(hand: Hand, joker: Boolean = false): HandType {
+            // group all cards to list of lists by
             val allCardsGrouped = hand.cards.toCharArray().groupBy { it }.values.toList().sortedBy { it.size }.reversed()
             if (joker && hand.cards.contains(JOKER)) {
-                // remove the joker and group the rest cards
-                val cardsGrouped = hand.cards.replace(Regex(JOKER.toString()), "").toCharArray().groupBy { it }.values.toList().sortedBy { it.size }.reversed()
+                // remove the joker from the grouped cards
+                val cardsGrouped = allCardsGrouped.filterNot { it.first() == JOKER } // hand.cards.replace(Regex(JOKER.toString()), "").toCharArray().groupBy { it }.values.toList().sortedBy { it.size }.reversed()
                 val groupSizes = cardsGrouped.map { it.size }.toSet()
                 return when (hand.cards.count { it == JOKER }) {
                     4, 5 -> FiveOfaKind
