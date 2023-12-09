@@ -1,12 +1,10 @@
 package mpdev.springboot.aoc2023.day08
 
 import mpdev.springboot.aoc2023.input.InputDataReader
+import mpdev.springboot.aoc2023.solutions.day08.AoCInput
 import mpdev.springboot.aoc2023.solutions.day08.Day08
 import mpdev.springboot.aoc2023.solutions.day08.InstructionMap
-import mpdev.springboot.aoc2023.utils.gcd
-import mpdev.springboot.aoc2023.utils.lcm
-import mpdev.springboot.aoc2023.utils.primeFactors
-import mpdev.springboot.aoc2023.utils.println
+import mpdev.springboot.aoc2023.utils.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
@@ -37,6 +35,10 @@ class Day08Test {
     @Order(3)
     fun `Reads Input ans sets Cards List`() {
         val instructionMap = InstructionMap(inputLines)
+        println("input transformed")
+        inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
+        println("input to json")
+        inputLines.stream().skip(2).forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         instructionMap.instructions.println()
         instructionMap.steps.forEach { it.println() }
         assertThat(instructionMap.instructions).isEqualTo(listOf('R','L'))

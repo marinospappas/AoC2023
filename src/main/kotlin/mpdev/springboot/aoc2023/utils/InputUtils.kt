@@ -7,7 +7,7 @@ import mpdev.springboot.aoc2023.utils.ListType.*
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class InputClass(val prefix: String = "", val delimiters: Array<String> = [" "], val suffix: String = "",
-    val ignoreNumLines: Int = 0)
+    val skipLines: Int = 0, val removePatterns: Array<String> = [], val skipEmptyLines: Boolean = true)
 
 // this type is used to define the type of collections
 enum class ListType { string, int, long, pair, list, point }
@@ -28,22 +28,35 @@ class InputUtils(inputClazz: Class<*>) {
     private var removePrefix = ""
     private var delimiters: Array<String> = arrayOf()
     private var removeSuffix = ""
-    private var remove: Array<String> = arrayOf()
-    private var replace: Array<Pair<String,String>> = arrayOf()
+    private var replacePatterns: Array<Pair<String,String>> = arrayOf()
+    private var removePatterns: List<String> = listOf()
+    private var mappings: List<FieldMapping> = listOf()
+    var skipEmptyLines: Boolean = true
+    var skipLines: Int = 0
 
     init {
-        // set the prefix, field delimiters and suffix from the input class annotation
+        // set the prefix, field delimiters and suffix from the input class annotation and other parameters
         if (clazz.isAnnotationPresent(InputClass::class.java)) {
             val delims = clazz.getAnnotation(InputClass::class.java).delimiters
             delimiters = Array(delims.size) { delims[it] }
             removePrefix = clazz.getAnnotation(InputClass::class.java).prefix
             removeSuffix = clazz.getAnnotation(InputClass::class.java).suffix
+            skipLines = clazz.getAnnotation(InputClass::class.java).skipLines
+            removePatterns = clazz.getAnnotation(InputClass::class.java).removePatterns.toList()
+            skipEmptyLines = clazz.getAnnotation(InputClass::class.java).skipEmptyLines
+            mappings = getFieldMappings()
+            if (mappings.size == 1)
+               delimiters = arrayOf("NA-NA-NA-NA-NA-NA-NA")
         }
+        else
+            throw AocException("AoCInput class must be annotated @InputClass")
     }
 
     inline fun <reified T> readAoCInput(input: List<String>): List<T> {
         return Json.decodeFromString(
-            input.joinToString(",", "[", "]") { toJson(it) }
+            input
+                .stream().skip(skipLines.toLong()).toList().filter { !skipEmptyLines || it.isNotEmpty() }
+                .joinToString(",", "[", "]") { toJson(it) }
         )
     }
 
@@ -51,7 +64,6 @@ class InputUtils(inputClazz: Class<*>) {
     // and convert to json string ready for deserialization to a clazz object
     fun toJson(s: String): String {
         val sArray = transform(s).split(FIELD_SEPARATOR)
-        val mappings = getFieldMappings()
         return mappings.indices.joinToString(", ", "{ ", " }") { i ->
             fieldToJson(mappings[i].name, sArray[i], mappings[i].type, mappings[i].annotation)
         }
@@ -62,6 +74,9 @@ class InputUtils(inputClazz: Class<*>) {
         var s1 = s
             .removePrefix(removePrefix)
             .removeSuffix(removeSuffix)
+        if (removePatterns.isNotEmpty())
+            for (pattern in removePatterns)
+                s1 = s1.replace(Regex(pattern), "")
         return if (delimiters.isEmpty())
             s1
         else {

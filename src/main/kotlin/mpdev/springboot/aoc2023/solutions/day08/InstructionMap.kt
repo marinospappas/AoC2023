@@ -1,24 +1,29 @@
 package mpdev.springboot.aoc2023.solutions.day08
 
+import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+@Serializable
+@InputClass(delimiters = ["=", ","], skipLines = 1, removePatterns = ["\\(", "\\)"])
+data class AoCInput(
+    // AAA = (BBB, CCC)
+    // 0      1    2
+    @InputField(0) val start: String,
+    @InputField(1) val left: String,
+    @InputField(2) val right: String
+)
+
 class InstructionMap(input: List<String>) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
-
     var debug = false
-    val instructions: List<Char>
-    val steps: Map<String, Pair<String, String>>
-    val instrList: CircularList<Char>
 
-    init {
-        val (first, second) = processInput(input)
-        instructions = first
-        steps = second
-        instrList = CircularList(instructions.toMutableList())
-    }
+    val instructions: List<Char> = input[0].toCharArray().toList()
+    private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
+    val steps: Map<String, Pair<String, String>> = aocInputList.associate { it.start to Pair(it.left, it.right) }
+    private val instrList: CircularList<Char> = CircularList(instructions.toMutableList())
 
     fun followSteps(start: String, endCondition: (String) -> Boolean): Long {
         var current = start
@@ -46,25 +51,6 @@ class InstructionMap(input: List<String>) {
     }
 
     companion object {
-
         const val LEFT = 'L'
-
-        fun processInput(input: List<String>): Pair<List<Char>, Map<String, Pair<String, String>>> {
-            val stepsMap = mutableMapOf<String, Pair<String, String>>()
-            var instruction = listOf<Char>()
-            var firstLine = true
-            input.filter { it.isNotEmpty() }.forEach { line ->
-                if (firstLine) {
-                    instruction = line.toCharArray().toList()
-                    firstLine = false
-                    return@forEach
-                }
-                // AAA = (BBB, BBB)
-                val match = Regex("""([\dA-Z]+) = \(([\dA-Z]+), ([\dA-Z]+)\)""").find(line)
-                val (key, left, right) = match!!.destructured
-                stepsMap[key] = Pair(left, right)
-            }
-            return Pair(instruction, stepsMap)
-        }
     }
 }

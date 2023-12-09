@@ -1,31 +1,30 @@
-package mpdev.springboot.aoc2023.day09
+package mpdev.springboot.aoc2023.day10
 
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.solutions.day09.AoCInput
-import mpdev.springboot.aoc2023.solutions.day09.Day09
-import mpdev.springboot.aoc2023.solutions.day09.Oasis
+import mpdev.springboot.aoc2023.solutions.day10.AoCInput
+import mpdev.springboot.aoc2023.solutions.day10.Day10
+import mpdev.springboot.aoc2023.solutions.day10.Xxxx
 import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 
-class Day09Test {
+class Day10Test {
 
-    private val day = 9                                     ///////// Update this for a new dayN test
-    private val puzzleSolver = Day09()                      ///////// Update this for a new dayN test
+    private val day = 10                                     ///////// Update this for a new dayN test
+    private val puzzleSolver = Day10()                      ///////// Update this for a new dayN test
     private val inputDataReader = InputDataReader("src/test/resources/inputdata/input")
     private var inputLines: List<String> = inputDataReader.read(day)
-    private lateinit var oasis: Oasis
+    private lateinit var xxxx: Xxxx
 
     @BeforeEach
     fun setup() {
         puzzleSolver.setDay()
         puzzleSolver.inputData = inputLines
         puzzleSolver.initSolver()
-        oasis = Oasis(inputLines)
+        xxxx = Xxxx(inputLines)
     }
 
     @Test
@@ -37,23 +36,19 @@ class Day09Test {
     @Test
     @Order(3)
     fun `Reads Input ans sets `() {
-        oasis.failures.forEach { it.println() }
         println("input transformed")
         inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
         println("input to json")
         inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
-        assertThat(oasis.failures.size).isEqualTo(3)
-        assertTrue(oasis.failures.all { it.size == 6 })
+        //xxxx. .forEach { it.println() }
+        //assertThat(oasis.failures.size).isEqualTo(3)
+        //assertTrue(oasis.failures.all { it.size == 6 })
     }
 
     @Test
     @Order(3)
     fun `Predicts next value`() {
-        val expected = listOf(18L, 28L, 68L)
-        oasis.failures.indices.forEach { i ->
-            val next = oasis.predictNextValue(oasis.failures[i]).also { it.println() }
-            assertThat(next).isEqualTo(expected[i])
-        }
+
     }
 
     @Test
@@ -65,11 +60,7 @@ class Day09Test {
     @Test
     @Order(6)
     fun `Extrapolates previous value`() {
-        val expected = listOf(-3L, 0L, 5L)
-        oasis.failures.indices.forEach { i ->
-            val next = oasis.extrapolatePastValue(oasis.failures[i]).also { it.println() }
-            assertThat(next).isEqualTo(expected[i])
-        }
+
     }
 
     @Test
