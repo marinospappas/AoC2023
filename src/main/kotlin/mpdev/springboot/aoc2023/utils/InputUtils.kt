@@ -98,24 +98,21 @@ class InputUtils {
         }
         private fun toList(s: String, annotation: InputField): String {
             return s.trim().split(Regex(annotation.delimiter))
-                .joinToString(", ", "[", "]") { """"${
+                .joinToString(", ", "[", "]") {
                     when (annotation.listType) {
-                        string, int, long -> it
+                        string, int, long -> """"$it""""
+                        // TODO: need to define delimiter for second level of collection inside the list
                         pair -> toPair(it,annotation)
+                        //list ->
                     }
-                }"""" }
-
-            //val listDelim = annotation.delimiter
-            //return when (annotation.listType) {
-             //   string, int, long -> s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"$it"""" }
-               // pair -> s.trim().split(Regex(listDelim)).joinToString(", ", "[", "]") { """"${toPair(it,annotation)}"""" }
-            //}
+                }
         }
         private fun toPair(s: String, annotation: InputField): String {
             val listDelim = annotation.delimiter
             val strArr = s.trim().split(Regex(" "))
             return  """{ "first": "${strArr[0].trim()}", "second": "${strArr[1].trim()}" }"""
         }
+        // TODO: also support point type
 
 
         // map of field name, index in input stream and type as per annotation in input data class

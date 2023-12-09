@@ -3,7 +3,7 @@ package mpdev.springboot.aoc2023.solutions.day09
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
 import org.springframework.stereotype.Component
-import kotlin.system.measureTimeMillis
+import kotlin.system.measureNanoTime
 
 @Component
 class Day09: PuzzleSolver() {
@@ -16,28 +16,27 @@ class Day09: PuzzleSolver() {
         setDay()
     }
 
-    var result = 0
-    lateinit var xxxx: Xxxx
+    var result = 0L
+    lateinit var oasis: Oasis
 
     override fun initSolver(): Pair<Long,String> {
-        result = 0
-        val elapsed = measureTimeMillis {
-            xxxx = Xxxx(inputData)
+        val elapsed = measureNanoTime {
+            oasis = Oasis(inputData)
         }
-        return Pair(elapsed, "milli-sec")
+        return Pair(elapsed/1000, "micro-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
-        val elapsed = measureTimeMillis {
-            //result =
+        val elapsed = measureNanoTime {
+            result = oasis.failures.sumOf { oasis.predictNextValue(it) }
         }
-        return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
+        return PuzzlePartSolution(1, result.toString(), elapsed/1000, "micro-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
-        val elapsed = measureTimeMillis {
-            //result =
+        val elapsed = measureNanoTime {
+            result = oasis.failures.sumOf { oasis.extrapolatePastValue(it) }
         }
-        return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
+        return PuzzlePartSolution(2, result.toString(), elapsed/1000, "micro-sec")
     }
 }
