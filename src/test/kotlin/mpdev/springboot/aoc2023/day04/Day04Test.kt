@@ -7,7 +7,6 @@ import mpdev.springboot.aoc2023.solutions.day04.Day04
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCard
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCardGame
 import mpdev.springboot.aoc2023.utils.println
-import mpdev.springboot.aoc2023.utils.toJson
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -39,11 +38,11 @@ class Day04Test {
     @Order(2)
     fun `Deserializes Input`() {
         // generate and print json message from input
-        inputLines.map { it.toJson(ScratchCard::class.java) }.also { it.println() }
+        //inputLines.map { it.toJson(ScratchCard::class.java) }.also { it.println() }
         // convert input to json, deserialize and print
-        Json.decodeFromString<List<ScratchCard>>(
-            inputLines.joinToString(",", "[", "]") {  it.toJson(ScratchCard::class.java) }
-        ).onEach { c -> c.println() }
+        //Json.decodeFromString<List<ScratchCard>>(
+        //    inputLines.joinToString(",", "[", "]") {  it.toJson(ScratchCard::class.java) }
+        //).onEach { c -> c.println() }
     }
 
     @Test

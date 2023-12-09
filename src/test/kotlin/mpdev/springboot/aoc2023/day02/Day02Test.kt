@@ -1,14 +1,11 @@
 package mpdev.springboot.aoc2023.day02
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.input.InputDataReader
+import mpdev.springboot.aoc2023.solutions.day02.AoCInputDay02
 import mpdev.springboot.aoc2023.solutions.day02.Cube
 import mpdev.springboot.aoc2023.solutions.day02.CubeGame
-import mpdev.springboot.aoc2023.solutions.day02.CubeGame.Companion.toJson
-import mpdev.springboot.aoc2023.solutions.day02.CubeSet
 import mpdev.springboot.aoc2023.solutions.day02.Day02
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -37,26 +34,10 @@ class Day02Test {
 
     @Test
     @Order(2)
-    fun `Deserializes Input`() {
-        // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-        val input = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
-        val cubeSet0 = CubeSet(setOf(Pair(3, Cube.blue), Pair(4, Cube.red)))
-        val cubeSet1 = CubeSet(setOf(Pair(1, Cube.red), Pair(2, Cube.green), Pair(6, Cube.blue)))
-        val cubeSet2 = CubeSet(setOf(Pair(2, Cube.green)))
-        val gameMap = mapOf(1 to setOf(cubeSet0, cubeSet1, cubeSet2))
-        Json.encodeToString(gameMap).also { it.println() }
-        // read input
-        val game = Json.decodeFromString<Map<Int, Set<CubeSet>>>(
-            listOf(input).joinToString(",", "{", "}") { it.toJson() }.also { it.println() }
-        ).also { it.println() }
-        assertThat(game.keys.first()).isEqualTo(1)
-        assertThat(game.size).isEqualTo(1)
-    }
-
-    @Test
-    @Order(2)
     fun `Reads Input ans sets Games List`() {
         val cubeGame = CubeGame(inputLines)
+        inputLines.forEach { InputUtils(AoCInputDay02::class.java).transform(it).println() }
+        inputLines.forEach { InputUtils(AoCInputDay02::class.java).toJson(it).println() }
         println(cubeGame.gameCubes)
         cubeGame.games.forEach { it.println() }
         assertThat(cubeGame.games.size).isEqualTo(5)

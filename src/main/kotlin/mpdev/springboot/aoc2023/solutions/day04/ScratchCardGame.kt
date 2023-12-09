@@ -6,14 +6,13 @@ import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.utils.AocException
 import mpdev.springboot.aoc2023.utils.InputClass
 import mpdev.springboot.aoc2023.utils.InputField
-import mpdev.springboot.aoc2023.utils.toJson
 import kotlin.math.pow
 
 class ScratchCardGame(input: List<String>) {
 
-    val cardsList = Json.decodeFromString<List<ScratchCard>>(
+    val cardsList = listOf<ScratchCard>() /*Json.decodeFromString<List<ScratchCard>>(
         input.joinToString(",", "[", "]") {  it.toJson(ScratchCard::class.java) }
-    )
+    )*/
     val cards = cardsList.associateBy { it.id }
 
     fun playGamePart1() = cards.values.sumOf { c -> c.points() }
@@ -46,8 +45,8 @@ data class ScratchCard(
     // Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
     //      0  1                1
     @InputField(0) val id: Int,
-    @InputField(1, " +") val winning: List<Int>,
-    @InputField(2, " +") val numbers: List<Int>,
+    @InputField(1, [" +"]) val winning: List<Int>,
+    @InputField(2, [" +"]) val numbers: List<Int>,
     var processed: Boolean = false, var winningCount: Int = -1) {
     init {
         if (winningCount < 0)   // calculate the winning count only if it's not set in the constructor

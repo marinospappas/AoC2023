@@ -2,6 +2,8 @@ package mpdev.springboot.aoc2023.day01
 
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day01.Day01
+import mpdev.springboot.aoc2023.utils.InputUtils
+import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
@@ -30,7 +32,10 @@ class Day01Test {
     @Test
     @Order(2)
     fun `Reads Input ans sets Integer List`() {
-        assertThat(puzzleSolver.inputData.size).isEqualTo(4)
+        inputLines.forEach { InputUtils(Day01.AoCInputDay01::class.java).transform(it).println() }
+        inputLines.forEach { InputUtils(Day01.AoCInputDay01::class.java).toJson(it).println() }
+        puzzleSolver.inputStrings.forEach { it.println() }
+        assertThat(puzzleSolver.inputStrings.size).isEqualTo(4)
     }
 
     @Test
