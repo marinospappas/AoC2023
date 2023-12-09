@@ -6,7 +6,8 @@ import mpdev.springboot.aoc2023.utils.ListType.*
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class InputClass(val prefix: String = "", val delimiters: Array<String> = [" "], val suffix: String = "")
+annotation class InputClass(val prefix: String = "", val delimiters: Array<String> = [" "], val suffix: String = "",
+    val ignoreNumLines: Int = 0)
 
 // this type is used to define the type of collections
 enum class ListType { string, int, long, pair, list, point }

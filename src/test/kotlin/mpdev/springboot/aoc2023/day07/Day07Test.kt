@@ -2,6 +2,7 @@ package mpdev.springboot.aoc2023.day07
 
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day07.*
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -34,6 +35,10 @@ class Day07Test {
     @Order(3)
     fun `Reads Input ans sets Hands List`() {
         val camelCards = CamelCards(inputLines)
+        println("input transformed")
+        inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
+        println("input to json")
+        inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         camelCards.handsList.forEach { it.println() }
         assertThat(camelCards.handsList.size).isEqualTo(5)
         assertThat(camelCards.handsList.sumOf { it.bid }).isEqualTo(2180)

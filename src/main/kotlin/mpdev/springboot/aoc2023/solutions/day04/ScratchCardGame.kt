@@ -41,7 +41,7 @@ class ScratchCardGame(input: List<String>) {
 @InputClass(prefix = "Card", delimiters = [":", "\\|"])
 data class AoCInput(
     // Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
-    //      0  1                1
+    //      0  1                2
     @InputField(0) val id: String,
     @InputField(1, delimiters = [" +"]) val winning: List<Int>,
     @InputField(2, delimiters = [" +"]) val numbers: List<Int>
