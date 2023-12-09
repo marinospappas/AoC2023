@@ -22,14 +22,14 @@ class Day01: PuzzleSolver() {
     }
 
     var result = 0
-    private lateinit var aocInputList: List<AoCInputDay01>
+    private lateinit var aocInputList: List<AoCInput>
     lateinit var inputStrings: List<String>
 
 
     override fun initSolver(): Pair<Long,String> {
         result = 0
         val elapsed = measureNanoTime {
-            aocInputList = InputUtils(AoCInputDay01::class.java).readAoCInput(inputData)
+            aocInputList = InputUtils(AoCInput::class.java).readAoCInput(inputData)
             inputStrings = aocInputList.map { it.s }
         }
         return Pair(elapsed/1000, "micro-sec")
@@ -58,7 +58,7 @@ class Day01: PuzzleSolver() {
 
     @Serializable
     @InputClass
-    data class AoCInputDay01(
+    data class AoCInput(
         @InputField(0)  val s: String
     )
 }

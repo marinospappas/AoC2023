@@ -32,8 +32,8 @@ class Day01Test {
     @Test
     @Order(2)
     fun `Reads Input ans sets Integer List`() {
-        inputLines.forEach { InputUtils(Day01.AoCInputDay01::class.java).transform(it).println() }
-        inputLines.forEach { InputUtils(Day01.AoCInputDay01::class.java).toJson(it).println() }
+        inputLines.forEach { InputUtils(Day01.AoCInput::class.java).transform(it).println() }
+        inputLines.forEach { InputUtils(Day01.AoCInput::class.java).toJson(it).println() }
         puzzleSolver.inputStrings.forEach { it.println() }
         assertThat(puzzleSolver.inputStrings.size).isEqualTo(4)
     }

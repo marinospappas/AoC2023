@@ -1,10 +1,7 @@
 package mpdev.springboot.aoc2023.day02
 
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.solutions.day02.AoCInputDay02
-import mpdev.springboot.aoc2023.solutions.day02.Cube
-import mpdev.springboot.aoc2023.solutions.day02.CubeGame
-import mpdev.springboot.aoc2023.solutions.day02.Day02
+import mpdev.springboot.aoc2023.solutions.day02.*
 import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
@@ -36,8 +33,10 @@ class Day02Test {
     @Order(2)
     fun `Reads Input ans sets Games List`() {
         val cubeGame = CubeGame(inputLines)
-        inputLines.forEach { InputUtils(AoCInputDay02::class.java).transform(it).println() }
-        inputLines.forEach { InputUtils(AoCInputDay02::class.java).toJson(it).println() }
+        println("input transformed")
+        inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
+        println("input to json")
+        inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         println(cubeGame.gameCubes)
         cubeGame.games.forEach { it.println() }
         assertThat(cubeGame.games.size).isEqualTo(5)

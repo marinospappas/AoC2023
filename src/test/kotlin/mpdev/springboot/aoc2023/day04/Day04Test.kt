@@ -1,11 +1,10 @@
 package mpdev.springboot.aoc2023.day04
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.input.InputDataReader
+import mpdev.springboot.aoc2023.solutions.day04.AoCInput
 import mpdev.springboot.aoc2023.solutions.day04.Day04
-import mpdev.springboot.aoc2023.solutions.day04.ScratchCard
 import mpdev.springboot.aoc2023.solutions.day04.ScratchCardGame
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -35,20 +34,13 @@ class Day04Test {
     }
 
     @Test
-    @Order(2)
-    fun `Deserializes Input`() {
-        // generate and print json message from input
-        //inputLines.map { it.toJson(ScratchCard::class.java) }.also { it.println() }
-        // convert input to json, deserialize and print
-        //Json.decodeFromString<List<ScratchCard>>(
-        //    inputLines.joinToString(",", "[", "]") {  it.toJson(ScratchCard::class.java) }
-        //).onEach { c -> c.println() }
-    }
-
-    @Test
     @Order(3)
-    fun `Reads Input ans sets Cards List`() {
+    fun `Reads Input and sets Cards List`() {
         val scratchCardGame = ScratchCardGame(inputLines)
+        println("input transformed")
+        inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
+        println("input to json")
+        inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         scratchCardGame.cards.forEach { it.println()}
         assertThat(scratchCardGame.cards.size).isEqualTo(6)
         assertThat(scratchCardGame.cards.keys).isEqualTo(setOf(1,2,3,4,5,6))

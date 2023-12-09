@@ -9,7 +9,7 @@ import mpdev.springboot.aoc2023.utils.InputUtils
 
 class CubeGame(input: List<String>) {
 
-    private var aocInputList: List<AoCInputDay02> = InputUtils(AoCInputDay02::class.java).readAoCInput(input)
+    private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
     val games: Map<Int, Set<CubeSet>> = aocInputList.map { Pair(it.id, it.cubeList.map { cList -> CubeSet(cList.toSet()) }.toSet())  }
         .associate { it.first to it.second }
     val gameCubes = setOf(Pair(12, red), Pair(13, green), Pair(14, blue))
@@ -27,7 +27,7 @@ class CubeGame(input: List<String>) {
 
 @Serializable
 @InputClass(delimiters = [":"], prefix = "Game")
-data class AoCInputDay02(
+data class AoCInput(
     @InputField(0) val id: Int,
     @InputField(1, delimiters = [";", ",", " "], listType = [list, pair]) val cubeList: List<List<Pair<Int,Cube>>>
 )
