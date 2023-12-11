@@ -45,7 +45,7 @@ class Day11Test {
     @Test
     @Order(3)
     fun `Expands universe by factor 2`() {
-        universe.expand(2)
+        universe.expandBy2()
         universe.grid.print()
         universe.grid.getMinMaxXY().println()
         assertThat(universe.grid.getDimensions()).isEqualTo(Pair(13L,12L))
@@ -54,7 +54,8 @@ class Day11Test {
     @Test
     @Order(4)
     fun `Measures Distances after Expansion(2)`() {
-        universe.expand(2)
+        universe.expandBy2()
+        universe.grid.print()
         val distances = universe.measureDistances().also { it.println() }
         distances.sum().println()
         assertThat(distances.size).isEqualTo(36)
