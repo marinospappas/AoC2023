@@ -60,12 +60,12 @@ class Day10Test {
         pipeNetwork.grid.print()
         pipeNetwork.findLoop()
         var count = pipeNetwork.findPointsInsideLoop().also { it.println() }
-        //assertThat(count).isEqualTo(4)
+        assertThat(count).isEqualTo(4)
         pipeNetwork = PipeNetwork(File("src/test/resources/inputdata/input10_3.txt").readLines())
         pipeNetwork.grid.print()
         pipeNetwork.findLoop()
         count = pipeNetwork.findPointsInsideLoop().also { it.println() }
-        //assertThat(count).isEqualTo(4)
+        assertThat(count).isEqualTo(8)
     }
 
     @Test

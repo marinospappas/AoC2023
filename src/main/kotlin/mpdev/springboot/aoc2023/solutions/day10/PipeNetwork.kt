@@ -4,7 +4,6 @@ import mpdev.springboot.aoc2023.utils.GridUtils.Direction
 import mpdev.springboot.aoc2023.utils.GridUtils.Direction.*
 import mpdev.springboot.aoc2023.solutions.day10.LineSegment.*
 import mpdev.springboot.aoc2023.utils.Grid
-import mpdev.springboot.aoc2023.utils.GridUtils.isInsideArea
 import mpdev.springboot.aoc2023.utils.Point
 
 class PipeNetwork(input: List<String>) {
@@ -50,57 +49,71 @@ class PipeNetwork(input: List<String>) {
             return null
         var nextPoint: Point = p
         var nextDirection: Direction = direction
-        when (direction) {
-            UP -> {
-                when (grid.getDataPoint(p)) {
-                    Vertical -> { nextPoint = p + Point(0,-1) }
-                    TopRight -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
-                    TopLeft -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
-                    else -> return null
-                }
-            }
-            DOWN -> {
-                when (grid.getDataPoint(p)) {
-                    Vertical -> { nextPoint = p + Point(0,1) }
-                    BottomRight -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
-                    BottomLeft -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
-                    else -> return null
-                }
-            }
-            LEFT -> {
-                when (grid.getDataPoint(p)) {
-                    Horizontal -> { nextPoint = p + Point(-1,0) }
-                    BottomLeft -> { nextPoint = p + Point(0,-1); nextDirection = UP }
-                    TopLeft -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
-                    else -> return null
-                }
-            }
-            RIGHT -> {
-                when (grid.getDataPoint(p)) {
-                    Horizontal -> { nextPoint = p + Point(1,0) }
-                    BottomRight -> { nextPoint = p + Point(0,-1); nextDirection = UP }
-                    TopRight -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
-                    else -> return null
-                }
-            }
+        when {
+            direction == UP && grid.getDataPoint(p) == Vertical -> { nextPoint = p + Point(0,-1); nextDirection = UP }
+            direction == UP && grid.getDataPoint(p) == TopRight -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
+            direction == UP && grid.getDataPoint(p) == TopLeft -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
+
+            direction == DOWN && grid.getDataPoint(p) == Vertical -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
+            direction == DOWN && grid.getDataPoint(p) == BottomRight -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
+            direction == DOWN && grid.getDataPoint(p) == BottomLeft -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
+
+            direction == LEFT && grid.getDataPoint(p) == Horizontal -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
+            direction == LEFT && grid.getDataPoint(p) == BottomLeft -> { nextPoint = p + Point(0,-1); nextDirection = UP }
+            direction == LEFT && grid.getDataPoint(p) == TopLeft -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
+
+            direction == RIGHT && grid.getDataPoint(p) == Horizontal -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
+            direction == RIGHT && grid.getDataPoint(p) == BottomRight -> { nextPoint = p + Point(0,-1); nextDirection = UP }
+            direction == RIGHT && grid.getDataPoint(p) == TopRight -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
         }
         return if (grid.isInsideGrid(nextPoint)) Pair(nextPoint, nextDirection) else null
     }
 
-    fun identifyStartDatum(): LineSegment = Vertical
+    fun identifyStartDatum(): LineSegment {
+        val valueBefore = loop.last().second
+        val valueAfter = loop[1].second
+        val pointBefore = loop.last().first
+        val pointAfter = loop[1].first
+        if (valueBefore == Vertical && setOf(Vertical,TopRight,TopLeft).contains(valueAfter))
+            return Vertical
+        if (valueAfter == Vertical && setOf(Vertical,BottomLeft,BottomRight).contains(valueBefore))
+            return Vertical
+        if (valueBefore == Horizontal && setOf(Vertical,TopRight,BottomRight).contains(valueAfter))
+            return Horizontal
+        if (valueAfter == Horizontal && setOf(Vertical,TopLeft,BottomLeft).contains(valueBefore))
+            return Horizontal
+
+        if (valueBefore == Vertical && valueAfter == Horizontal) {
+            if (pointAfter.x > pointBefore.x)
+                return TopLeft
+            else
+                return TopRight
+        }
+        if (valueBefore == Horizontal && valueAfter == Vertical) {
+            if (pointAfter.x > pointBefore.x)
+                return BottomRight
+            else
+                return TopLeft
+        }
+        return EMPTY
+    }
 
     fun findPointsInsideLoop(): Int {
         loop[0] = Pair(loop[0].first, identifyStartDatum())
         val auxGrid = Grid(loop.associate { it.first to it.second }, LineSegment.mapper)
         val (minx, maxx, miny, maxy) = auxGrid.getMinMaxXY()
         var count = 0
-        for (x in minx..maxx)
-            for (y in miny .. maxy) {
-                if (loop.map { it.first }.contains(Point(x,y)))
-                    continue
-                if(isInsideArea(auxGrid,Point(x,y), setOf(Vertical, BottomLeft, BottomRight)))
-                    ++count
+        for (y in miny..maxy) {
+            var countCrossings = 0
+            for (x in minx..maxx) {
+                val point = Point(x, y)
+                if (listOf(Vertical, BottomLeft, BottomRight).contains(auxGrid.getDataPoint(point)))
+                    ++countCrossings
+                else
+                    if (!loop.map { it.first }.contains(point) && countCrossings % 2 == 1)
+                        ++count
             }
+        }
         return count
     }
 }
