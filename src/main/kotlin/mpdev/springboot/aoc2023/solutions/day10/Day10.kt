@@ -17,11 +17,11 @@ class Day10: PuzzleSolver() {
     }
 
     var result = 0L
-    lateinit var xxxx: Xxxx
+    lateinit var pipeNetwork: PipeNetwork
 
     override fun initSolver(): Pair<Long,String> {
         val elapsed = measureNanoTime {
-            xxxx = Xxxx(inputData)
+            pipeNetwork = PipeNetwork(inputData)
         }
         return Pair(elapsed/1000, "micro-sec")
     }

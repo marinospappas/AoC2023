@@ -1,16 +1,16 @@
 package mpdev.springboot.aoc2023.utils
 
-open class Grid<T>(inputGridVisual: List<String> = emptyList(),
-                   private val mapper: Map<Char,T>,
-                   private val border: Int = 1,
-                   private val defaultChar: Char = '.',
-                   private val defaultSize: Pair<Int,Int> = Pair(-1,-1)) {
+open class GridL<T>(inputGridVisual: List<String> = emptyList(),
+                    private val mapper: Map<Char,T>,
+                    private val border: Int = 1,
+                    private val defaultChar: Char = '.',
+                    private val defaultSize: Pair<Long,Long> = Pair(-1,-1)) {
 
-    protected var data = mutableMapOf<Point,T>()
-    protected var maxX: Int = 0
-    protected var maxY: Int = 0
-    protected var minX: Int = 0
-    protected var minY: Int = 0
+    protected var data = mutableMapOf<PointL,T>()
+    protected var maxX: Long = 0
+    protected var maxY: Long = 0
+    protected var minX: Long = 0
+    protected var minY: Long = 0
     protected var DEFAULT_CHAR: Char
 
     init {
@@ -21,19 +21,19 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
         DEFAULT_CHAR = defaultChar
     }
 
-    constructor(gridData: Map<Point,T>, mapper: Map<Char,T>, border: Int = 1, defaultChar: Char = '.', defaultSize: Pair<Int,Int> = Pair(-1,-1)):
+    constructor(gridData: Map<PointL,T>, mapper: Map<Char,T>, border: Int = 1, defaultChar: Char = '.', defaultSize: Pair<Long,Long> = Pair(-1,-1)):
             this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
         data = gridData.toMutableMap()
         updateXYDimensions(border)
     }
 
-    constructor(inputGridXY: Set<String>, mapper: Map<Char,T>, border: Int = 1, defaultChar: Char = '.', defaultSize: Pair<Int,Int> = Pair(-1,-1)):
+    constructor(inputGridXY: Set<String>, mapper: Map<Char,T>, border: Int = 1, defaultChar: Char = '.', defaultSize: Pair<Long,Long> = Pair(-1,-1)):
             this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
         processInputXY(inputGridXY)
         updateXYDimensions(border)
     }
 
-    constructor(inputGridXY: Array<Point>, mapper: Map<Char,T>, border: Int = 1, defaultChar: Char = '.', defaultSize: Pair<Int,Int> = Pair(-1,-1)):
+    constructor(inputGridXY: Array<PointL>, mapper: Map<Char,T>, border: Int = 1, defaultChar: Char = '.', defaultSize: Pair<Long,Long> = Pair(-1,-1)):
             this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
         processInputXY(inputGridXY)
         updateXYDimensions(border)
@@ -58,19 +58,19 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
     }
 
     fun getDataPoints() = data.toMap()
-    open fun getDataPoint(p: Point) = data[p]
-    open fun setDataPoint(p: Point, t: T) {
+    open fun getDataPoint(p: PointL) = data[p]
+    open fun setDataPoint(p: PointL, t: T) {
         data[p] = t
     }
-    open fun removeDataPoint(p: Point) {
+    open fun removeDataPoint(p: PointL) {
         data.remove(p)
     }
 
-    fun getAdjacentArea(p: Point): Set<Point> {
-        val area = mutableSetOf<Point>()
+    fun getAdjacentArea(p: PointL): Set<PointL> {
+        val area = mutableSetOf<PointL>()
         val value = data[p] ?: return area
-        val visited = mutableSetOf<Point>()
-        val queue = ArrayDeque<Point>().also { q -> q.add(p) }
+        val visited = mutableSetOf<PointL>()
+        val queue = ArrayDeque<PointL>().also { q -> q.add(p) }
         while (queue.isNotEmpty()) {
             val point = queue.removeFirst().also { visited.add(it) }
             area.add(point)
@@ -83,27 +83,19 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
     }
 
     fun getDimensions() = Pair(maxX-minX+1, maxY-minY+1)
-    fun getMinMaxXY() = FourComponents(minX, maxX, minY, maxY)
+    fun getMinMaxXY() = FourComponentsL(minX, maxX, minY, maxY)
     fun countOf(item: T) = data.values.count { it == item }
 
-    fun firstPoint() = Point(minX,minY)
+    fun firstPoint() = PointL(minX,minY)
 
-    fun nextPoint(p: Point) = if (p.x < maxX) p + Point(1,0) else Point(minX,p.y+1)
+    fun nextPoint(p: PointL) = if (p.x < maxX) p + PointL(1,0) else PointL(minX,p.y+1)
 
-    fun isInsideGrid(p: Point) = p.x in minX..maxX && p.y in minY..maxY
+    open fun isInsideGrid(p: PointL) = p.x in minX..maxX && p.y in minY..maxY
+    open fun isOnEdge(p: PointL) = p.x == minX || p.x == maxX || p.y == minY || p.y == maxY
 
     open fun updateDimensions() {
         updateXYDimensions(border)
     }
-
-    // mapping of a column or a row to int by interpreting the co-ordinates as bit positions
-    fun mapRowToInt(n: Int, predicate: (T) -> Boolean = { true }) =
-        data.filter { e -> predicate(e.value) && e.key.y == n }.map { e -> bitToInt[e.key.x] }
-            .fold(0) { acc, i -> acc + i }
-
-    fun mapColToInt(n: Int, predicate: (T) -> Boolean = { true }) =
-        data.filter { e -> predicate(e.value) && e.key.x == n }.map { e -> bitToInt[e.key.y] }
-            .fold(0) { acc, i -> acc + i }
 
     companion object {
         val allCharsDefMapper = (' '..'~').associateWith { it }
@@ -116,12 +108,12 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
         input.indices.forEach { y ->
             input[y].indices.forEach { x ->
                 if (mapper[input[y][x]] != null)
-                    data[Point(x, y)] = mapper[input[y][x]]!!
+                    data[PointL(x.toLong(), y.toLong())] = mapper[input[y][x]]!!
             }
         }
     }
 
-    private fun processInputXY(input: Array<Point>) {
+    private fun processInputXY(input: Array<PointL>) {
         input.forEach { p ->
             data[p] = mapper.values.first()
         }
@@ -130,13 +122,13 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
     private fun processInputXY(input: Set<String>) {
         input.forEach { s ->
             val (x, y) = s.split(",")
-            data[Point(x.trim().toInt(), y.trim().toInt())] = mapper.values.first()
+            data[PointL(x.trim().toLong(), y.trim().toLong())] = mapper.values.first()
         }
     }
 
     private fun data2Grid(): Array<CharArray> {
-        val grid: Array<CharArray> = Array(maxY-minY+1) { CharArray(maxX-minX+1) { DEFAULT_CHAR } }
-        data.forEach { (pos, item) -> grid[pos.y - minY][pos.x - minX] = map2Char(item) }
+        val grid: Array<CharArray> = Array((maxY-minY+1).toInt()) { CharArray((maxX-minX+1).toInt()) { DEFAULT_CHAR } }
+        data.forEach { (pos, item) -> grid[(pos.y - minY).toInt()][(pos.x - minX).toInt()] = map2Char(item) }
         return grid
     }
 
@@ -166,4 +158,4 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
 
 }
 
-data class FourComponents(val x1: Int, val x2: Int, val x3: Int, val x4: Int)
+data class FourComponentsL(val x1: Long, val x2: Long, val x3: Long, val x4: Long)

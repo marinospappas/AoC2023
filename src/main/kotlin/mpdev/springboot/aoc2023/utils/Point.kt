@@ -31,6 +31,8 @@ data class Point(var x: Int, var y: Int): Comparable<Point> {
             listOf(Point(x-1,y), Point(x,y-1), Point(x+1,y), Point(x,y+1)))
             .toTypedArray()
 
+    fun adjacentCardinal() = adjacent(false)
+
     fun manhattan(other: Point): Int =
         abs(this.x - other.x) + abs(this.y - other.y)
     override fun toString() = "Point($x,$y)"
