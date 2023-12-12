@@ -26,7 +26,7 @@ class CubeGame(input: List<String>) {
 }
 
 @Serializable
-@InputClass(delimiters = [":"], prefix = "Game")
+@InputClass(delimiters = [":"], removePatterns = ["Game"])
 data class AoCInput(
     @InputField(0) val id: Int,
     @InputField(1, delimiters = [";", ",", " "], listType = [list, pair]) val cubeList: List<List<Pair<Int,Cube>>>

@@ -100,7 +100,7 @@ class SerializationTest {
 }
 
 
-@Serializable @InputClass("Card", [":", "\\|", "/"])
+@Serializable @InputClass(removePatterns = ["Card"], delimiters =  [":", "\\|", "/"])
 data class Card(
     //Card  1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 / 35 , lambda
     //      0  1                2                         3
@@ -111,7 +111,7 @@ data class Card(
 )
 
 
-@Serializable @InputClass("Game", [":"])
+@Serializable @InputClass(removePatterns = ["Game"], delimiters =  [":"])
 data class Game(
     //"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
     //      0  1

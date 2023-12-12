@@ -4,10 +4,19 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mpdev.springboot.aoc2023.utils.ListType.*
 
+/**
+ * Annotation for the class that will receive the input
+ * attributes:
+ *      delimiters: a series of delimiters to separate the fields in each line
+ *      remove patterns a series of Regex that will be removed from each line
+ *      skip lines: skip n lines from the beginning of the stream
+ *      skip empty lines: if true, ignore empty lines
+ *
+ */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class InputClass(val prefix: String = "", val delimiters: Array<String> = [" "], val suffix: String = "",
-    val skipLines: Int = 0, val removePatterns: Array<String> = [], val skipEmptyLines: Boolean = true)
+annotation class InputClass(val delimiters: Array<String> = [" "], val removePatterns: Array<String> = [],
+    val skipLines: Int = 0, val skipEmptyLines: Boolean = true)
 
 // this type is used to define the type of collections
 enum class ListType { string, int, long, pair, list, point }
@@ -25,9 +34,7 @@ class InputUtils(inputClazz: Class<*>) {
     }
 
     var clazz: Class<*> = inputClazz
-    private var removePrefix = ""
     private var delimiters: Array<String> = arrayOf()
-    private var removeSuffix = ""
     private var replacePatterns: Array<Pair<String,String>> = arrayOf()
     private var removePatterns: List<String> = listOf()
     private var mappings: List<FieldMapping> = listOf()
@@ -39,8 +46,6 @@ class InputUtils(inputClazz: Class<*>) {
         if (clazz.isAnnotationPresent(InputClass::class.java)) {
             val delims = clazz.getAnnotation(InputClass::class.java).delimiters
             delimiters = Array(delims.size) { delims[it] }
-            removePrefix = clazz.getAnnotation(InputClass::class.java).prefix
-            removeSuffix = clazz.getAnnotation(InputClass::class.java).suffix
             skipLines = clazz.getAnnotation(InputClass::class.java).skipLines
             removePatterns = clazz.getAnnotation(InputClass::class.java).removePatterns.toList()
             skipEmptyLines = clazz.getAnnotation(InputClass::class.java).skipEmptyLines
@@ -72,8 +77,9 @@ class InputUtils(inputClazz: Class<*>) {
     // remove noise from input string and convert it to list of values
     fun transform(s: String): String {
         var s1 = s
-            .removePrefix(removePrefix)
-            .removeSuffix(removeSuffix)
+        if (removePatterns.isNotEmpty())
+            for (pattern in removePatterns)
+                s1 = s.replace(Regex(pattern), "")
         if (removePatterns.isNotEmpty())
             for (pattern in removePatterns)
                 s1 = s1.replace(Regex(pattern), "")

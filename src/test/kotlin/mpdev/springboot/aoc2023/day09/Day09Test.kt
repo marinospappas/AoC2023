@@ -36,7 +36,7 @@ class Day09Test {
 
     @Test
     @Order(3)
-    fun `Reads Input ans sets `() {
+    fun `Reads Input ans sets Failures data`() {
         oasis.failures.forEach { it.println() }
         println("input transformed")
         inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
