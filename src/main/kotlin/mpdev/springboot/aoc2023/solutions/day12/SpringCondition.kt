@@ -18,7 +18,7 @@ data class AoCInput(
 class SpringCondition(input: List<String>) {
 
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
-    val records = aocInputList.map { Pair(it.s.replace(Regex("""\."""),"1").replace(Regex("""#"""),"0"), it.numList) }
+    val records: List<Pair<String,List<Int>>> = aocInputList.map { Pair(it.s.replace(Regex("""\."""),"1").replace(Regex("""#"""),"0"), it.numList) }
 
     fun groupsToPattern(listLen: List<Int>): Regex {
         val regex = listLen.map { "0".repeat(it) }.joinToString("1+")
