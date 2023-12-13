@@ -2,7 +2,9 @@ package mpdev.springboot.aoc2023.day05
 
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day05.Almanac
+import mpdev.springboot.aoc2023.solutions.day05.AoCInput
 import mpdev.springboot.aoc2023.solutions.day05.Day05
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -15,12 +17,14 @@ class Day05Test {
     private val puzzleSolver = Day05()                      ///////// Update this for a new dayN test
     private val inputDataReader = InputDataReader("src/test/resources/inputdata/input")
     private var inputLines: List<String> = inputDataReader.read(day)
+    //private lateinit var almanac: Almanac
 
     @BeforeEach
     fun setup() {
         puzzleSolver.setDay()
         puzzleSolver.inputData = inputLines
-        puzzleSolver.initSolver()
+        //almanac = Almanac(inputLines)
+        //puzzleSolver.initSolver()
     }
 
     @Test
@@ -32,13 +36,16 @@ class Day05Test {
     @Test
     @Order(2)
     fun `Reads Input ans sets Mappings`() {
-        val almanac = Almanac(inputLines)
+        println("input transformed")
+        inputLines.filter { it.isNotEmpty() }.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
+        println("input to json")
+        inputLines.filter { it.isNotEmpty() }.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         println("seeds list")
-        almanac.seedsList.println()
-        Almanac.State.values().forEach { state ->
-            println(state)
-            almanac.maps[state]?.forEach { it.println() }
-        }
+        //almanac.seedsList.println()
+        //Almanac.State.values().forEach { state ->
+        //    println(state)
+        //    almanac.maps[state]?.forEach { it.println() }
+        //}
     }
 
     @Test

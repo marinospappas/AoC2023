@@ -2,24 +2,25 @@ package mpdev.springboot.aoc2023.solutions.day05
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.solutions.day05.Almanac.State.*
-import mpdev.springboot.aoc2023.solutions.day09.AoCInput
-import mpdev.springboot.aoc2023.utils.AocInClass
-import mpdev.springboot.aoc2023.utils.AocInField
-import mpdev.springboot.aoc2023.utils.InputUtils
+import mpdev.springboot.aoc2023.utils.*
 import kotlin.math.max
 import kotlin.math.min
 
 @Serializable
-@AocInClass
+@AocInClass(delimiters = [","])
+@AocInRetainValues(patterns = ["""^(.+) map:"""])
+@AocInReplacePatterns(patterns = ["seeds:", """^"""], replace = ["seeds,", "$1:"])
+@AocInRemovePatterns(patterns = [""""^.+ map:"""])
 data class AoCInput(
-    // 0 3 6 9 12 15
-    // 0
-    @AocInField(0, delimiters = [" "]) val values: List<Long>
+    // seeds: 79 14 55 13
+    // 0      1
+    @AocInField(0) val mapId: String,
+    @AocInField(1, delimiters = [" "]) val values: List<Long>
 )
 
 class Almanac(input: List<String>) {
 
-    private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
+    //private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
     val seedsList = mutableListOf<Long>()
     val maps = mutableMapOf<State, MutableList<Pair<LongRange, Long>>>()
 

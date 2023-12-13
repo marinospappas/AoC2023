@@ -2,6 +2,7 @@ package mpdev.springboot.aoc2023.utils
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import mpdev.springboot.aoc2023.solutions.dayxxexample.Claim
 import mpdev.springboot.aoc2023.utils.ListType.*
 
 /**
@@ -63,7 +64,8 @@ class InputUtils(inputClazz: Class<*>) {
     private var delimiters: Array<String> = arrayOf()
     private var replacePatterns: List<Pair<String,String>> = listOf()
     private var removePatterns: List<String> = listOf()
-    private var retainValues: List<String> = listOf()
+    private var retainPatterns: List<String> = listOf()
+    private var retainedValues: Array<String> = emptyArray()
 
     private var mappings: List<FieldMapping> = listOf()
     var skipEmptyLines: Boolean = true
@@ -96,14 +98,15 @@ class InputUtils(inputClazz: Class<*>) {
             replacePatterns = replaceList
         }
         if (clazz.isAnnotationPresent(AocInRetainValues::class.java)) {
-            retainValues = clazz.getAnnotation(AocInRetainValues::class.java).patterns.toList()
+            retainPatterns = clazz.getAnnotation(AocInRetainValues::class.java).patterns.toList()
+            retainedValues = Array(retainPatterns.size){""}
         }
     }
 
     inline fun <reified T> readAoCInput(input: List<String>): List<T> {
         return Json.decodeFromString(
             input
-                .stream().skip(skipLines.toLong()).toList().filter { !skipEmptyLines || it.isNotEmpty() }
+                .stream().skip(skipLines.toLong()).toList().filterNot { skipEmptyLines && it.isEmpty() }
                 .joinToString(",", "[", "]") { toJson(it) }
         )
     }
@@ -120,13 +123,31 @@ class InputUtils(inputClazz: Class<*>) {
     // remove noise from input string and convert it to list of values
     fun transform(s: String): String {
         var s1 = s
+        for (i in retainPatterns.indices) {
+            val pattern = retainPatterns[i]
+            val match = Regex(pattern).find(s1)
+            try {
+                val (value) = match!!.destructured
+                retainedValues[i] = value
+            } catch (ignore: Exception) {}
+        }
         for (pattern in removePatterns)
-            s1 = s.replace(Regex(pattern), "")
+            s1 = s1.replace(Regex(pattern), "")
         for (i in replacePatterns.indices) {
-            var pattern = replacePatterns[i].first
-            if (pattern.contains("$1"))
-                pattern = pattern.replace("$1", retainValues[0])
-            s1 = s1.replace(Regex(pattern), replacePatterns[i].second)
+            var replacement = replacePatterns[i].second
+            if (replacement.contains(Regex("""\$\d"""))) {
+                var retainedPatternIndex = ""
+                val match = Regex("""\$(\d)""").find(s1)
+                try {
+                    val (value) = match!!.destructured
+                    retainedPatternIndex = value
+                    replacement = replacement.replace("$$value", retainedValues[Integer.parseInt(value)-1])
+                } catch (ignore: Exception) {
+                    replacement = replacement.replace("\$1", "")
+                }
+            }
+            else
+                s1 = s1.replace(Regex(replacePatterns[i].first), replacement)
         }
         return if (delimiters.isEmpty())
             s1
