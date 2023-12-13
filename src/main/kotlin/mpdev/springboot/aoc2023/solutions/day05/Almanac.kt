@@ -9,8 +9,8 @@ import kotlin.math.min
 @Serializable
 @AocInClass(delimiters = [","])
 @AocInRetainValues(patterns = ["""^(.+) map:"""])
-@AocInReplacePatterns(patterns = ["seeds:", """^"""], replace = ["seeds,", "$1:"])
-@AocInRemovePatterns(patterns = [""""^.+ map:"""])
+@AocInReplacePatterns(patterns = ["seeds:", """^[^s]"""], replace = ["seeds,", "$1,"])
+@AocInRemovePatterns(patterns = ["""^.+ map:"""])
 data class AoCInput(
     // seeds: 79 14 55 13
     // 0      1

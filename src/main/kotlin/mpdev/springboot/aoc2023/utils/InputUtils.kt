@@ -2,7 +2,6 @@ package mpdev.springboot.aoc2023.utils
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import mpdev.springboot.aoc2023.solutions.dayxxexample.Claim
 import mpdev.springboot.aoc2023.utils.ListType.*
 
 /**
@@ -59,17 +58,16 @@ class InputUtils(inputClazz: Class<*>) {
 
     companion object {
         const val FIELD_SEPARATOR = "££££"
+        private var retainedValues: Array<String> = emptyArray()
+        var skipEmptyLines: Boolean = true
+        var skipLines: Int = 0
     }
     private var clazz: Class<*> = inputClazz
     private var delimiters: Array<String> = arrayOf()
-    private var replacePatterns: List<Pair<String,String>> = listOf()
+    private var replacePatterns: List<Pair<String, String>> = listOf()
     private var removePatterns: List<String> = listOf()
     private var retainPatterns: List<String> = listOf()
-    private var retainedValues: Array<String> = emptyArray()
-
     private var mappings: List<FieldMapping> = listOf()
-    var skipEmptyLines: Boolean = true
-    var skipLines: Int = 0
 
     init {
         // set the prefix, field delimiters and suffix from the input class annotation and other parameters
@@ -99,14 +97,17 @@ class InputUtils(inputClazz: Class<*>) {
         }
         if (clazz.isAnnotationPresent(AocInRetainValues::class.java)) {
             retainPatterns = clazz.getAnnotation(AocInRetainValues::class.java).patterns.toList()
-            retainedValues = Array(retainPatterns.size){""}
+            if (retainedValues.isEmpty())
+                retainedValues = Array(retainPatterns.size){""}
         }
     }
 
     inline fun <reified T> readAoCInput(input: List<String>): List<T> {
         return Json.decodeFromString(
             input
-                .stream().skip(skipLines.toLong()).toList().filterNot { skipEmptyLines && it.isEmpty() }
+                .stream().skip(skipLines.toLong()).toList()
+                .map { transform(it) }
+                .filterNot { skipEmptyLines && it.isEmpty() }
                 .joinToString(",", "[", "]") { toJson(it) }
         )
     }
@@ -114,7 +115,7 @@ class InputUtils(inputClazz: Class<*>) {
     // transform an input line (removes noise)
     // and convert to json string ready for deserialization to a clazz object
     fun toJson(s: String): String {
-        val sArray = transform(s).split(FIELD_SEPARATOR)
+        val sArray = s.split(FIELD_SEPARATOR)
         return mappings.indices.joinToString(", ", "{ ", " }") { i ->
             fieldToJson(mappings[i].name, sArray[i], mappings[i].type, mappings[i].annotation)
         }
@@ -134,17 +135,16 @@ class InputUtils(inputClazz: Class<*>) {
         for (pattern in removePatterns)
             s1 = s1.replace(Regex(pattern), "")
         for (i in replacePatterns.indices) {
+            if (s1.isEmpty())
+                break
             var replacement = replacePatterns[i].second
             if (replacement.contains(Regex("""\$\d"""))) {
-                var retainedPatternIndex = ""
-                val match = Regex("""\$(\d)""").find(s1)
+                val match = Regex(""".*\$(\d).*""").find(replacement)
                 try {
                     val (value) = match!!.destructured
-                    retainedPatternIndex = value
                     replacement = replacement.replace("$$value", retainedValues[Integer.parseInt(value)-1])
-                } catch (ignore: Exception) {
-                    replacement = replacement.replace("\$1", "")
-                }
+                    s1 = s1.replace(Regex(replacePatterns[i].first), replacement)
+                } catch (ignore: Exception) {}
             }
             else
                 s1 = s1.replace(Regex(replacePatterns[i].first), replacement)
