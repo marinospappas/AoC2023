@@ -1,18 +1,18 @@
 package mpdev.springboot.aoc2023.solutions.day12
 
 import kotlinx.serialization.Serializable
-import mpdev.springboot.aoc2023.utils.InputClass
-import mpdev.springboot.aoc2023.utils.InputField
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
 import mpdev.springboot.aoc2023.utils.InputUtils
 import kotlin.math.pow
 
 @Serializable
-@InputClass
+@AocInClass
 data class AoCInput(
     // ???.### 1,1,3
     // 0       1
-    @InputField(0) val s: String,
-    @InputField(1, delimiters = [","]) val numList: List<Int>
+    @AocInField(0) val s: String,
+    @AocInField(1, delimiters = [","]) val numList: List<Int>
 )
 
 class SpringCondition(input: List<String>) {

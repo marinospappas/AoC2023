@@ -2,8 +2,8 @@ package mpdev.springboot.aoc2023.solutions.day04
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.AocException
-import mpdev.springboot.aoc2023.utils.InputClass
-import mpdev.springboot.aoc2023.utils.InputField
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
 import mpdev.springboot.aoc2023.utils.InputUtils
 import kotlin.math.pow
 
@@ -38,13 +38,13 @@ class ScratchCardGame(input: List<String>) {
 }
 
 @Serializable
-@InputClass(removePatterns = ["Card"], delimiters = [":", "\\|"])
+@AocInClass(removePatterns = ["Card"], delimiters = [":", "\\|"])
 data class AoCInput(
     // Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
     //      0  1                2
-    @InputField(0) val id: String,
-    @InputField(1, delimiters = [" +"]) val winning: List<Int>,
-    @InputField(2, delimiters = [" +"]) val numbers: List<Int>
+    @AocInField(0) val id: String,
+    @AocInField(1, delimiters = [" +"]) val winning: List<Int>,
+    @AocInField(2, delimiters = [" +"]) val numbers: List<Int>
 )
 
 data class ScratchCard(val id: Int, val winning: List<Int>, val numbers: List<Int>,

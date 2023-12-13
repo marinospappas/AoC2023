@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
 import mpdev.springboot.aoc2023.utils.AocException
-import mpdev.springboot.aoc2023.utils.InputClass
-import mpdev.springboot.aoc2023.utils.InputField
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
 import mpdev.springboot.aoc2023.utils.InputUtils
 import org.springframework.stereotype.Component
 import kotlin.system.measureNanoTime
@@ -57,8 +57,8 @@ class Day01: PuzzleSolver() {
     }
 
     @Serializable
-    @InputClass
+    @AocInClass
     data class AoCInput(
-        @InputField(0)  val s: String
+        @AocInField(0)  val s: String
     )
 }

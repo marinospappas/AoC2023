@@ -6,13 +6,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @Serializable
-@InputClass(delimiters = ["=", ","], skipLines = 1, removePatterns = ["\\(", "\\)"])
+@AocInClass(delimiters = ["=", ","], skipLines = 1, removePatterns = ["\\(", "\\)"])
 data class AoCInput(
     // AAA = (BBB, CCC)
     // 0      1    2
-    @InputField(0) val start: String,
-    @InputField(1) val left: String,
-    @InputField(2) val right: String
+    @AocInField(0) val start: String,
+    @AocInField(1) val left: String,
+    @AocInField(2) val right: String
 )
 
 class InstructionMap(input: List<String>) {

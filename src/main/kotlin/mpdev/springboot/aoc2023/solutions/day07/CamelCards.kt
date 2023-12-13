@@ -2,8 +2,8 @@ package mpdev.springboot.aoc2023.solutions.day07
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.solutions.day07.CamelCards.Companion.JOKER
-import mpdev.springboot.aoc2023.utils.InputClass
-import mpdev.springboot.aoc2023.utils.InputField
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
 import mpdev.springboot.aoc2023.utils.InputUtils
 
 class CamelCards(input: List<String>) {
@@ -89,10 +89,10 @@ enum class HandType(val test: (List<List<Char>>) -> Boolean) {
 }
 
 @Serializable
-@InputClass(delimiters = [" "])
+@AocInClass(delimiters = [" "])
 data class AoCInput(
     // 32T3K 765
     // 0     1
-    @InputField(0) val cards: String,
-    @InputField(1) val bid: Int
+    @AocInField(0) val cards: String,
+    @AocInField(1) val bid: Int
 )

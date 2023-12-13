@@ -100,23 +100,23 @@ class SerializationTest {
 }
 
 
-@Serializable @InputClass(removePatterns = ["Card"], delimiters =  [":", "\\|", "/"])
+@Serializable @AocInClass(removePatterns = ["Card"], delimiters =  [":", "\\|", "/"])
 data class Card(
     //Card  1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 / 35 , lambda
     //      0  1                2                         3
-    @InputField(0) val id: Long,
-    @InputField(1, [" +"]) val winning: List<Int>,
-    @InputField(2, [" +"]) val numbers: List<String>,
-    @InputField(3, [" *, *"]) val check: Pair<Int,String>
+    @AocInField(0) val id: Long,
+    @AocInField(1, [" +"]) val winning: List<Int>,
+    @AocInField(2, [" +"]) val numbers: List<String>,
+    @AocInField(3, [" *, *"]) val check: Pair<Int,String>
 )
 
 
-@Serializable @InputClass(removePatterns = ["Game"], delimiters =  [":"])
+@Serializable @AocInClass(removePatterns = ["Game"], delimiters =  [":"])
 data class Game(
     //"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
     //      0  1
-    @InputField(0) val id: Long,
-    @InputField(1, [",|;"], [pair]) val cubeSet: List<Pair<Int,CubeColour>>,
+    @AocInField(0) val id: Long,
+    @AocInField(1, [",|;"], [pair]) val cubeSet: List<Pair<Int,CubeColour>>,
 )
 
 enum class CubeColour { red, green, blue }

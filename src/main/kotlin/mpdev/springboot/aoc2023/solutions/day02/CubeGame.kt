@@ -3,8 +3,8 @@ package mpdev.springboot.aoc2023.solutions.day02
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.solutions.day02.Cube.*
 import mpdev.springboot.aoc2023.utils.ListType.*
-import mpdev.springboot.aoc2023.utils.InputClass
-import mpdev.springboot.aoc2023.utils.InputField
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
 import mpdev.springboot.aoc2023.utils.InputUtils
 
 class CubeGame(input: List<String>) {
@@ -26,10 +26,10 @@ class CubeGame(input: List<String>) {
 }
 
 @Serializable
-@InputClass(delimiters = [":"], removePatterns = ["Game"])
+@AocInClass(delimiters = [":"], removePatterns = ["Game"])
 data class AoCInput(
-    @InputField(0) val id: Int,
-    @InputField(1, delimiters = [";", ",", " "], listType = [list, pair]) val cubeList: List<List<Pair<Int,Cube>>>
+    @AocInField(0) val id: Int,
+    @AocInField(1, delimiters = [";", ",", " "], listType = [list, pair]) val cubeList: List<List<Pair<Int,Cube>>>
 )
 
 data class CubeSet(val cubes: Set<Pair<Int,Cube>> = setOf())

@@ -1,16 +1,16 @@
 package mpdev.springboot.aoc2023.solutions.day09
 
 import kotlinx.serialization.Serializable
-import mpdev.springboot.aoc2023.utils.InputClass
-import mpdev.springboot.aoc2023.utils.InputField
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
 import mpdev.springboot.aoc2023.utils.InputUtils
 
 @Serializable
-@InputClass
+@AocInClass
 data class AoCInput(
     // 0 3 6 9 12 15
     // 0
-    @InputField(0, delimiters = [" "]) val values: List<Long>
+    @AocInField(0, delimiters = [" "]) val values: List<Long>
 )
 
 class Oasis(input: List<String>) {

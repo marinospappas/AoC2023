@@ -16,26 +16,31 @@ class Day13: PuzzleSolver() {
         setDay()
     }
 
-    var result = 0L
-    lateinit var xxxx: Xxxx
+    var result = 0
+    lateinit var mirror: Mirror
 
     override fun initSolver(): Pair<Long,String> {
         val elapsed = measureTimeMillis {
-            xxxx = Xxxx(inputData)
+            mirror = Mirror(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            //result =
+            mirror = Mirror(inputData)
+            mirror.reflections.forEach { mirror.checkReflection(it, mirror::listCompare1) }
+            result = mirror.reflections.fold(0)
+            { acc, r -> acc + r.reflLine * (if (r.reflType == ReflectionType.H) 100 else 1) }
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            //result =
+            mirror.reflections.forEach { mirror.checkReflection(it, mirror::listCompare2) }
+            result = mirror.reflections.fold(0)
+            { acc, r -> acc + r.reflLine * (if (r.reflType == ReflectionType.H) 100 else 1) }
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

@@ -8,22 +8,49 @@ import mpdev.springboot.aoc2023.utils.ListType.*
  * Annotation for the class that will receive the input
  * attributes:
  *      delimiters: a series of delimiters to separate the fields in each line
- *      remove patterns a series of Regex that will be removed from each line
  *      skip lines: skip n lines from the beginning of the stream
  *      skip empty lines: if true, ignore empty lines
- *
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class InputClass(val delimiters: Array<String> = [" "], val removePatterns: Array<String> = [],
-    val skipLines: Int = 0, val skipEmptyLines: Boolean = true)
+annotation class AocInClass(val delimiters: Array<String> = [" "], val removePatterns: Array<String> = [],
+                            val skipLines: Int = 0, val skipEmptyLines: Boolean = true)
+
+/**
+ * List of patterns to be replaced with the patterns of the second list
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class AocInReplacePatterns(val patterns: Array<String> = [], val replace: Array<String> = [])
+
+/**
+ * List of patterns to be removed
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class AocInRemovePatterns(val patterns: Array<String> = [])
+
+/**
+ * Strings that match any of the patterns will be retained and can be accessed in replacement patterns
+ * as &1, &2, ... in order they are listed
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class AocInRetainValues(val patterns: Array<String> = [])
+
 
 // this type is used to define the type of collections
 enum class ListType { string, int, long, pair, list, point }
 
+/**
+ * Annotation for each input field
+ * attributes:
+ *      field id:
+ *      delimiters: a series of delimiters to separate the fields in each line
+ */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD)
-annotation class InputField(val fieldId: Int, val delimiters:  Array<String> = [","],
+annotation class AocInField(val fieldId: Int, val delimiters:  Array<String> = [","],
                             val listType: Array<ListType> = [string])
                             // list type and delimiter 0 valid only for List, delimiters 1 and above valid only for list of collection
 
@@ -32,29 +59,45 @@ class InputUtils(inputClazz: Class<*>) {
     companion object {
         const val FIELD_SEPARATOR = "££££"
     }
-
-    var clazz: Class<*> = inputClazz
+    private var clazz: Class<*> = inputClazz
     private var delimiters: Array<String> = arrayOf()
-    private var replacePatterns: Array<Pair<String,String>> = arrayOf()
+    private var replacePatterns: List<Pair<String,String>> = listOf()
     private var removePatterns: List<String> = listOf()
+    private var retainValues: List<String> = listOf()
+
     private var mappings: List<FieldMapping> = listOf()
     var skipEmptyLines: Boolean = true
     var skipLines: Int = 0
 
     init {
         // set the prefix, field delimiters and suffix from the input class annotation and other parameters
-        if (clazz.isAnnotationPresent(InputClass::class.java)) {
-            val delims = clazz.getAnnotation(InputClass::class.java).delimiters
+        if (clazz.isAnnotationPresent(AocInClass::class.java)) {
+            val delims = clazz.getAnnotation(AocInClass::class.java).delimiters
             delimiters = Array(delims.size) { delims[it] }
-            skipLines = clazz.getAnnotation(InputClass::class.java).skipLines
-            removePatterns = clazz.getAnnotation(InputClass::class.java).removePatterns.toList()
-            skipEmptyLines = clazz.getAnnotation(InputClass::class.java).skipEmptyLines
+            skipLines = clazz.getAnnotation(AocInClass::class.java).skipLines
+            removePatterns = clazz.getAnnotation(AocInClass::class.java).removePatterns.toList()
+            skipEmptyLines = clazz.getAnnotation(AocInClass::class.java).skipEmptyLines
             mappings = getFieldMappings()
             if (mappings.size == 1)
                delimiters = arrayOf("NA-NA-NA-NA-NA-NA-NA")
         }
         else
             throw AocException("AoCInput class must be annotated @InputClass")
+        if (clazz.isAnnotationPresent(AocInRemovePatterns::class.java)) {
+            removePatterns = clazz.getAnnotation(AocInRemovePatterns::class.java).patterns.toList()
+        }
+        if (clazz.isAnnotationPresent(AocInReplacePatterns::class.java)) {
+            val replaceList = mutableListOf<Pair<String,String>>()
+            for (i in clazz.getAnnotation(AocInReplacePatterns::class.java).patterns.indices)
+                replaceList.add(Pair(
+                    clazz.getAnnotation(AocInReplacePatterns::class.java).patterns[i],
+                    clazz.getAnnotation(AocInReplacePatterns::class.java).replace[i]
+                ))
+            replacePatterns = replaceList
+        }
+        if (clazz.isAnnotationPresent(AocInRetainValues::class.java)) {
+            retainValues = clazz.getAnnotation(AocInRetainValues::class.java).patterns.toList()
+        }
     }
 
     inline fun <reified T> readAoCInput(input: List<String>): List<T> {
@@ -77,12 +120,14 @@ class InputUtils(inputClazz: Class<*>) {
     // remove noise from input string and convert it to list of values
     fun transform(s: String): String {
         var s1 = s
-        if (removePatterns.isNotEmpty())
-            for (pattern in removePatterns)
-                s1 = s.replace(Regex(pattern), "")
-        if (removePatterns.isNotEmpty())
-            for (pattern in removePatterns)
-                s1 = s1.replace(Regex(pattern), "")
+        for (pattern in removePatterns)
+            s1 = s.replace(Regex(pattern), "")
+        for (i in replacePatterns.indices) {
+            var pattern = replacePatterns[i].first
+            if (pattern.contains("$1"))
+                pattern = pattern.replace("$1", retainValues[0])
+            s1 = s1.replace(Regex(pattern), replacePatterns[i].second)
+        }
         return if (delimiters.isEmpty())
             s1
         else {
@@ -92,7 +137,7 @@ class InputUtils(inputClazz: Class<*>) {
     }
 
     // convert  field to json format "name": value
-    private fun fieldToJson(name: String, value: String, type: Class<*>, annotation: InputField): String {
+    private fun fieldToJson(name: String, value: String, type: Class<*>, annotation: AocInField): String {
         var result = ""
         result += """"$name": """
         result += getFieldValueForJson(value, type, annotation)
@@ -100,7 +145,7 @@ class InputUtils(inputClazz: Class<*>) {
     }
 
     // get the value of a field as json-friendly string
-    private fun getFieldValueForJson(value: String, type: Class<*>, annotation: InputField): String {
+    private fun getFieldValueForJson(value: String, type: Class<*>, annotation: AocInField): String {
         return when (type) {
             String::class.java -> """"${toString(value)}""""
             Int::class.java -> """"${toInt(value)}""""
@@ -116,8 +161,8 @@ class InputUtils(inputClazz: Class<*>) {
     private fun getFieldMappings(): List<FieldMapping> {
         val fieldMapppings = mutableListOf<FieldMapping>()
         clazz.declaredFields.forEach { f ->
-            if (f.isAnnotationPresent(InputField::class.java)) {
-                val annotation = f.getAnnotation(InputField::class.java)
+            if (f.isAnnotationPresent(AocInField::class.java)) {
+                val annotation = f.getAnnotation(AocInField::class.java)
                 fieldMapppings.add(FieldMapping(f.name, annotation.fieldId, f.type, annotation))
             }
         }
@@ -134,7 +179,7 @@ class InputUtils(inputClazz: Class<*>) {
     private fun toLong(s: String): String {
         return s.trim().toLong().toString()
     }
-    private fun toList(s: String, annotation: InputField, level: Int): String {
+    private fun toList(s: String, annotation: AocInField, level: Int): String {
         return s.trim().split(Regex(annotation.delimiters[level]))
             .joinToString(", ", "[", "]") {
                 when (annotation.listType[level]) {
@@ -155,6 +200,6 @@ class InputUtils(inputClazz: Class<*>) {
     }
 
     // map of field name, index in input stream and type as per annotation in input data class
-    data class FieldMapping(val name: String, val indx: Int, val type: Class<*>, val annotation: InputField)
+    data class FieldMapping(val name: String, val indx: Int, val type: Class<*>, val annotation: AocInField)
 
 }
