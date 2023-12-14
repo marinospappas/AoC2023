@@ -84,8 +84,8 @@ class Day14Test {
         val (first, second, list) = reflectorDish.findRepeatCycle()
         println("start $first, next $second")
         println("results: $list")
-        assertThat(first).isEqualTo(97)
-        assertThat(second).isEqualTo(104)
+        assertThat(first).isEqualTo(195)
+        assertThat(second).isEqualTo(202)
     }
 
 

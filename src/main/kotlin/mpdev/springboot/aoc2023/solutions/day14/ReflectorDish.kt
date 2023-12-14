@@ -2,10 +2,13 @@ package mpdev.springboot.aoc2023.solutions.day14
 
 import mpdev.springboot.aoc2023.utils.*
 import mpdev.springboot.aoc2023.utils.GridUtils.Direction.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 
 class ReflectorDish(input: List<String>) {
 
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
     val grid = Grid(input, Rock.mapper, 0)
 
     fun calculateLoadUp(): Int {
@@ -21,7 +24,7 @@ class ReflectorDish(input: List<String>) {
     }
 
     private val MAX_CYCLE_TRIES = 400
-    private val CYCLE_SETTLE_COUNT = 100
+    private val CYCLE_SETTLE_COUNT = 200
 
     fun findRepeatCycle(): Triple<Int,Int,List<Int>> {
         val resultsList = mutableListOf<Int>()
@@ -36,7 +39,7 @@ class ReflectorDish(input: List<String>) {
                 }
             resultsList.add(result)
         }
-        return Triple(-1, -1, emptyList())
+        throw AocException("did not identify repeat cycle")
     }
 
     private fun checkCycle(list: List<Int>): Boolean {
@@ -46,6 +49,7 @@ class ReflectorDish(input: List<String>) {
                 indices.add(i)
         val cycle = indices[1] - indices[0]
         return (1 .. indices.lastIndex).all { indices[it] - indices[it-1] == cycle }
+            .also { if (it) log.info("cycle identified: start: {} repeats every {}, verified {} cycles", indices[0], cycle, indices.count()-1 ) }
     }
 
     fun rollAllUp() {
@@ -68,15 +72,21 @@ class ReflectorDish(input: List<String>) {
     }
 
     private fun rollSphere(start: Point, direction: GridUtils.Direction = UP) {
-        when (direction) {
-            UP -> rollSphereUp(start)
-            LEFT -> rollSphereLeft(start)
-            DOWN -> rollSphereDown(start)
-            RIGHT -> rollSphereRight(start)
+        val newPosition =
+            when (direction) {
+                UP -> rollSphereUp(start)
+                LEFT -> rollSphereLeft(start)
+                DOWN -> rollSphereDown(start)
+                RIGHT -> rollSphereRight(start)
+            }
+        if (newPosition != start) {
+            grid.setDataPoint(newPosition, grid.getDataPoint(start)!!)
+            grid.removeDataPoint(start)
         }
     }
 
-    private fun rollSphereUp(start: Point) {
+    // TODO refactor the below 4 functions to make them less verbose
+    private fun rollSphereUp(start: Point): Point {
         val miny = grid.getMinMaxXY().x3
         var newY = start.y
         for (y in newY downTo miny + 1) {
@@ -84,13 +94,10 @@ class ReflectorDish(input: List<String>) {
                 break
             --newY
         }
-        if (newY != start.y) {
-            grid.setDataPoint(Point(start.x, newY), grid.getDataPoint(start)!!)
-            grid.removeDataPoint(start)
-        }
+        return Point(start.x, newY)
     }
 
-    private fun rollSphereLeft(start: Point) {
+    private fun rollSphereLeft(start: Point): Point {
         val minx = grid.getMinMaxXY().x1
         var newX = start.x
         for (x in newX downTo minx + 1) {
@@ -98,13 +105,10 @@ class ReflectorDish(input: List<String>) {
                 break
             --newX
         }
-        if (newX != start.x) {
-            grid.setDataPoint(Point(newX, start.y), grid.getDataPoint(start)!!)
-            grid.removeDataPoint(start)
-        }
+        return Point(newX, start.y)
     }
 
-    private fun rollSphereDown(start: Point) {
+    private fun rollSphereDown(start: Point): Point {
         val maxy = grid.getMinMaxXY().x4
         var newY = start.y
         for (y in newY .. maxy - 1) {
@@ -112,13 +116,10 @@ class ReflectorDish(input: List<String>) {
                 break
             ++newY
         }
-        if (newY != start.y) {
-            grid.setDataPoint(Point(start.x, newY), grid.getDataPoint(start)!!)
-            grid.removeDataPoint(start)
-        }
+        return Point(start.x, newY)
     }
 
-    private fun rollSphereRight(start: Point) {
+    private fun rollSphereRight(start: Point): Point {
         val maxx = grid.getMinMaxXY().x2
         var newX = start.x
         for (x in newX .. maxx - 1) {
@@ -126,10 +127,7 @@ class ReflectorDish(input: List<String>) {
                 break
             ++newX
         }
-        if (newX != start.x) {
-            grid.setDataPoint(Point(newX, start.y), grid.getDataPoint(start)!!)
-            grid.removeDataPoint(start)
-        }
+        return Point(newX, start.y)
     }
 }
 

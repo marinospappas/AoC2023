@@ -45,6 +45,7 @@ class SpringCondition(input: List<String>) {
         return count
     }
 
+    // TODO refactor the below to make it easier to read
     fun getMatchingCountDp(dpState: MutableMap<Triple<Int,Int,Int>,Long>, str: String, groups: List<Int>,
                            sIndx: Int, gIndex: Int, cur0Count: Int): Long {
         val key = Triple(sIndx, gIndex, cur0Count)
