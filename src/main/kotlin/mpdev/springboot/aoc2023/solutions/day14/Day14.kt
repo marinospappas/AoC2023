@@ -16,26 +16,27 @@ class Day14: PuzzleSolver() {
         setDay()
     }
 
-    var result = 0L
-    lateinit var xxxx: Xxxx
+    var result = 0
+    lateinit var reflectorDish: ReflectorDish
 
     override fun initSolver(): Pair<Long,String> {
         val elapsed = measureTimeMillis {
-            xxxx = Xxxx(inputData)
+            reflectorDish = ReflectorDish(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            //result =
+            reflectorDish.rollAllUp()
+            result = reflectorDish.calculateLoadUp()
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            //result =
+            result = reflectorDish.calculateLoadForCycles(1_000_000_000)
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

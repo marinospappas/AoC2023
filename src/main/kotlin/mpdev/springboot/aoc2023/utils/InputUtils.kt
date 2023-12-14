@@ -18,10 +18,11 @@ annotation class AocInClass(val delimiters: Array<String> = [" "], val removePat
 
 /**
  * List of patterns to be replaced with the patterns of the second list
+ * the format is: pattern1, replace1, pattern2, replace2, ...
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class AocInReplacePatterns(val patterns: Array<String> = [], val replace: Array<String> = [])
+annotation class AocInReplacePatterns(val patterns: Array<String> = [])
 
 /**
  * List of patterns to be removed
@@ -88,10 +89,10 @@ class InputUtils(inputClazz: Class<*>) {
         }
         if (clazz.isAnnotationPresent(AocInReplacePatterns::class.java)) {
             val replaceList = mutableListOf<Pair<String,String>>()
-            for (i in clazz.getAnnotation(AocInReplacePatterns::class.java).patterns.indices)
+            for (i in 0 until clazz.getAnnotation(AocInReplacePatterns::class.java).patterns.lastIndex step(2))
                 replaceList.add(Pair(
                     clazz.getAnnotation(AocInReplacePatterns::class.java).patterns[i],
-                    clazz.getAnnotation(AocInReplacePatterns::class.java).replace[i]
+                    clazz.getAnnotation(AocInReplacePatterns::class.java).patterns[i+1]
                 ))
             replacePatterns = replaceList
         }
@@ -124,16 +125,9 @@ class InputUtils(inputClazz: Class<*>) {
     // remove noise from input string and convert it to list of values
     fun transform(s: String): String {
         var s1 = s
-        for (i in retainPatterns.indices) {
-            val pattern = retainPatterns[i]
-            val match = Regex(pattern).find(s1)
-            try {
-                val (value) = match!!.destructured
-                retainedValues[i] = value
-            } catch (ignore: Exception) {}
-        }
         for (pattern in removePatterns)
             s1 = s1.replace(Regex(pattern), "")
+
         for (i in replacePatterns.indices) {
             if (s1.isEmpty())
                 break
@@ -149,6 +143,16 @@ class InputUtils(inputClazz: Class<*>) {
             else
                 s1 = s1.replace(Regex(replacePatterns[i].first), replacement)
         }
+
+        for (i in retainPatterns.indices) {
+            val pattern = retainPatterns[i]
+            val match = Regex(pattern).find(s1)
+            try {
+                val (value) = match!!.destructured
+                retainedValues[i] = value
+            } catch (ignore: Exception) {}
+        }
+
         return if (delimiters.isEmpty())
             s1
         else {

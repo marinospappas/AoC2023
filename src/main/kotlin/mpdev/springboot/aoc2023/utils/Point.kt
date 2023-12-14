@@ -36,4 +36,17 @@ data class Point(var x: Int, var y: Int): Comparable<Point> {
     fun manhattan(other: Point): Int =
         abs(this.x - other.x) + abs(this.y - other.y)
     override fun toString() = "Point($x,$y)"
+
+    class ComparatorXY: Comparator<Point> {
+        override fun compare(p1: Point?, p2: Point?): Int {
+            if (p1 == null || p2 == null)
+                throw AocException ("unknown error - null point")
+            if (p1.x < p2.x)
+                return -1
+            if (p1.x > p2.x)
+                return 1
+            return Integer.compare(p1.y, p2.y)
+        }
+
+    }
 }

@@ -41,7 +41,7 @@ class Day05Test {
         println("input transformed")
         val inputTransformed = inputLines.stream().skip(skipLines.toLong()).toList()
             .map { InputUtils(AoCInput::class.java).transform(it) }
-            .filterNot { skipEmptyLines && it.isEmpty() }.also { it.println() }
+            .filterNot { skipEmptyLines && it.isEmpty() }.also { it.forEach { s -> s.println() } }
         println("input to json")
         inputTransformed.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         println("seeds list")
