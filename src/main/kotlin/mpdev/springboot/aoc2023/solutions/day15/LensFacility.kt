@@ -12,24 +12,12 @@ class LensFacility(input: List<String>) {
 
     fun executeStep(s: String) {
         val sArray = s.split(Regex("""[-=]"""))
-        val label = sArray[0]
-        val boxId = label.hashD152023()
-        val box = boxes[boxId]
-        if (s.contains('=')) {
-            val focalPt = Integer.parseInt(sArray[1])
-            box[label] = focalPt
-        }
+        val box = boxes[sArray[0].hashD152023()]
+        if (s.contains('='))
+            box[sArray[0]] = Integer.parseInt(sArray[1])
         else
-            box.remove(label)
+            box.remove(sArray[0])
     }
 }
 
-fun String.hashD152023(): Int {
-    var hash = 0
-    this.forEach { c ->
-        hash += c.code
-        hash *= 17
-        hash %= 256
-    }
-    return hash
-}
+fun String.hashD152023() = this.toList().fold(0) { hash, c -> (hash + c.code) * 17 % 256 }
