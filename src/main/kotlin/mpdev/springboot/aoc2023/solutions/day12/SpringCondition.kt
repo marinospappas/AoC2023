@@ -51,12 +51,22 @@ class SpringCondition(input: List<String>) {
         val key = Triple(sIndx, gIndex, cur0Count)
         if (dpState.containsKey(key))
             return dpState[key]!!
+
         if (sIndx == str.length)
-            return if ((gIndex == groups.size && cur0Count == 0) || (gIndex == groups.size - 1 && groups[gIndex] == cur0Count)) 1L
+            return if ((gIndex > groups.lastIndex && cur0Count == 0) ||
+                (gIndex == groups.lastIndex && groups[gIndex] == cur0Count)) 1L
             else 0L
 
         var count = 0L
         val c = str[sIndx]
+        count += when (c) {
+            '1' ->  if (cur0Count == 0)     // already outside a 0 group
+                        getMatchingCountDp(dpState, str, groups, sIndx+1, gIndex, 0)
+                    else 0L
+            '0' -> { 1 }
+            '?' -> { 1 }
+            else -> 0
+        }
         if ((c == '1' || c == '?') && cur0Count == 0)
             count += getMatchingCountDp(dpState, str, groups, sIndx + 1, gIndex, 0)
         else if ((c == '1' || c == '?') && cur0Count > 0 && gIndex < groups.size && groups[gIndex] == cur0Count)
