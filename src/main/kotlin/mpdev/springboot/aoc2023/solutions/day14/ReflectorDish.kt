@@ -85,7 +85,6 @@ class ReflectorDish(input: List<String>) {
         }
     }
 
-    // TODO refactor the below 4 functions to make them less verbose
     private fun rollSphereUp(start: Point): Point {
         val miny = grid.getMinMaxXY().x3
         var newY = start.y

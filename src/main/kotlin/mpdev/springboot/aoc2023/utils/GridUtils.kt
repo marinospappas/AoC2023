@@ -40,6 +40,53 @@ object GridUtils {
         }
     }
 
+    /**
+     * get gris perimeter
+     */
+    fun <T> getPerimeter(grid: Grid<T>): Set<Point> {
+        val (minx, maxx, miny, maxy) = grid.getMinMaxXY()
+        val perimeter = mutableSetOf<Point>()
+        for (x in minx..maxx) {
+            perimeter.add(Point(x,miny))
+            perimeter.add(Point(x,maxy))
+        }
+        for (y in miny+1 .. maxy-1) {
+            perimeter.add(Point(minx,y))
+            perimeter.add(Point(maxx,y))
+        }
+        return perimeter
+    }
+
+    /**
+     * example of walk grid function
+     */
+    /*
+      fun walkGrid(p: Point, direction: Direction): Pair<Point,Direction>? {
+        if (!grid.isInsideGrid(p))
+            return null
+        var nextPoint: Point = p
+        var nextDirection: Direction = direction
+        when {
+            direction == UP && grid.getDataPoint(p) == Vertical -> { nextPoint = p + Point(0,-1); nextDirection = UP }
+            direction == UP && grid.getDataPoint(p) == TopRight -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
+            direction == UP && grid.getDataPoint(p) == TopLeft -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
+
+            direction == DOWN && grid.getDataPoint(p) == Vertical -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
+            direction == DOWN && grid.getDataPoint(p) == BottomRight -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
+            direction == DOWN && grid.getDataPoint(p) == BottomLeft -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
+
+            direction == LEFT && grid.getDataPoint(p) == Horizontal -> { nextPoint = p + Point(-1,0); nextDirection = LEFT }
+            direction == LEFT && grid.getDataPoint(p) == BottomLeft -> { nextPoint = p + Point(0,-1); nextDirection = UP }
+            direction == LEFT && grid.getDataPoint(p) == TopLeft -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
+
+            direction == RIGHT && grid.getDataPoint(p) == Horizontal -> { nextPoint = p + Point(1,0); nextDirection = RIGHT }
+            direction == RIGHT && grid.getDataPoint(p) == BottomRight -> { nextPoint = p + Point(0,-1); nextDirection = UP }
+            direction == RIGHT && grid.getDataPoint(p) == TopRight -> { nextPoint = p + Point(0,1); nextDirection = DOWN }
+        }
+        return if (grid.isInsideGrid(nextPoint)) Pair(nextPoint, nextDirection) else null
+    }
+     */
+
     enum class Direction(val increment: Point) {
         UP(Point(0, -1)),
         RIGHT(Point(1, 0)),
