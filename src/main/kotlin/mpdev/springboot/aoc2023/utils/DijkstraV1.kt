@@ -7,7 +7,7 @@ import java.util.*
  * T is the type of the Node ID in the Graph
  * the costMap can be provided by the caller, or else all costs default to 1
  */
-class Dijkstra<T>(private var costMap: Map<Pair<T,T>,Int>? = null) {
+class DijkstraV1<T>(private var costMap: Map<Pair<T,T>,Int>? = null) {
 
     data class PathNode<T>(
         val node: Vertex<T>?,
@@ -31,22 +31,18 @@ class Dijkstra<T>(private var costMap: Map<Pair<T,T>,Int>? = null) {
      * The Dijkstra algorithm implementation
      * start: Vertex, end: Vertex
      */
-    fun runIt(startState: Vertex<T>, endState: Vertex<T>, maxPath: Int = Int.MAX_VALUE,
-              pathConstraint: (DijkstraPathMap<T>, PathNode<T>, PathNode<T>) -> Boolean = {_,_,_ -> true}) =
-        runIt(startState, { id -> id == endState.getId() }, maxPath, pathConstraint )
+    fun runIt(startState: Vertex<T>, endState: Vertex<T>, maxPath: Int = Int.MAX_VALUE) =
+        runIt(startState, { id -> id == endState.getId() }, maxPath )
 
     /**
      * The Dijkstra algorithm implementation
      * start: Vertex, end: function that returns true when we reach the end
-     * pathConstraint is a function that will decide whether a connected node from the list of connections
-     * can be added to the path (defaults to true)
      */
-    fun runIt(startState: Vertex<T>, isAtEnd: (T) -> Boolean, maxPath: Int = Int.MAX_VALUE,
-              pathConstraint: (DijkstraPathMap<T>, PathNode<T>, PathNode<T>) -> Boolean = {_,_,_ -> true}): MinCostPath<T> {
+    fun runIt(startState: Vertex<T>, isAtEnd: (T) -> Boolean, maxPath: Int = Int.MAX_VALUE,): MinCostPath<T> {
         // setup priority queue, visited set and minimum total costs for each node
         val toVisitQueue = PriorityQueue<PathNode<T>>().apply { add(PathNode(startState, 0)) }
         val visitedNodes = mutableSetOf<PathNode<T>>()
-        val dijkstraCost = DijkstraPathMap<T>()
+        val dijkstraCost =  mutableMapOf<T, PathNode<T>>(). withDefault { PathNode(null, Int.MAX_VALUE) }
 
         var iterations = 0
         // while the priority Q has elements, get the top one (least cost as per Comparator)
@@ -57,26 +53,26 @@ class Dijkstra<T>(private var costMap: Map<Pair<T,T>,Int>? = null) {
                 val minCostPath = MinCostPath<T>()
                 minCostPath.minCost = currentNode.costFromStart
                 minCostPath.numberOfIterations = iterations
-                minCostPath.path = dijkstraCost.getMinCostPath(currentNode.node!!.getId(), startState.getId())
+                minCostPath.path = getMinCostPath(currentNode.node!!.getId(), startState.getId(), dijkstraCost)
                 if (minCostPath.path.size > maxPath)
                     throw DijkstraException("Calculated Path exceeded max size ($maxPath)")
                 return minCostPath
             }
             // else for each connected node
             currentNode.node!!.getConnectedNodes().forEach { connectedNode ->
-                val nextPathNode = PathNode(connectedNode, getCost(currentNode.node!!.getId(), connectedNode.getId()))
-                if (!pathConstraint(dijkstraCost, currentNode, nextPathNode) || visitedNodes.contains(nextPathNode))
-                    return@forEach
                 ++iterations
+                val nextPathNode = PathNode(connectedNode, getCost(currentNode.node!!.getId(), connectedNode.getId()))
+                if (visitedNodes.contains(nextPathNode))
+                    return@forEach
                 visitedNodes.add(nextPathNode)
                 // calculate the new cost to that node and the new *estimated* total cost to the end node
                 val newCost = currentNode.costFromStart + getCost(currentNode.node!!.getId(),connectedNode.getId())
                 // if the new cost is less than what we have already recorded in the map of nodes/costs
                 // update the map with the new costs and "updatedBy" (to be able to back-track the min.cost path)
-                if (newCost < dijkstraCost.pathMap.getValue(connectedNode.getId()).costFromStart) {
+                if (newCost < dijkstraCost.getValue(connectedNode.getId()).costFromStart) {
                     nextPathNode.updatedBy = currentNode.node!!.getId()
                     nextPathNode.costFromStart = newCost
-                    dijkstraCost.pathMap[connectedNode.getId()] = nextPathNode
+                    dijkstraCost[connectedNode.getId()] = nextPathNode
                     // and put the updated new node back into the priority queue
                     toVisitQueue.add(nextPathNode)
                 }
@@ -84,15 +80,12 @@ class Dijkstra<T>(private var costMap: Map<Pair<T,T>,Int>? = null) {
         }
         throw DijkstraException("no path found from ${startState.getId()} to endState")
     }
-}
 
-data class DijkstraPathMap<T>(val pathMap: MutableMap<T, Dijkstra.PathNode<T>> =
-    mutableMapOf<T, Dijkstra.PathNode<T>>().withDefault { Dijkstra.PathNode(null, Int.MAX_VALUE) }) {
-    fun getMinCostPath(minCostKey: T, startKey: T): List<Pair<T,Int>> {
+    private fun getMinCostPath(minCostKey: T, startKey: T, dijkstraCost: Map<T, PathNode<T>>): List<Pair<T,Int>> {
         var key = minCostKey
         val path = mutableListOf<Pair<T,Int>>()
         do {
-            val node = pathMap.getValue(key)
+            val node = dijkstraCost.getValue(key)
             path.add(Pair(key,node.costFromStart))
             key = node.updatedBy ?: startKey
         } while (key != startKey)

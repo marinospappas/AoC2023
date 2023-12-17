@@ -61,7 +61,7 @@ class Graph<T>(var getConnections: (id: T) -> List<GraphNode<T>>? = { null } ) {
     }*/
 }
 
-class GraphNode<T>(var nodeId: T, var getConnections: (id: T) -> List<GraphNode<T>>? = { null }): Vertex<T> {
+data class GraphNode<T>(var nodeId: T, var getConnections: (id: T) -> List<GraphNode<T>>? = { null }): Vertex<T> {
 
     val neighbours = mutableListOf<GraphNode<T>>()
 
