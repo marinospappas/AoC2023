@@ -92,5 +92,15 @@ object GridUtils {
         RIGHT(Point(1, 0)),
         DOWN(Point(0, 1)),
         LEFT(Point(-1, 0));
+        companion object {
+            fun of(s: String): Direction =
+                when (s) {
+                    "U" -> UP
+                    "R" -> RIGHT
+                    "D" -> DOWN
+                    "L" -> LEFT
+                    else -> throw AocException("invalid Direction: [$s]")
+                }
+        }
     }
 }

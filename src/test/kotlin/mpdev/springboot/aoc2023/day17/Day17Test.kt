@@ -3,13 +3,15 @@ package mpdev.springboot.aoc2023.day17
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day17.CityMap
 import mpdev.springboot.aoc2023.solutions.day17.Day17
-import mpdev.springboot.aoc2023.utils.println
+import mpdev.springboot.aoc2023.utils.MinCostPath
+import mpdev.springboot.aoc2023.utils.Point
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import java.io.File
 
-class Day16Test {
+class Day17Test {
 
     private val day = 17                                     ///////// Update this for a new dayN test
     private val puzzleSolver = Day17()                      ///////// Update this for a new dayN test
@@ -42,10 +44,10 @@ class Day16Test {
     @Test
     @Order(3)
     fun `Find Min Heat Loss Path`() {
-        val result = cityMap.findMinPath()
-        result.path.forEach { it.println() }
-        result.minCost.println()
-        result.numberOfIterations.println()
+        inputLines = File("src/test/resources/inputdata/input17.txt").readLines()
+        cityMap = CityMap(inputLines)
+        val result: MinCostPath<Point> = cityMap.findMinPath()
+        MinCostPath<Point>().print(result)
     }
 
     @Test

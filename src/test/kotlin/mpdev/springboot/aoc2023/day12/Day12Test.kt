@@ -60,7 +60,8 @@ class Day12Test {
         val expected = listOf(1L, 4, 1, 1, 4, 10)
         for (i in springCondition.records.indices) {
             val rec = springCondition.records[i]
-            val result = springCondition.getMatchingCountDp(mutableMapOf(), rec.first, rec.second, 0, 0, 0)
+            val result = springCondition.getMatchingCountDp(mutableMapOf(), rec.first,
+                rec.second.joinToString("1", "1", "1") { "0".repeat(it) }, 0, 0)
                 .also { it.println() }
             assertThat(result).isEqualTo(expected[i])
         }
@@ -74,11 +75,30 @@ class Day12Test {
 
     @Test
     @Order(6)
+    fun `Test Matching DP`() {
+        //springCondition.getMatchingCountDp(mutableMapOf(), "11100101110", "10010101", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "00101110", "10010101", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "10010101", "10010101", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "1010101", "10010101", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "100010101", "10010101", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "100101001", "10010101", 0, 0).println()
+
+        springCondition.getMatchingCountDp(mutableMapOf(), "???1000", "101010001", 0, 0).println()
+       // springCondition.getMatchingCountDp(mutableMapOf(), "1??11??111?00", "101010001", 0, 0).println()
+       // springCondition.getMatchingCountDp(mutableMapOf(), "?0?0?0?0?0?0?0?", "1010001010000001", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "????10000001100000", "1010000001000001", 0, 0).println()
+        //springCondition.getMatchingCountDp(mutableMapOf(), "?000????????", "1000100101", 0, 0).println()
+
+    }
+
+    @Test
+    @Order(6)
     fun `Finds Extended Matching Combinations DP`() {
         val expected = listOf(1L, 16384, 1, 16, 2500, 506250)
         for (i in springCondition.records.indices) {
             val rec = springCondition.records[i] * 5
-            val result = springCondition.getMatchingCountDp(mutableMapOf(), rec.first, rec.second, 0, 0, 0)
+            val result = springCondition.getMatchingCountDp(mutableMapOf(), rec.first,
+                rec.second.joinToString("1", "1", "1") { "0".repeat(it) }, 0, 0)
                 .also { it.println() }
             assertThat(result).isEqualTo(expected[i])
         }
