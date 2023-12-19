@@ -1,6 +1,6 @@
 package mpdev.springboot.aoc2023.utils
 
-class Graph<T>(var getConnections: (id: T) -> List<GraphNode<T>>? = { null } ) {
+class Graph<T>(var getConnections: (T, DijkstraPathMap<T>?) -> List<GraphNode<T>>? = { _,_ -> null } ) {
 
     private val nodes = mutableMapOf<T, GraphNode<T>>()
 
@@ -15,7 +15,7 @@ class Graph<T>(var getConnections: (id: T) -> List<GraphNode<T>>? = { null } ) {
     fun nodeExists(id: T) = nodes[id] != null
 
     fun addNode(id: T) {
-        nodes[id] = GraphNode(id) { nodeId -> getConnections(nodeId) }
+        nodes[id] = GraphNode(id) { nodeId,dpm -> getConnections(nodeId, dpm) }
     }
 
     fun connect(first: T, second: T) = connect(this[first], this[second])
@@ -61,7 +61,8 @@ class Graph<T>(var getConnections: (id: T) -> List<GraphNode<T>>? = { null } ) {
     }*/
 }
 
-data class GraphNode<T>(var nodeId: T, var getConnections: (id: T) -> List<GraphNode<T>>? = { null }): Vertex<T> {
+data class GraphNode<T>(var nodeId: T, var getConnections:
+    (T, dijkstraPathMap: DijkstraPathMap<T>?) -> List<GraphNode<T>>? = { _,_ -> null }): Vertex<T> {
 
     val neighbours = mutableListOf<GraphNode<T>>()
 
@@ -71,13 +72,14 @@ data class GraphNode<T>(var nodeId: T, var getConnections: (id: T) -> List<Graph
         nodeId = id
     }
 
-    override fun getConnectedNodes() = getConnections(nodeId) ?: neighbours
+    override fun getConnectedNodes(dijkstraPathMap: DijkstraPathMap<T>?) =
+        getConnections(nodeId, dijkstraPathMap) ?: neighbours
 }
 
 interface Vertex<T> {
     fun getId(): T
     fun setId(id: T)
-    fun getConnectedNodes(): List<Vertex<T>>
+    fun getConnectedNodes(dijkstraPathMap: DijkstraPathMap<T>? = null): List<Vertex<T>>
 }
 
 class MinCostPath<T> {

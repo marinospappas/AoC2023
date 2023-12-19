@@ -1,4 +1,4 @@
-package mpdev.springboot.aoc2023.solutions.day12
+package mpdev.springboot.aoc2023.solutions.day19
 
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component
 import kotlin.system.measureTimeMillis
 
 @Component
-class Day12: PuzzleSolver() {
+class Day19: PuzzleSolver() {
 
     final override fun setDay() {
-        day = 12
+        day = 19
     }
 
     init {
@@ -17,25 +17,26 @@ class Day12: PuzzleSolver() {
     }
 
     var result = 0L
-    lateinit var springs: SpringCondition
+    lateinit var machineParts: MachineParts
 
-    override fun initSolver(): Pair<Long,String> {
+    override fun initSolver(): Pair<Long, String> {
         val elapsed = measureTimeMillis {
-            springs = SpringCondition(inputData)
+            machineParts = MachineParts(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = springs.records.sumOf { springs.getMathingCount(it) }
+            result = machineParts.sumOfAcceptedAttributes().toLong()
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = springs.records.sumOf { springs.getMathingCount(it * 5) }
+            machineParts.processRanges()
+            result = machineParts.acceptedRanges.sumOf { machineParts.rangeCountCombis(it) }
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

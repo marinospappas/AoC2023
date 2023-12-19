@@ -101,6 +101,8 @@ object GridUtils {
                     "L" -> LEFT
                     else -> throw AocException("invalid Direction: [$s]")
                 }
+            fun of(inc: Point): Direction =
+                values().firstOrNull { it.increment == inc } ?: throw AocException("invalid Direction increment: [$inc]")
         }
     }
 }

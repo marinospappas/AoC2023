@@ -63,7 +63,7 @@ class Dijkstra<T>(private var costMap: Map<Pair<T,T>,Int>? = null) {
                 return minCostPath
             }
             // else for each connected node
-            currentNode.node!!.getConnectedNodes().forEach { connectedNode ->
+            currentNode.node!!.getConnectedNodes(dijkstraCost).forEach { connectedNode ->
                 val nextPathNode = PathNode(connectedNode, getCost(currentNode.node!!.getId(), connectedNode.getId()))
                 if (!pathConstraint(dijkstraCost, currentNode, nextPathNode) || visitedNodes.contains(nextPathNode))
                     return@forEach

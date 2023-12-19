@@ -45,82 +45,34 @@ class SpringCondition(input: List<String>) {
         return count
     }
 
-    // TODO refactor the below to make it easier to read
-    fun getMatchingCountDp(dpState: MutableMap<Triple<Int,Int,Char>,Long>, string: String, pattern: String,
-                           sIndx: Int, pIndex: Int, level: Int = 0): Long {
-
-        val indent = "  ".repeat(level)
-       println("${indent}string $string $sIndx pattern $pattern $pIndex")
-        if (sIndx > string.lastIndex)
-            if ((pIndex > pattern.lastIndex) ||
-                (pIndex == pattern.lastIndex && pattern[pIndex] == '1')) {
-                println("${indent}returning 1 (a)")
-                return 1L
-            }
-            else {
-                println("${indent}returning 0 (a)")
-                return 0L
-            }
-        if (sIndx <= string.lastIndex && pIndex > pattern.lastIndex) {
-                println("${indent}returning 0 (b)")
-                return 0L
-            }
-
-        val state = Triple(sIndx, pIndex, string[sIndx])
-        if (dpState.containsKey(state)) {
-            println("${indent}returning cached result: $state: ${dpState[state]}")
-            return dpState[state]!!
-        }
-
-        val c = string[sIndx]
-        val p = pattern[pIndex]
-        val thisCount = when {
-            c == '0' && p == '0' -> // within a 0 group
-                getMatchingCountDp(dpState, string, pattern, sIndx+1, pIndex+1, level+1)
-            c == '1' && p == '1' -> // outside a 0 group
-                getMatchingCountDp(dpState, string, pattern, sIndx+1, pIndex, level+1)
-            c == '0' && p == '1' && pIndex < pattern.lastIndex -> // outside a 0 group
-                getMatchingCountDp(dpState, string, pattern, sIndx, pIndex+1, level+1)
-            c == '?' -> // for ? try both 0 and 1
-                getMatchingCountDp(dpState, string.replaceAt(sIndx, '0'), pattern, sIndx, pIndex, level+1) +
-                        getMatchingCountDp(dpState, string.replaceAt(sIndx, '1'), pattern, sIndx, pIndex, level+1)
-            else -> 0
-        }
-        dpState[state] = thisCount
-        println("${indent}returning count $thisCount for state $state")
-        return thisCount
-    }
-
-    private fun String.replaceAt(i: Int, c: Char) = this.replaceRange(i, i+1, c.toString())
-
-
-    // working version
-    fun getMatchingCountDp(dpState: MutableMap<Triple<Int,Int,Int>,Long>, str: String, groups: List<Int>,
+    fun getMatchingCountDp(dpState: MutableMap<Triple<Int,Int,Int>,Long>, string: String, groupsOf0: List<Int>,
                            sIndx: Int, gIndex: Int, cur0Count: Int): Long {
         val key = Triple(sIndx, gIndex, cur0Count)
-        if (dpState.containsKey(key))
+        if (dpState[key] != null)
             return dpState[key]!!
-        if (sIndx == str.length)
-            return if ((gIndex == groups.size && cur0Count == 0) || (gIndex == groups.size - 1 && groups[gIndex] == cur0Count)) 1L
+        if (sIndx == string.length)
+            return if ((gIndex == groupsOf0.size && cur0Count == 0)
+                || (gIndex == groupsOf0.size - 1 && groupsOf0[gIndex] == cur0Count)) 1L
             else 0L
 
-        var count = 0L
-        val c = str[sIndx]
+        var matchingCount = 0L
+        val c = string[sIndx]
+        // outside a 0-group, while processing a series of 1s, '? also matched as 1, advance string ptr, 0-count must be 0
         if ((c == '1' || c == '?') && cur0Count == 0)
-            count += getMatchingCountDp(dpState, str, groups, sIndx + 1, gIndex, 0)
-        else if ((c == '1' || c == '?') && cur0Count > 0 && gIndex < groups.size && groups[gIndex] == cur0Count)
-            count += getMatchingCountDp(dpState, str, groups, sIndx + 1, gIndex + 1, 0)
+            matchingCount += getMatchingCountDp(dpState, string, groupsOf0, sIndx + 1, gIndex, 0)
+        // encountered 1 just after a matched 0-group, '? also matched as 1, advance string ptr, 0-group ptr, reset 0-count
+        else if ((c == '1' || c == '?') && cur0Count > 0 && gIndex < groupsOf0.size && groupsOf0[gIndex] == cur0Count)
+            matchingCount += getMatchingCountDp(dpState, string, groupsOf0, sIndx + 1, gIndex + 1, 0)
+        // within a 0-group, '?' also matched as 0, advance string ptr and 0-count
         if (c == '0' || c == '?')
-            count += getMatchingCountDp(dpState, str, groups, sIndx + 1, gIndex, cur0Count + 1)
+            matchingCount += getMatchingCountDp(dpState, string, groupsOf0, sIndx + 1, gIndex, cur0Count + 1)
 
-        dpState[key] = count
-        return count
+        dpState[key] = matchingCount
+        return matchingCount
     }
 
-
-    fun getCount(rec: Pair<String,List<Int>>) =
-        getMatchingCountDp(mutableMapOf(), rec.first,
-            rec.second.joinToString("1", "1", "1") { "0".repeat(it) }, 0, 0)
+    fun getMathingCount(rec: Pair<String,List<Int>>) =
+        getMatchingCountDp(mutableMapOf(), rec.first, rec.second, 0, 0, 0)
 }
 
 operator fun Pair<String,List<Int>>.times(n: Int): Pair<String,List<Int>> {

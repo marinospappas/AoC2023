@@ -1,12 +1,7 @@
 package mpdev.springboot.aoc2023.solutions.day17
 
-import mpdev.springboot.aoc2023.utils.Dijkstra
-import mpdev.springboot.aoc2023.utils.DijkstraPathMap
-import mpdev.springboot.aoc2023.utils.Graph
-import mpdev.springboot.aoc2023.utils.GraphNode
-import mpdev.springboot.aoc2023.utils.Grid
-import mpdev.springboot.aoc2023.utils.MinCostPath
-import mpdev.springboot.aoc2023.utils.Point
+import mpdev.springboot.aoc2023.utils.*
+import mpdev.springboot.aoc2023.utils.GridUtils.Direction.*
 
 class CityMap(input: List<String>) {
 
@@ -18,27 +13,41 @@ class CityMap(input: List<String>) {
         grid.getDataPoints().forEach { graph.addNode(it.key) }
         grid.getDataPoints().forEach { e ->
             e.key.adjacentCardinal().filter { grid.isInsideGrid(it) }.forEach { p ->
-                graph.connect(e.key, p)
+                // only update cost - connected nodes will be calculated dynamically based on constraints
                 graph.updateCost(e.key, p, grid.getDataPoint(p)!!)
             }
         }
     }
 
-    fun getNeighbours(p: Point): List<GraphNode<Point>> {
-        val neighbours = p.adjacentCardinal().filter { grid.isInsideGrid(it) }
-        return neighbours.map { graph[it] }
+    var maxStraightSteps = 4
+    var minStraightSteps = 1
+
+    fun getNeighbours(p: Point, dijkstraPathMap: DijkstraPathMap<Point>?): List<GraphNode<Point>> {
+        var neighbours = p.adjacentCardinal().toList()
+        val curPath = dijkstraPathMap?.getMinCostPath(p, start)?.map { it.first }!!
+        if (curPath.size < 2 || curPath[0] == curPath[1])
+            return neighbours.filter { grid.isInsideGrid(it) }.map { graph[it] }
+        val lastStep = curPath.last() - curPath[curPath.lastIndex - 1]
+        val direction = GridUtils.Direction.of(lastStep)
+        val straightSegment = getStraightPathSegment(curPath, lastStep).size
+        if (straightSegment == maxStraightSteps)
+            neighbours = when (direction) {
+                UP -> listOf(p + LEFT.increment, p + RIGHT.increment)
+                RIGHT -> listOf(p + UP.increment, p + DOWN.increment)
+                DOWN -> listOf(p + LEFT.increment, p + RIGHT.increment)
+                LEFT -> listOf(p + UP.increment, p + DOWN.increment)
+            }
+        return neighbours.filter { grid.isInsideGrid(it) }.map { graph[it] }
     }
 
     fun findMinPath():MinCostPath<Point> {
         val (_, maxx, _, maxy) = grid.getMinMaxXY()
         val startNode = graph[start]
         val endNode = graph[Point(maxx,maxy)]
-        return Dijkstra(graph.costs).runIt(startNode, endNode,
-            pathConstraint = { pathMap, currNode, nextNode -> pathConstraint(pathMap, currNode, nextNode) })
+        return Dijkstra(graph.costs).runIt(startNode, endNode)
     }
 
-    var maxStraightSteps = 3
-    var minStraightSteps = 1
+
 
     // TODO: refactor the below and move the constraint to getConnectedNodes in Vertex<T> in Graph.kt
     private fun pathConstraint(dijkstraPathMap: DijkstraPathMap<Point>,
@@ -51,7 +60,8 @@ class CityMap(input: List<String>) {
             println("*** backtrack constraint: ${curPath.takeLast(15)}  not accepted")
             return false
         }
-        val straightPath = getStraightPathSegment(curPath)
+        val lastStep = curPath.last() - curPath[curPath.lastIndex - 1]
+        val straightPath = getStraightPathSegment(curPath, lastStep)
         //println("path $curPath -> straight segmt: $straightPath")
         // check min straight steps
         if (curPath.size >= minStraightSteps  &&  straightPath.size < minStraightSteps) {
@@ -66,10 +76,9 @@ class CityMap(input: List<String>) {
         return true
     }
 
-    private fun getStraightPathSegment(path: List<Point>): List<Point> {
+    private fun getStraightPathSegment(path: List<Point>, lastStep: Point): List<Point> {
         if (path.size < 2)
             return emptyList()
-        val lastStep = path.last() - path[path.lastIndex - 1]
         val pathSegment = mutableListOf(path.last())
         for (i in path.lastIndex - 1 downTo 0)
             if (path[i + 1] - path[i] == lastStep)
