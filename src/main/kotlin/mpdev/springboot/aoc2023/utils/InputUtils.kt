@@ -204,11 +204,13 @@ class InputUtils(inputClazz: Class<*>) {
     private fun toLong(s: String): String {
         return s.trim().toLong().toString()
     }
+
+    //TODO - check below in case trim is needed in all cases
     private fun toList(s: String, annotation: AocInField, level: Int): String {
         return s.trim().split(Regex(annotation.delimiters[level]))
             .joinToString(", ", "[", "]") {
                 when (annotation.listType[level]) {
-                    string, int, long -> """"$it""""
+                    string, int, long -> """"${it.trim()}""""
                     pair -> toPair(it, annotation.delimiters[level+1])
                     point -> toPoint(it, annotation.delimiters[level+1])
                     list -> toList(it, annotation, level+1)

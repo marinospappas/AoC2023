@@ -1,0 +1,35 @@
+*** cycle 1
+button -low-> broadcaster
+broadcaster -low-> a
+a -high-> inv
+a -high-> con
+inv -low-> b
+con -high-> output
+b -high-> con
+con -low-> output
+
+** cycle 2
+button -low-> broadcaster
+broadcaster -low-> a
+a -low-> inv
+a -low-> con
+inv -high-> b
+con -high-> output
+
+** cycle 3
+button -low-> broadcaster
+broadcaster -low-> a
+a -high-> inv
+a -high-> con
+inv -low-> b
+con -low-> output
+b -low-> con
+con -high-> output
+
+** cycle 4
+button -low-> broadcaster
+broadcaster -low-> a
+a -low-> inv
+a -low-> con
+inv -high-> b
+con -high-> output
