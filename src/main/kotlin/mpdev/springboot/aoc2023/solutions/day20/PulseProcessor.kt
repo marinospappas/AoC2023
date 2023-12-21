@@ -26,11 +26,13 @@ class PulseProcessor(input: List<String>) {
     private val startModule = "broadcaster"
     private val endModule = (modules.values.map { it.receivers }.flatten().distinct().toSet()
             - modules.keys).first()
+    val endStateInputs = mutableMapOf<String, MutableList<PulseType>>()
+
     init {
         updateConjState()
     }
 
-    fun processPulse(): Pair<Int,Int> {
+    fun processPulse(recordId: String = ""): Pair<Int,Int> {
         val count = mutableMapOf(PulseType.LOW to 0, PulseType.HIGH to 0, PulseType.NA to 0)
         count[startPulse.hl] =  count[startPulse.hl]?.plus(1)!!
         val queue = ArrayDeque<Pair<Module,Pulse>>().also { q -> q.add(Pair(modules[startModule]!!, startPulse)) }
@@ -48,6 +50,13 @@ class PulseProcessor(input: List<String>) {
                     queue.add(Pair(modules[rcvr]!!, Pulse(curModule.outPulse, curModule.id)))
             }
         }
+        if (modules[recordId] != null)
+            for ((id, pulse) in modules[recordId]?.receivedFrom!!) {
+                if (endStateInputs[id] == null)
+                    endStateInputs[id] = mutableListOf(pulse)
+                else
+                    endStateInputs[id]?.add(pulse)
+            }
         return Pair(count[PulseType.LOW]!!, count[PulseType.HIGH]!!)
     }
 
@@ -55,9 +64,7 @@ class PulseProcessor(input: List<String>) {
         var countL = 0
         var countH = 0
         repeat(1000) {
-            val (l, h) = processPulse()
-            countL += l
-            countH += h
+            processPulse().let { countL += it.first; countH += it.second }
         }
         return countL * countH
     }
@@ -76,6 +83,7 @@ data class Module(val id: String, val type: ModuleType, val receivers: List<Stri
                   var state: ModuleState = ModuleState.LOW, val receivedFrom: MutableMap<String,PulseType> = mutableMapOf()
 ) {
     var outPulse = PulseType.NA
+
     fun output(input: Pulse): PulseType {
         return when(type) {
             ModuleType.F -> {
