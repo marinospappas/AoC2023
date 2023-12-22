@@ -1,4 +1,4 @@
-package mpdev.springboot.aoc2023.solutions.day22
+package mpdev.springboot.aoc2023.solutions.day23
 
 import mpdev.springboot.aoc2023.model.PuzzlePartSolution
 import mpdev.springboot.aoc2023.solutions.PuzzleSolver
@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component
 import kotlin.system.measureTimeMillis
 
 @Component
-class Day22: PuzzleSolver() {
+class Day23: PuzzleSolver() {
 
     final override fun setDay() {
-        day = 22
+        day = 23
     }
 
     init {
@@ -18,28 +18,25 @@ class Day22: PuzzleSolver() {
     }
 
     var result = 0
-    lateinit var jengaBricks: JengaBricks
+    lateinit var xxxx: Xxxx
 
     override fun initSolver(): Pair<Long,String> {
         val elapsed = measureTimeMillis {
-            jengaBricks = JengaBricks(inputData)
+            xxxx = Xxxx(inputData)
         }
         return Pair(elapsed, "milli-sec")
     }
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            jengaBricks.landAllBricks()
-            result = jengaBricks.getRemovableBricks().size
+            //result =
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            val collapseList = jengaBricks.bricks.toSet() -
-                    jengaBricks.getRemovableBricks().map { jengaBricks.bricks[it] }.toSet()
-            result = collapseList.sumOf { brick -> jengaBricks.determineBricksToFall(brick) }
+            //result =
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

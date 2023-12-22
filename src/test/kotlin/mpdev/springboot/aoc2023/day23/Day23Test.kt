@@ -1,9 +1,9 @@
-package mpdev.springboot.aoc2023.day22
+package mpdev.springboot.aoc2023.day23
 
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.solutions.day22.AoCInput
-import mpdev.springboot.aoc2023.solutions.day22.Day22
-import mpdev.springboot.aoc2023.solutions.day22.JengaBricks
+import mpdev.springboot.aoc2023.solutions.day23.AoCInput
+import mpdev.springboot.aoc2023.solutions.day23.Day23
+import mpdev.springboot.aoc2023.solutions.day23.Xxxx
 import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
@@ -11,20 +11,20 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 
-class Day22Test {
+class Day23Test {
 
-    private val day = 22                                     ///////// Update this for a new dayN test
-    private val puzzleSolver = Day22()                      ///////// Update this for a new dayN test
+    private val day = 23                                     ///////// Update this for a new dayN test
+    private val puzzleSolver = Day23()                      ///////// Update this for a new dayN test
     private val inputDataReader = InputDataReader("src/main/resources/inputdata/input")
     private var inputLines: List<String> = inputDataReader.read(day)
-    private lateinit var jengaBricks: JengaBricks
+    private lateinit var xxxx: Xxxx
 
     @BeforeEach
     fun setup() {
         puzzleSolver.setDay()
         puzzleSolver.inputData = inputLines
         puzzleSolver.initSolver()
-        jengaBricks = JengaBricks(inputLines)
+        xxxx = Xxxx(inputLines)
     }
 
     @Test
@@ -44,17 +44,12 @@ class Day22Test {
             .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
             .println()
         println("List of Bricks")
-        jengaBricks.bricks.forEach { it.println() }
-        assertThat(jengaBricks.bricks.size).isEqualTo(7)
     }
 
     @Test
     @Order(3)
     fun `Lands Bricks on Ground or on Other Bricks`() {
-        jengaBricks.debug = true
-        jengaBricks.landAllBricks()
-        val removable = jengaBricks.getRemovableBricks().also { it.println() }
-        assertThat(removable.size).isEqualTo(5)
+
     }
 
     @Test
@@ -66,22 +61,12 @@ class Day22Test {
     @Test
     @Order(6)
     fun `Simulates Collapse of Bricks`() {
-        jengaBricks.landAllBricks()
-        val collapseList = jengaBricks.bricks.toSet() -
-                jengaBricks.getRemovableBricks().map{jengaBricks.bricks[it]}.toSet()
-        collapseList.println()
-        collapseList.forEach { brick ->
-               print("brick $brick removed   ")
-               jengaBricks.determineBricksToFall(brick).println()
-        }
-        val result = collapseList.sumOf { brick -> jengaBricks.determineBricksToFall(brick) }.also { it.println() }
-        assertThat(result).isEqualTo(7)
+
     }
 
     @Test
     @Order(8)
     fun `Solves Part 2`() {
-        puzzleSolver.solvePart1()
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("7")
     }
 }

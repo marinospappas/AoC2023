@@ -3,6 +3,7 @@ package mpdev.springboot.aoc2023.day20
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day20.*
 import mpdev.springboot.aoc2023.utils.InputUtils
+import mpdev.springboot.aoc2023.utils.divisors
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -70,18 +71,19 @@ class Day20Test {
     @Test
     @Order(6)
     fun `Finds Pulse Cycle`() {
-        inputLines = File("src/main/resources/inputdata/input20.txt").readLines()
+        inputLines = File("src/mpdev.springboot.aoc2023.solutions.day22.main/resources/inputdata/input20.txt").readLines()
         pulseProcessor = PulseProcessor(inputLines)
-        repeat(10000) {
+        repeat(1000000) {
             pulseProcessor.processPulse("df")
         }
         println("end module inputs")
         println(pulseProcessor.endStateInputs.keys)
         for (i in pulseProcessor.endStateInputs.values.first().indices) {
-            print("$i: ")
-            pulseProcessor.endStateInputs.values.forEach { print("${it[i]} ") }
-            println("")
+//            print("$i: ")
+  //          pulseProcessor.endStateInputs.values.forEach { print("${it[i]} ") }
+    //        println("")
         }
+
     }
 
     @Test

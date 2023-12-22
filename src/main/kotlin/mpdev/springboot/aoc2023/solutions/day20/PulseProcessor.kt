@@ -42,6 +42,9 @@ class PulseProcessor(input: List<String>) {
             if (debug) println("module ${curModule.id} received ${input.hl} from ${input.sender}, new state ${curModule.state}")
             for (rcvr in curModule.receivers) {
                 count[curModule.outPulse] = count[curModule.outPulse]?.plus(1)!!
+                if (modules[recordId] != null && modules[recordId]?.receivedFrom?.any { it.value == PulseType.HIGH } == true)
+                    println("H detected")
+
                 if (rcvr == endModule) {
                     if (debug) println("module $endModule received ${curModule.outPulse} from ${curModule.id}")
                     continue
