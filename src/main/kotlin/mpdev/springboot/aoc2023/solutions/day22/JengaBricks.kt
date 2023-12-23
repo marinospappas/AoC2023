@@ -2,7 +2,6 @@ package mpdev.springboot.aoc2023.solutions.day22
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
-import kotlin.math.abs
 
 @Serializable
 @AocInClass(delimiters = ["~"])
@@ -72,18 +71,19 @@ class JengaBricks(input: List<String>) {
         }
     }
 
+    //TODO: refactor the below to see if it can be done more efficiently by use of Queue
     fun determineBricksToFall(brickId: Int): Int {
         val jenga = bricks.indices.toMutableList().also { j -> j.remove(brickId) }
         val fallen = mutableListOf(brickId)
         do {
-            val unsupported = jenga.filter {
+            val willFall = jenga.filter {
                 bricks[it].supportedBy.isNotEmpty() && bricks[it].supportedBy.all { supportId ->
                     fallen.contains(supportId)
                 }
             }
-            jenga.removeAll(unsupported)
-            fallen.addAll(unsupported)
-        } while (unsupported.isNotEmpty())
+            jenga.removeAll(willFall)
+            fallen.addAll(willFall)
+        } while (willFall.isNotEmpty())
         return fallen.size - 1
     }
 }
