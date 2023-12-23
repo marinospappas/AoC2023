@@ -85,23 +85,6 @@ class JengaBricks(input: List<String>) {
             fallen.addAll(unsupported)
         } while (unsupported.isNotEmpty())
         return fallen.size - 1
-
-
-        var count = 0
-        val queue = ArrayDeque<Brick>().also { it.add(bricks[brickId]) }
-        val visited = mutableListOf<Brick>().also { it.add(bricks[brickId]) }
-        while (queue.isNotEmpty()) {
-            val current = queue.removeFirst()
-            ++count
-            current.supports.forEach { supportedId ->
-                val supportedBrick = bricks[supportedId]
-                if (!visited.contains(supportedBrick)) {
-                    visited.add(supportedBrick)
-                    queue.add(supportedBrick)
-                }
-            }
-        }
-        return count - 1
     }
 }
 
