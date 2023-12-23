@@ -1,4 +1,4 @@
-package mpdev.springboot.aoc2023.solutions.day23
+package mpdev.springboot.aoc2023.solutions.day24
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
@@ -16,4 +16,6 @@ class Xxxx(input: List<String>) {
 
     var debug = false
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
+
 }
+

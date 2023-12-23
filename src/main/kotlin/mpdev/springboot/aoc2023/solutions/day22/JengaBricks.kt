@@ -30,26 +30,13 @@ class JengaBricks(input: List<String>) {
         }
     private val space: MutableMap<PointND, Int> = mutableMapOf()
 
-    fun getRemovableBricks(): Set<Int> {
-        val result = mutableSetOf<Int>()
-        bricks.indices.forEach { id ->
+    fun getRemovableBricks(): Set<Int> =
+        // a brick can be removed if (a) it supports nothing or
+        // (b) all the bricks supported by it have at least one more support
+        bricks.indices.filter { id ->
             val brick = bricks[id]
-            var canBeRemoved = true
-            // a brick can be removed if (a) it support nothing or
-            // (b) all the bricks it supports have more than 1 support
-            for (supportedBrick in brick.supports) {
-                if (bricks[supportedBrick].supportedBy.size < 2) {
-                    canBeRemoved = false
-                    break
-                }
-            }
-            if (canBeRemoved)
-                result.add(id)
-        }
-        return result
-    }
-    //= bricks.map { it.value.supportedBy }.filter { it.size > 1 }.flatten().toSet() +
-      //    bricks.filter{ it.value.supports.isEmpty() }.map { it.key }.toSet()
+            brick.supports.isEmpty() || brick.supports.all { bricks[it].supportedBy.size >= 2 }
+        }.toSet()
 
     fun landAllBricks() {
         for (id in bricks.indices) {
@@ -61,18 +48,15 @@ class JengaBricks(input: List<String>) {
                 bricks.forEach { it.println() }
             }
         }
-        bricks.indices.forEach {
-                println("brick $it  ${space.filter { e -> e.value == it }.map { e -> e.key } }} supports: ${bricks[it].supports} supported by: ${bricks[it].supportedBy} ")
-        }
     }
 
     private fun landBrick(id: Int, brick: Brick) {
         val groundPoints = brick.points.map { Point(it.x(), it.y()) }
         val spacePointsSection = space.keys.filter { groundPoints.contains(Point(it.x(), it.y())) }
-        val highestPoint = spacePointsSection.maxOfOrNull { it.z() } ?: 0
+        val highestPoint = spacePointsSection.maxOfOrNull { it.z() } ?: -1
         // get any bricks immediately below and add them to the supported by list
         // also update the "supports" lists of the bricks below
-        if (highestPoint > 0)   // only if it lands on another brick
+        if (highestPoint >= 0)   // only if it lands on another brick
             spacePointsSection.forEach { p3d ->
                 if (p3d.z() == highestPoint) {
                     val supportingBrickId = space[p3d]!!
@@ -83,21 +67,34 @@ class JengaBricks(input: List<String>) {
         // brick lands on top
         val lowZ = brick.points.first().z()
         brick.points.forEach { p ->
-            val newP = PointND(intArrayOf(p.x(), p.y(),
-                if (highestPoint == 0) 0 else highestPoint + p.z() + 1 - 2 * lowZ))
+            val newP = PointND(intArrayOf(p.x(), p.y(), highestPoint + 1 + p.z() - lowZ))
             space[newP] = id
         }
     }
 
-    fun determineBricksToFall(brick: Brick): Int {
+    fun determineBricksToFall(brickId: Int): Int {
+        val jenga = bricks.indices.toMutableList().also { j -> j.remove(brickId) }
+        val fallen = mutableListOf(brickId)
+        do {
+            val unsupported = jenga.filter {
+                bricks[it].supportedBy.isNotEmpty() && bricks[it].supportedBy.all { supportId ->
+                    fallen.contains(supportId)
+                }
+            }
+            jenga.removeAll(unsupported)
+            fallen.addAll(unsupported)
+        } while (unsupported.isNotEmpty())
+        return fallen.size - 1
+
+
         var count = 0
-        val queue = ArrayDeque<Brick>().also { it.add(brick) }
-        val visited = mutableListOf<Brick>().also { it.add(brick) }
+        val queue = ArrayDeque<Brick>().also { it.add(bricks[brickId]) }
+        val visited = mutableListOf<Brick>().also { it.add(bricks[brickId]) }
         while (queue.isNotEmpty()) {
             val current = queue.removeFirst()
             ++count
             current.supports.forEach { supportedId ->
-                val supportedBrick = bricks[supportedId]!!
+                val supportedBrick = bricks[supportedId]
                 if (!visited.contains(supportedBrick)) {
                     visited.add(supportedBrick)
                     queue.add(supportedBrick)
@@ -109,5 +106,6 @@ class JengaBricks(input: List<String>) {
 }
 
 data class Brick(val points: Set<PointND>,
-                 val supports: MutableList<Int> = mutableListOf(),
-                 val supportedBy: MutableList<Int> = mutableListOf())
+                 val supports: MutableSet<Int> = mutableSetOf(),
+                 val supportedBy: MutableSet<Int> = mutableSetOf()
+)

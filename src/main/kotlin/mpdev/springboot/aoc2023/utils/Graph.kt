@@ -1,5 +1,6 @@
 package mpdev.springboot.aoc2023.utils
 
+// TODO simplify the getconnectins fun - intrduce two different versions of it (with and without Dijkstra path)
 class Graph<T>(var getConnections: (T, DijkstraPathMap<T>?) -> List<GraphNode<T>>? = { _,_ -> null } ) {
 
     private val nodes = mutableMapOf<T, GraphNode<T>>()

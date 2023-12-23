@@ -95,12 +95,13 @@ object GridUtils {
         companion object {
             fun of(s: String): Direction =
                 when (s) {
-                    "U" -> UP
-                    "R" -> RIGHT
-                    "D" -> DOWN
-                    "L" -> LEFT
+                    "U","UP",   "N","NORTH","^" -> UP
+                    "R","RIGHT","E","EAST", ">" -> RIGHT
+                    "D","DOWN", "S","SOUTH","v" -> DOWN
+                    "L","LEFT", "W","WEST", "<" -> LEFT
                     else -> throw AocException("invalid Direction: [$s]")
                 }
+            fun of(c: Char): Direction = of(c.toString())
             fun of(inc: Point): Direction =
                 values().firstOrNull { it.increment == inc } ?: throw AocException("invalid Direction increment: [$inc]")
         }
