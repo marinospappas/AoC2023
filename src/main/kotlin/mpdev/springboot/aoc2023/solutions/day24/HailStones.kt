@@ -3,6 +3,8 @@ package mpdev.springboot.aoc2023.solutions.day24
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @Serializable
 @AocInClass(delimiters = ["@"])
@@ -71,19 +73,28 @@ class HailStones(input: List<String>) {
         val vZThrow = vzReduced.last()
         // step 2 calculate position
         // TODO: refactor the position calculation to make it more robust
-        val (xThrow, time1) = LinearEqSys.solve2(
-            longArrayOf(1,1),
-            longArrayOf(vXThrow - stones[0].velocity.x, vXThrow - stones.last().velocity.x),
-            longArrayOf(stones[0].position.x, stones.last().position.x))
-        val (yThrow, time2) = LinearEqSys.solve2(
-            longArrayOf(1,1),
-            longArrayOf(vYThrow - stones[0].velocity.y, vYThrow - stones.last().velocity.y),
-            longArrayOf(stones[0].position.y, stones.last().position.y))
-        val (zThrow, time3) = LinearEqSys.solve2(
-            longArrayOf(1,1),
-            longArrayOf(vZThrow - stones[0].velocity.z, vZThrow - stones.last().velocity.z),
-            longArrayOf(stones[0].position.z, stones.last().position.z))
-        return Stone(Point3DL(xThrow.toLong(), yThrow.toLong(), zThrow.toLong()), Point3DL(vXThrow, vYThrow, vZThrow))
+        var xThrow: Long? = null
+        var yThrow: Long? = null
+        var zThrow: Long? = null
+        outerLoop1@for (i in 0 .. stones.lastIndex-1)
+            for (j in i+1 .. stones.lastIndex) {
+                xThrow = calculatePossiblePosThrow(i, j, vXThrow, 0)
+                if (xThrow != null)
+                    break@outerLoop1
+            }
+        outerLoop1@for (i in 0 .. stones.lastIndex-1)
+            for (j in i+1 .. stones.lastIndex) {
+                yThrow = calculatePossiblePosThrow(i, j, vYThrow, 1)
+                if (yThrow != null)
+                    break@outerLoop1
+            }
+        outerLoop1@for (i in 0 .. stones.lastIndex-1)
+            for (j in i+1 .. stones.lastIndex) {
+                zThrow = calculatePossiblePosThrow(i, j, vZThrow, 2)
+                if (yThrow != null)
+                    break@outerLoop1
+            }
+        return Stone(Point3DL(xThrow!!, yThrow!!, zThrow!!), Point3DL(vXThrow, vYThrow, vZThrow))
     }
 
     fun calculatePossibbleVThrow(pList: Pair<Long,Long>, v: Long): Set<Long> {
@@ -94,6 +105,24 @@ class HailStones(input: List<String>) {
         return result
     }
 
+    fun calculatePossiblePosThrow(i1: Int, i2: Int, vThrow: Long, xyz: Int): Long? {
+        val (position, time) = LinearEqSys.solve2(
+            longArrayOf(1, 1),
+            longArrayOf(vThrow - stones[i1].velocity.toList()[xyz], vThrow - stones[i2].velocity.toList()[xyz]),
+            longArrayOf(stones[i1].position.toList()[xyz], stones[i2].position.toList()[xyz])
+        )
+        if (position.isNaN() || ceil(position).toLong() != position.toLong() || ceil(time).toLong() != time.toLong() || time <= 0.0)
+            return null
+        // check the result is acceptable for all stones
+        (stones.indices).forEach { i ->
+            if (vThrow == stones[i].velocity.toList()[xyz])
+                return@forEach
+            if ((stones[i].position.toList()[xyz] - position.toLong()) % (vThrow - stones[i].velocity.toList()[xyz]) != 0L
+                || (stones[i].position.toList()[xyz] - position.toLong()) % (vThrow - stones[i].velocity.toList()[xyz]) <= 0L)
+                return null
+        }
+        return position.toLong()
+    }
 }
 
 data class Stone(var position: Point3DL = Point3DL(0,0,0), var velocity: Point3DL = Point3DL(0,0,0)) {
