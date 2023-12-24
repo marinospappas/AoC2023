@@ -70,18 +70,19 @@ class HailStones(input: List<String>) {
         val vYThrow = vyReduced.last()
         val vZThrow = vzReduced.last()
         // step 2 calculate position
+        // TODO: refactor the position calculation to make it more robust
         val (xThrow, time1) = LinearEqSys.solve2(
             longArrayOf(1,1),
-            longArrayOf(vXThrow - stones[0].velocity.x, vXThrow - stones[1].velocity.x),
-            longArrayOf(stones[0].position.x, stones[1].position.x))
+            longArrayOf(vXThrow - stones[0].velocity.x, vXThrow - stones.last().velocity.x),
+            longArrayOf(stones[0].position.x, stones.last().position.x))
         val (yThrow, time2) = LinearEqSys.solve2(
             longArrayOf(1,1),
-            longArrayOf(vYThrow - stones[0].velocity.y, vYThrow - stones[1].velocity.y),
-            longArrayOf(stones[0].position.y, stones[1].position.y))
+            longArrayOf(vYThrow - stones[0].velocity.y, vYThrow - stones.last().velocity.y),
+            longArrayOf(stones[0].position.y, stones.last().position.y))
         val (zThrow, time3) = LinearEqSys.solve2(
             longArrayOf(1,1),
-            longArrayOf(vZThrow - stones[0].velocity.z, vZThrow - stones[1].velocity.z),
-            longArrayOf(stones[0].position.z, stones[1].position.z))
+            longArrayOf(vZThrow - stones[0].velocity.z, vZThrow - stones.last().velocity.z),
+            longArrayOf(stones[0].position.z, stones.last().position.z))
         return Stone(Point3DL(xThrow.toLong(), yThrow.toLong(), zThrow.toLong()), Point3DL(vXThrow, vYThrow, vZThrow))
     }
 
