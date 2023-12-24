@@ -68,6 +68,7 @@ class Day20Test {
         assertThat(puzzleSolver.solvePart1().result).isEqualTo("11687500")
     }
 
+    // TODO: refactor to convert the Exel code to Kotlin
     @Test
     @Order(6)
     fun `Finds Pulse Cycle`() {
