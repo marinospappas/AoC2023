@@ -32,15 +32,11 @@ class WiringDiagram(val input: List<String>) {
         val connFrequency: MutableMap<Set<String>, Int> = mutableMapOf()
         val nodes: List<String> = graph.getNodes()
         for (i in 0 .. nodes.lastIndex - 1) {
-            val start = nodes[i]
-            for (j in i + 1 .. nodes.lastIndex) {
-                val end = nodes[j]
-                markConnections(start, end, connFrequency)
-            }
+            for (j in i + 1 .. nodes.lastIndex)
+                markConnections(nodes[i], nodes[j], connFrequency)
         }
         connFrequency.entries
             .sortedBy { e -> e.value }.reversed()
-            //.sortedWith(Comparator.comparingInt { (_, value): Map.Entry<Set<String>, Int> -> value }.reversed())
             .take(3).forEach { (keyPair): Map.Entry<Set<String>, Int> ->
                 graph.removeConnection(keyPair)
             }
