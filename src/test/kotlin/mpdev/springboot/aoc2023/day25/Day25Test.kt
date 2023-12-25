@@ -43,7 +43,8 @@ class Day25Test {
             .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
             .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
             .println()
-        wiringDiagram.graph.forEach { it.println() }
+       // wiringDiagram.graph_.forEach { it.println() }
+        wiringDiagram.graph.getNodesAndConnections().forEach { it.println() }
     }
 
     @Test
