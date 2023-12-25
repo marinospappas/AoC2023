@@ -1,17 +1,38 @@
 package mpdev.springboot.aoc2023.solutions.day25
 
+import kotlinx.serialization.Serializable
+import mpdev.springboot.aoc2023.utils.AocInClass
+import mpdev.springboot.aoc2023.utils.AocInField
+import mpdev.springboot.aoc2023.utils.InputUtils
 import java.util.*
 import kotlin.Comparator
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
+
+@Serializable
+@AocInClass(delimiters = [": "])
+data class AoCInput(
+    // cmg: qnr nvd lhk bvb
+    // 0    1
+    @AocInField(0) val id: String,
+    @AocInField(1, delimiters = [" "]) val connections: List<String>
+)
 
 // TODO: review the below to see if performance can be improved - use the SGraph class
 class WiringDiagram(val input: List<String>) {
 
-    val graph: MutableMap<String, MutableSet<String>> = HashMap()
+    var debug = false
+    private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
+    val graph: MutableMap<String, MutableSet<String>> = mutableMapOf()
+
+    init {
+        aocInputList.forEach { inputRec ->
+            for (conxn in inputRec.connections) {
+                graph.computeIfAbsent(inputRec.id) { k: String? -> HashSet() }.add(conxn)
+                graph.computeIfAbsent(conxn) { k: String? -> HashSet() }.add(inputRec.id)
+            }
+        }
+    }
 
     fun solvePart1(): Int {
-        input.forEach { l: String -> processLine(l, graph) }
         val edgeFrequency: MutableMap<Set<String>, Int> = mutableMapOf()
         val vertexes: List<String> = graph.keys.toList()
         for (i in vertexes.indices) {
@@ -79,20 +100,6 @@ class WiringDiagram(val input: List<String>) {
             }
         }
         return visited.size
-    }
-
-    private fun processLine(line: String, graph: MutableMap<String, MutableSet<String>>) {
-        val parts = line.split(": ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val name = parts[0]
-        val cons = parts[1].split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        for (con in cons) {
-            markConnection(graph, name, con)
-        }
-    }
-
-    private fun markConnection(graph: MutableMap<String, MutableSet<String>>, from: String, to: String) {
-        graph.computeIfAbsent(from) { k: String? -> HashSet() }.add(to)
-        graph.computeIfAbsent(to) { k: String? -> HashSet() }.add(from)
     }
 
     internal class Step(var vertex: String, val edges: List<Set<String>>)

@@ -1,8 +1,10 @@
 package mpdev.springboot.aoc2023.day25
 
 import mpdev.springboot.aoc2023.input.InputDataReader
+import mpdev.springboot.aoc2023.solutions.day25.AoCInput
 import mpdev.springboot.aoc2023.solutions.day25.Day25
 import mpdev.springboot.aoc2023.solutions.day25.WiringDiagram
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -34,9 +36,15 @@ class Day25Test {
     @Test
     @Order(3)
     fun `Reads Input ans sets Wired Components`() {
+        println("input transformed")
+        inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
+        println("input to json")
+        inputLines.map { InputUtils(AoCInput::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
+            .println()
         wiringDiagram.graph.forEach { it.println() }
     }
-
 
     @Test
     @Order(5)
