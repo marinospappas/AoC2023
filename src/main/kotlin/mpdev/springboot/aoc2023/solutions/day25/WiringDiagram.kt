@@ -39,8 +39,9 @@ class WiringDiagram(val input: List<String>) {
             }
         }
         connFrequency.entries
-            .sortedWith(Comparator.comparingInt { (_, value): Map.Entry<Set<String>, Int> -> value }
-                .reversed()).take(3).forEach { (keyPair): Map.Entry<Set<String>, Int> ->
+            .sortedBy { e -> e.value }.reversed()
+            //.sortedWith(Comparator.comparingInt { (_, value): Map.Entry<Set<String>, Int> -> value }.reversed())
+            .take(3).forEach { (keyPair): Map.Entry<Set<String>, Int> ->
                 graph.removeConnection(keyPair)
             }
         val part1Size = getGroupSize(graph.getNodes().first())
