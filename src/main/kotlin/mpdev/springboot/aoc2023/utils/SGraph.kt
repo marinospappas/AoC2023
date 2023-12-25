@@ -1,7 +1,5 @@
 package mpdev.springboot.aoc2023.utils
 
-import java.util.*
-
 /**
  * simple graph class
  * nodes: map of node_id to (map connected_node_id to weight)

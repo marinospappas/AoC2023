@@ -2,9 +2,7 @@ package mpdev.springboot.aoc2023.solutions.day24
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
-import kotlin.math.abs
 import kotlin.math.ceil
-import kotlin.math.floor
 
 @Serializable
 @AocInClass(delimiters = ["@"])
@@ -118,7 +116,7 @@ class HailStones(input: List<String>) {
             if (vThrow == stones[i].velocity.toList()[xyz])
                 return@forEach
             if ((stones[i].position.toList()[xyz] - position.toLong()) % (vThrow - stones[i].velocity.toList()[xyz]) != 0L
-                || (stones[i].position.toList()[xyz] - position.toLong()) % (vThrow - stones[i].velocity.toList()[xyz]) <= 0L)
+                || (stones[i].position.toList()[xyz] - position.toLong()) / (vThrow - stones[i].velocity.toList()[xyz]) <= 0L)
                 return null
         }
         return position.toLong()
