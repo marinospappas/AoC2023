@@ -30,12 +30,12 @@ class WiringDiagram(val input: List<String>) {
 
     fun solvePart1(): Int {
         val connFrequency: MutableMap<Set<String>, Int> = mutableMapOf()
-        val vertices: List<String> = graph.getNodes()
-        for (i in 0 .. vertices.lastIndex - 1) {
-            val start = vertices[i]
-            for (j in i + 1 .. vertices.lastIndex) {
-                val target = vertices[j]
-                markConnections(start, target, connFrequency)
+        val nodes: List<String> = graph.getNodes()
+        for (i in 0 .. nodes.lastIndex - 1) {
+            val start = nodes[i]
+            for (j in i + 1 .. nodes.lastIndex) {
+                val end = nodes[j]
+                markConnections(start, end, connFrequency)
             }
         }
         connFrequency.entries
@@ -48,15 +48,15 @@ class WiringDiagram(val input: List<String>) {
     }
 
     private fun markConnections(
-        start: String, target: String, connectionFrequency: MutableMap<Set<String>, Int>) {
+        start: String, end: String, connectionFrequency: MutableMap<Set<String>, Int>) {
         val queue: Queue<Step> = LinkedList()
         val visited: MutableSet<String> = mutableSetOf()
         queue.add(Step(start, listOf()))
         visited.add(start)
         while (!queue.isEmpty()) {
             val curr = queue.poll()
-            if (curr.nodeId == target) {
-                curr.connections.forEach { e: Set<String> ->
+            if (curr.nodeId == end) {
+                curr.connections.forEach { e ->
                     val v = connectionFrequency.getOrDefault(e, 0)
                     connectionFrequency[e] = v + 1
                 }
