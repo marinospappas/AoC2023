@@ -79,6 +79,7 @@ class HailStones(input: List<String>) {
         val (vx, vy, vz) = calculateThrowSpeed()
         log.info("calculated speed: {}, {}, {},", vx, vy, vz)
         val (x, y, z) = calculateThrowPosition(vx, vy, vz)
+        log.info("calculated position: {}, {}, {},", x, y, z)
         return Stone(Point3DL(x, y, z), Point3DL(vx, vy, vz))
     }
 
@@ -90,15 +91,15 @@ class HailStones(input: List<String>) {
      * then
      * For each collision
      *   Xt = Xot + Vxt * T1      trajectory of the throw
-     *   X1 + Xo1 + Vx1 * T1      trajectory of stone 1
+     *   X1 = Xo1 + Vx1 * T1      trajectory of stone 1
      * if T1 is the time of the collision with stone 1 and T2 with stone 2, we have
      *   Xot + Vxt * T1 = Xo1 + Vx1 * T1
      *   Xot + Vxt * T2 = Xo2 + Vx2 * T2
      * We take all the stones that have SAME Vx (i.e. Vx1 = Vx2 above) and by removing Xt we have
      *   Xo1 - Xo2 = (T1 - T2) * (Vxt - Vx12)
      * which means that we need to select those speeds Vxt for which the modulo (Xo1 - Xo2) % (Vxt - Vx12) is 0
+     * As all the stone speeds are similar, the throw must also happen at similar speed
      * A range is chosen between 2 * lowest negative speed and 2 * highest positive speed
-     *
      */
     private fun calculateThrowSpeed(): Triple<Long,Long,Long> {
         val vxSet = mutableListOf<Set<Long>>()
@@ -129,15 +130,29 @@ class HailStones(input: List<String>) {
         return result
     }
 
+    /**
+     * the position is calculated by using the vx and vy velocity components of the throw and the first 2 stones x and y
+     * as follows
+     * if T1 is the time of the collision with stone 1 and T2 with stone 2, we use the x and y components and have
+     *   Xot + Vxt * T1 = Xo1 + Vx1 * T1
+     *   Xot + Vxt * T2 = Xo2 + Vx2 * T2   and
+     *   Yot + Vyt * T1 = Yo1 + Vy1 * T1
+     *   Yot + Vyt * T2 = Yo2 + Vy2 * T2
+     * by eliminating Xot and Yot (the x, y of the throw) we get
+     *   (Vxt - Vx1) * T1 + (Vx2 - Vxt) * T2 = Xo1 - Xo2
+     *   (Vyt - Vy1) * T1 + (Vy2 - Vyt) * T2 = Yo1 - yo2
+     * we solve this for T1 and T2 and from T1 and the first equation above we get the x of the throw
+     *   Xot = Xo1 + T1 * (Vx1 - Vxt)   and similarly we get the y and z of the throw
+     */
     private fun calculateThrowPosition(vx: Long, vy: Long, vz: Long): Triple<Long,Long,Long> {
-        val (_, t1) = LinearEqSys.solve2(
-            longArrayOf(vx - stones[1].velocity.x, vy - stones[1].velocity.y),
-            longArrayOf(stones[0].velocity.x - vx, stones[0].velocity.y - vy),
-            longArrayOf(stones[1].position.x - stones[0].position.x, stones[1].position.y - stones[0].position.y),
+        val (t1, _) = LinearEqSys.solve2(
+            longArrayOf(vx - stones[0].velocity.x, vy - stones[0].velocity.y),
+            longArrayOf(stones[1].velocity.x - vx, stones[1].velocity.y - vy),
+            longArrayOf(stones[0].position.x - stones[1].position.x, stones[0].position.y - stones[1].position.y),
         )
-        val posX = stones[0].position.x - t1.toLong() * (vx - stones[0].velocity.x)
-        val posY = stones[0].position.y - t1.toLong() * (vy - stones[0].velocity.y)
-        val posZ = stones[0].position.z - t1.toLong() * (vz - stones[0].velocity.z)
+        val posX = stones[0].position.x + t1.toLong() * (stones[0].velocity.x - vx)
+        val posY = stones[0].position.y + t1.toLong() * (stones[0].velocity.y - vy)
+        val posZ = stones[0].position.z + t1.toLong() * (stones[0].velocity.z - vz)
         return Triple(posX,posY,posZ)
     }
 }
