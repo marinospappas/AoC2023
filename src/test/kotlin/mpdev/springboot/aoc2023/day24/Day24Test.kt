@@ -5,7 +5,7 @@ import mpdev.springboot.aoc2023.solutions.day24.AoCInput
 import mpdev.springboot.aoc2023.solutions.day24.Day24
 import mpdev.springboot.aoc2023.solutions.day24.HailStones
 import mpdev.springboot.aoc2023.utils.InputUtils
-import mpdev.springboot.aoc2023.utils.LinearEqSys
+import mpdev.springboot.aoc2023.utils.Point3DL
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -45,6 +45,7 @@ class Day24Test {
             .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
             .println()
         hailStones.stones.forEach { it.println() }
+        assertThat(hailStones.stones.size).isEqualTo(5)
     }
 
     @Test
@@ -67,12 +68,13 @@ class Day24Test {
     @Order(6)
     fun `Calculates Throw Position and Speed`() {
         val `throw` = hailStones.calculateThrow().also { it.println() }
+        assertThat(`throw`.position).isEqualTo(Point3DL(24,13,10))
+        assertThat(`throw`.velocity).isEqualTo(Point3DL(-3,1,2))
     }
 
     @Test
     @Order(8)
     fun `Solves Part 2`() {
-        puzzleSolver.solvePart1()
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("47")
     }
 }

@@ -15,6 +15,9 @@ data class Point3DL(var x: Long, var y: Long, var z: Long): Comparable<Point3DL>
         else
             return this.y.compareTo(other.y)
     }
+
+    operator fun get(i: Int) = when(i) { 0-> x; 1-> y; else-> z }
+
     operator fun plus(other: Point3DL) =
         Point3DL(this.x + other.x, this.y + other.y, this.z + other.z)
 

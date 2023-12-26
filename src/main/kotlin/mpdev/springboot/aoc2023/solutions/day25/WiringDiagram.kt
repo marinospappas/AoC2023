@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
 import java.util.*
 import kotlin.Comparator
+import kotlin.collections.ArrayDeque
 
 @Serializable
 @AocInClass(delimiters = [": "])
@@ -19,7 +20,6 @@ class WiringDiagram(val input: List<String>) {
 
     var debug = false
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
-    //val graph_: MutableMap<String, MutableSet<String>> = mutableMapOf()
     val graph = SGraph<String>()
 
     init {
@@ -46,12 +46,12 @@ class WiringDiagram(val input: List<String>) {
 
     private fun markConnections(
         start: String, end: String, connectionFrequency: MutableMap<Set<String>, Int>) {
-        val queue: Queue<Step> = LinkedList()
-        val visited: MutableSet<String> = mutableSetOf()
+        val queue = ArrayDeque<Step>()
+        val visited = mutableSetOf<String>()
         queue.add(Step(start, listOf()))
         visited.add(start)
         while (!queue.isEmpty()) {
-            val curr = queue.poll()
+            val curr = queue.removeFirst()
             if (curr.nodeId == end) {
                 curr.connections.forEach { e ->
                     val v = connectionFrequency.getOrDefault(e, 0)
@@ -59,13 +59,13 @@ class WiringDiagram(val input: List<String>) {
                 }
                 return
             }
-            graph[curr.nodeId].filter { n -> !visited.contains(n.key) }.forEach { n ->
+            graph[curr.nodeId].keys.filter { n -> !visited.contains(n) }.forEach { n ->
                 val nextConnections: MutableList<Set<String>> =
                     curr.connections.toMutableList()
-                nextConnections.add(setOf(curr.nodeId, n.key))
-                val nextStep = Step(n.key, nextConnections)
+                nextConnections.add(setOf(curr.nodeId, n))
+                val nextStep = Step(n, nextConnections)
                 queue.add(nextStep)
-                visited.add(n.key)
+                visited.add(n)
             }
         }
     }
@@ -77,9 +77,9 @@ class WiringDiagram(val input: List<String>) {
         visited.add(start)
         while (!queue.isEmpty()) {
             val curr = queue.poll()
-            graph[curr].filter { n -> !visited.contains(n.key) }.forEach { n ->
-                queue.add(n.key)
-                visited.add(n.key)
+            graph[curr].keys.filter { n -> !visited.contains(n) }.forEach { n ->
+                queue.add(n)
+                visited.add(n)
             }
         }
         return visited.size
