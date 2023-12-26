@@ -62,6 +62,19 @@ class HailStones(input: List<String>) {
      * including the same for Y and Z we have a total of 9 equations with 9 unknowns
      * the python code for this is quite simple (using sympy)
      *
+     * x = Symbol('x')
+     * y = Symbol('y')
+     * z = Symbol('z')
+     * vx = Symbol('vx')
+     * vy = Symbol('vy')
+     * vz = Symbol('vz')
+     * equations = []
+     * t_syms = []
+     * # the first 3 stones will gives 9 equations with 9 unknowns
+     * for idx,stone in enumerate(stones[:3]):
+     *   # vxt is the velocity of the throw, vx is the velocity of the stone
+     *   x,y,z,vx,vy,vz = stone
+     *
      *   t = Symbol('t'+str(index))
      *   x_eq = x + vx*t - xt - vxt*t
      *   y_eq = y + vy*t - yt - vyt*t
