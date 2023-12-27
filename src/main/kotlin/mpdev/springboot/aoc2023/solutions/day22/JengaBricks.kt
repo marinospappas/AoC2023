@@ -18,7 +18,7 @@ class JengaBricks(input: List<String>) {
 
     var debug = false
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
-    val bricks = aocInputList.sortedBy { it.coord1[2] }
+    val bricks: List<Brick> = aocInputList.sortedBy { it.coord1[2] }
         .map {
             val pointsSet = mutableSetOf<PointND>()
             for (x in it.coord1[0] .. it.coord2[0])
@@ -71,19 +71,23 @@ class JengaBricks(input: List<String>) {
         }
     }
 
-    //TODO: refactor the below to see if it can be done more efficiently by use of Queue
+    /**
+     * for each brick removed, the fallen bricks are determined using a Queue and BFS
+     * each brick supported by a fallen brick, will fall if all of its supports have already fallen
+     */
     fun determineBricksToFall(brickId: Int): Int {
-        val jenga = bricks.indices.toMutableList().also { j -> j.remove(brickId) }
-        val fallen = mutableListOf(brickId)
-        do {
-            val willFall = jenga.filter {
-                bricks[it].supportedBy.isNotEmpty() && bricks[it].supportedBy.all { supportId ->
-                    fallen.contains(supportId)
+        val queue = ArrayDeque<Int>().also { it.add(brickId) }
+        val fallen = mutableListOf<Int>().also { it.add(brickId) }
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+            bricks[current].supports.forEach { supported ->
+                if (!fallen.contains(supported) &&
+                    bricks[supported].supportedBy.all { supportId -> fallen.contains(supportId) }) {
+                    fallen.add(supported)
+                    queue.add(supported)
                 }
             }
-            jenga.removeAll(willFall)
-            fallen.addAll(willFall)
-        } while (willFall.isNotEmpty())
+        }
         return fallen.size - 1
     }
 }
