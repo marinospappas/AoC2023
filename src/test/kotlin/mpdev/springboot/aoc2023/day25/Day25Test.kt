@@ -4,8 +4,7 @@ import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day25.AoCInput
 import mpdev.springboot.aoc2023.solutions.day25.Day25
 import mpdev.springboot.aoc2023.solutions.day25.WiringDiagram
-import mpdev.springboot.aoc2023.utils.InputUtils
-import mpdev.springboot.aoc2023.utils.println
+import mpdev.springboot.aoc2023.utils.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
@@ -43,7 +42,17 @@ class Day25Test {
             .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
             .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
             .println()
-        wiringDiagram.graph.getNodesAndConnections().forEach { it.println() }
+        val nodes = wiringDiagram.graph.getNodesAndConnections().onEach { it.println() }
+        val connectedPairs = wiringDiagram.graph.getAllConnectedPairs().onEach { it.println() }
+        assertThat(nodes.size).isEqualTo(15)
+        assertThat(connectedPairs.size).isEqualTo(33)
+    }
+
+    @Test
+    @Order(4)
+    fun `Breaks Connections to split the Graph in Two`() {
+        val (g1, g2) = wiringDiagram.breakConnectionsV2().also { it.println() }
+        assertThat(setOf(g1,g2)).isEqualTo(setOf(6,9))
     }
 
     @Test
@@ -56,6 +65,6 @@ class Day25Test {
     @Test
     @Order(8)
     fun `Solves Part 2`() {
-        // NA - assertThat(puzzleSolver.solvePart2().result).isEqualTo("47")
+        // NA - assertThat(puzzleSolver.solvePart2().result).isEqualTo("")
     }
 }

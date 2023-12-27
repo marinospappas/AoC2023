@@ -36,11 +36,11 @@ class TrailMap(input: List<String>) {
     }
 
     fun findMaxPath1(): Int {
-        return initGraph(1).getMaxPathDfs(start, end)
+        return initGraph(1).longestPathDfs(start, end)
     }
 
     fun findMaxPath2(): Int {
-        return SGraph(reduceGraph(initGraph(2)).nodes).getMaxPathDfs(start, end)
+        return SGraph(reduceGraph(initGraph(2)).nodes).longestPathDfs(start, end)
     }
 
     fun reduceGraph(graph: SGraph<Point>): SGraph<Point> {

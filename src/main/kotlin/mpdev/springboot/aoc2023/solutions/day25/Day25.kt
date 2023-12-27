@@ -28,7 +28,7 @@ class Day25: PuzzleSolver() {
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = wiringDiagram.solvePart1()
+            result = wiringDiagram.breakConnectionsV2().let { it.first* it.second }
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }

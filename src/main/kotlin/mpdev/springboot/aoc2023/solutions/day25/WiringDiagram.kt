@@ -2,9 +2,8 @@ package mpdev.springboot.aoc2023.solutions.day25
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
-import java.util.*
-import kotlin.Comparator
-import kotlin.collections.ArrayDeque
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @Serializable
 @AocInClass(delimiters = [": "])
@@ -18,7 +17,7 @@ data class AoCInput(
 // TODO: review the below to see if performance can be improved
 class WiringDiagram(val input: List<String>) {
 
-    var debug = false
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
     val graph = SGraph<String>()
 
@@ -28,62 +27,70 @@ class WiringDiagram(val input: List<String>) {
         }
     }
 
-    fun solvePart1(): Int {
-        val connFrequency: MutableMap<Set<String>, Int> = mutableMapOf()
-        val nodes: List<String> = graph.getNodes()
-        for (i in 0 .. nodes.lastIndex - 1) {
-            for (j in i + 1 .. nodes.lastIndex)
-                markConnections(nodes[i], nodes[j], connFrequency)
-        }
-        connFrequency.entries
-            .sortedBy { e -> e.value }.reversed()
-            .take(3).forEach { (keyPair): Map.Entry<Set<String>, Int> ->
-                graph.removeConnection(keyPair)
-            }
-        val part1Size = getGroupSize(graph.getNodes().first())
-        return part1Size * (graph.getNodes().size - part1Size)
-    }
-
-    private fun markConnections(
-        start: String, end: String, connectionFrequency: MutableMap<Set<String>, Int>) {
-        val queue = ArrayDeque<Step>()
-        val visited = mutableSetOf<String>()
-        queue.add(Step(start, listOf()))
-        visited.add(start)
-        while (!queue.isEmpty()) {
-            val curr = queue.removeFirst()
-            if (curr.nodeId == end) {
-                curr.connections.forEach { e ->
-                    val v = connectionFrequency.getOrDefault(e, 0)
-                    connectionFrequency[e] = v + 1
+    /**
+     * solution 1 - too slow
+     * For each connected pair
+     *   break the connection and get the shortest path between that pair
+     *   for each component in the above path
+     *     break that connection and get the shortest path between that latest pair
+     *     for each component in the latest path
+     *       break that connection and get the shortest path between that latest pair
+     *       if there is no path between them then we have the three connections to break
+     */
+    fun breakConnectionsV1(): Pair<Int,Int> {
+        val totalGraphCount = graph.getAllConnectedNodes(graph.nodes.keys.first()).size
+        for (connPair1 in graph.getAllConnectedPairs()) {
+            val tmpGraph1 = SGraph.of(graph).also { g -> g.removeConnection(connPair1) }
+            val pathAB1 = tmpGraph1.shortestPathBfs(connPair1.first(), connPair1.last())
+            val connectedPairs2 = mutableSetOf<Set<String>>()
+            for (i in 0 .. pathAB1.lastIndex - 1)
+                for (j in i + 1 .. pathAB1.lastIndex)
+                    connectedPairs2.add(setOf(pathAB1[i], pathAB1[j]))
+            for (connPair2 in connectedPairs2) {
+                val tmpGraph2 = SGraph.of(tmpGraph1).also { g -> g.removeConnection(connPair2) }
+                val pathAB2 = tmpGraph2.shortestPathBfs(connPair1.first(), connPair1.last())
+                val connectedPairs3 = mutableSetOf<Set<String>>()
+                for (i in 0 .. pathAB2.lastIndex - 1)
+                    for (j in i + 1 .. pathAB2.lastIndex)
+                        connectedPairs3.add(setOf(pathAB2[i], pathAB2[j]))
+                for (connPair3 in connectedPairs3) {
+                    val tmpGraph3 = SGraph.of(tmpGraph2).also { g -> g.removeConnection(connPair3) }
+                    val pathAB3 = tmpGraph3.shortestPathBfs(connPair1.first(), connPair1.last())
+                    if (pathAB3 == listOf<String>()) {
+                        log.info("removed connections: {}, {}, {}", connPair1, connPair2, connPair3)
+                        val count1 = tmpGraph3.getAllConnectedNodes(connPair1.first()).size
+                        val count2 = tmpGraph3.getAllConnectedNodes(connPair1.last()).size
+                        if (count1 + count2 == totalGraphCount)
+                            return Pair(count1, count2)
+                    }
                 }
-                return
-            }
-            graph[curr.nodeId].keys.filter { n -> !visited.contains(n) }.forEach { n ->
-                val nextConnections: MutableList<Set<String>> =
-                    curr.connections.toMutableList()
-                nextConnections.add(setOf(curr.nodeId, n))
-                val nextStep = Step(n, nextConnections)
-                queue.add(nextStep)
-                visited.add(n)
             }
         }
+        return Pair(-1,-1)
     }
 
-    private fun getGroupSize(start: String): Int {
-        val queue: Queue<String> = LinkedList()
-        val visited: MutableSet<String> = mutableSetOf()
-        queue.add(start)
-        visited.add(start)
-        while (!queue.isEmpty()) {
-            val curr = queue.poll()
-            graph[curr].keys.filter { n -> !visited.contains(n) }.forEach { n ->
-                queue.add(n)
-                visited.add(n)
-            }
+    /**
+     * solution 2 - fast
+     *  For each connected pair
+     *    break the connection and get the shortest path between that pair
+     *  Take the three pairs that are furthest apart (the three longest paths)
+     *    these are the three connections to break
+     */
+    fun breakConnectionsV2(): Pair<Int,Int> {
+        val totalGraphCount = graph.getAllConnectedNodes(graph.nodes.keys.first()).size
+        val pathSizes = mutableMapOf<Set<String>,Int>()
+        for (connPair in graph.getAllConnectedPairs()) {
+            val tmpGraph1 = SGraph.of(graph)
+            tmpGraph1.removeConnection(connPair)
+            pathSizes[connPair] = tmpGraph1.shortestPathBfs(connPair.first(), connPair.last()).size
         }
-        return visited.size
+        val connectionsToRemove = pathSizes.entries.sortedBy { it.value }.reversed().take(3).map { it.key }
+        connectionsToRemove.forEach { graph.removeConnection(it) }
+        log.info("removed connections: {}", connectionsToRemove)
+        val count1 = graph.getAllConnectedNodes(connectionsToRemove.first().first()).size
+        val count2 = graph.getAllConnectedNodes(connectionsToRemove.first().last()).size
+        if (count1 + count2 == totalGraphCount)
+            return Pair(count1, count2)
+        return Pair(-1,-1)
     }
-
-    internal class Step(var nodeId: String, val connections: List<Set<String>>)
 }

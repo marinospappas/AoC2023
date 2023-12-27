@@ -1,13 +1,11 @@
 package mpdev.springboot.aoc2023.utils
 
-import java.util.HashSet
-
 /**
  * simple graph class
  * nodes: map of node_id to (map connected_node_id to weight)
  */
 //TODO replace the Int weight with Weight<U> to be able to implement custom compare
-class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf()) {
+class SGraph<T: Comparable<T>>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf()) {
 
     constructor(nodesList: List<Pair<T, MutableSet<T>>>):
             this (nodesList.map { (id, conn) ->
@@ -22,12 +20,11 @@ class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf()) {
 
     fun getNodesAndConnections() = nodes.toList()
 
-    fun removeConnection(edge: Set<T>) {
-        nodes[edge.first()]!!.remove(edge.last())
-        nodes[edge.last()]!!.remove(edge.first())
+    fun addNode(id: T, connected: T, connectBothWays: Boolean = false) {
+        addNode(id, mapOf(connected to 1), connectBothWays)
     }
 
-    fun addNode(id: T, connected: Set<T>, connectBothWays: Boolean = false) {
+    fun addNode(id: T, connected: Set<T> = emptySet(), connectBothWays: Boolean = false) {
         addNode(id, connected.associateWith { 1 }, connectBothWays)
     }
 
@@ -38,7 +35,22 @@ class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf()) {
             connected.forEach { (cId, v) -> addNode(cId, mapOf(id to v)) }
     }
 
-    fun getMaxPathDfs(start: T, end: T): Int {
+    fun getConnected(id: T): Set<Pair<T,Int>> = (nodes[id] ?: emptyMap()).map { Pair(it.key, it.value) }.toSet()
+
+    fun getAllConnectedPairs(): Set<Set<T>> {
+        return nodes.map { n -> n.value.map { c -> setOf(n.key, c.key) } }.flatten().toSet()
+    }
+
+    fun removeConnection(a: T, b: T) {
+        removeConnection(setOf(a, b))
+    }
+
+    fun removeConnection(edge: Set<T>) {
+        nodes[edge.first()]?.remove(edge.last())
+        nodes[edge.last()]?.remove(edge.first())
+    }
+
+    fun longestPathDfs(start: T, end: T): Int {
         return dfsMaxPath(start, end, mutableMapOf()) ?: -1
     }
 
@@ -61,4 +73,14 @@ class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf()) {
         return maxPath
     }
 
+    companion object {
+        inline fun <reified T: Comparable<T>> of(g: SGraph<T>): SGraph<T> {
+            val newGraph = SGraph<T>()
+            for ((id, connxns) in g.nodes) {
+                for ((connId, cost) in connxns)
+                    newGraph.addNode(id, mapOf(connId to cost))
+            }
+            return newGraph
+        }
+    }
 }

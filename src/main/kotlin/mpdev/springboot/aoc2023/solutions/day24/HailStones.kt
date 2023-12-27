@@ -23,8 +23,8 @@ class HailStones(input: List<String>) {
     val stones: List<Stone> = aocInputList.map { Stone(Point3DL(it.position), Point3DL(it.velocity)) }
     var testArea = LongRange(200000000000000, 400000000000000)
     // estimated V range for the throw
-    val vMin = stones.minOf { it.velocity.toList().min() } * 2
-    val vMax = stones.maxOf { it.velocity.toList().max() } * 2
+    private val vMin = stones.minOf { it.velocity.toList().min() } * 2
+    private val vMax = stones.maxOf { it.velocity.toList().max() } * 2
 
     fun calculateIntersections(): Int {
         val intersectTimesXY = mutableMapOf<Pair<Int,Int>, Pair<Double,Double>>()
@@ -69,22 +69,22 @@ class HailStones(input: List<String>) {
      * vy = Symbol('vy')
      * vz = Symbol('vz')
      * equations = []
-     * t_syms = []
-     * # the first 3 stones will gives 9 equations with 9 unknowns
+     * t_symbols = []
+     * # the first 3 stones will give us 9 equations with 9 unknowns
      * for idx,stone in enumerate(stones[:3]):
-     *   # vxt is the velocity of the throw, vx is the velocity of the stone
-     *   x,y,z,vx,vy,vz = stone
+     *     # vxt is the velocity of the throw, vx is the velocity of the stone
+     *     x,y,z,vx,vy,vz = stone
+     *     t = Symbol('t'+str(index))
+     *     x_eq = x + vx * t - xt - vxt * t
+     *     y_eq = y + vy * t - yt - vyt * t
+     *     z_eq = z + vz * t - zt - vzt * t
+     *     equations.append(x_eq)
+     *     equations.append(y_eq)
+     *     equations.append(z_eq)
+     *     t_symbols.append(t)
      *
-     *   t = Symbol('t'+str(index))
-     *   x_eq = x + vx*t - xt - vxt*t
-     *   y_eq = y + vy*t - yt - vyt*t
-     *   z_eq = z + vz*t - zt - vzt*t
-     *   equations.append(x_eq)
-     *   equations.append(y_eq)
-     *   equations.append(z_eq)
-     *   t_syms.append(t)
-     * result = solve_poly_system(equations,*([x,y,z,vx,vy,vz]+t_syms))
-     * print(result[0][0],result[0][1],result[0][2],result[0][3],result[0][4],result[0][5]) #part 2 answer
+     * result = solve_poly_system(equations,*([x,y,z,vx,vy,vz]+t_symbols))
+     * print(result[0][0],result[0][1],result[0][2],result[0][3],result[0][4],result[0][5])
      *
      * Instead, the following method has been used to calculate the speed and position of the throw
      */
@@ -121,11 +121,11 @@ class HailStones(input: List<String>) {
         for (i in 0 .. stones.lastIndex-1)
             for (j in i+1 .. stones.lastIndex) {
                 if (stones[i].velocity.x == stones[j].velocity.x)
-                    vxSet.add(calculatePossibbleVThrow(Pair(stones[i].position.x, stones[j].position.x), stones[i].velocity.x))
+                    vxSet.add(calculatePossibleVThrow(Pair(stones[i].position.x, stones[j].position.x), stones[i].velocity.x))
                 if (stones[i].velocity.y == stones[j].velocity.y)
-                    vySet.add(calculatePossibbleVThrow(Pair(stones[i].position.y, stones[j].position.y), stones[i].velocity.y))
+                    vySet.add(calculatePossibleVThrow(Pair(stones[i].position.y, stones[j].position.y), stones[i].velocity.y))
                 if (stones[i].velocity.z == stones[j].velocity.z)
-                    vzSet.add(calculatePossibbleVThrow(Pair(stones[i].position.z, stones[j].position.z), stones[i].velocity.z))
+                    vzSet.add(calculatePossibleVThrow(Pair(stones[i].position.z, stones[j].position.z), stones[i].velocity.z))
             }
         // take the speed(s) that are common to every entry - if more than 1 (as in test) use the last one
         // ideally this should be further analysed but the real data gives us only 1
@@ -135,7 +135,7 @@ class HailStones(input: List<String>) {
         return Triple(vx, vy, vz)
     }
 
-    private fun calculatePossibbleVThrow(pList: Pair<Long,Long>, v: Long): Set<Long> {
+    private fun calculatePossibleVThrow(pList: Pair<Long,Long>, v: Long): Set<Long> {
         val result = mutableSetOf<Long>()
         for (vThrow in vMin .. vMax)
             if (vThrow != v && (pList.first - pList.second) % (vThrow - v) == 0L)
