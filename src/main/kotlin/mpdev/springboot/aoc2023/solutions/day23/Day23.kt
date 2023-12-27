@@ -28,7 +28,7 @@ class Day23: PuzzleSolver() {
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = trailMap.findAllPaths().maxOf { it.size - 1 }
+            result = trailMap.findMaxPath1()
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }

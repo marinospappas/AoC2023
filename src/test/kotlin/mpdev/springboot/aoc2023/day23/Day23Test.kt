@@ -3,8 +3,7 @@ package mpdev.springboot.aoc2023.day23
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day23.Day23
 import mpdev.springboot.aoc2023.solutions.day23.TrailMap
-import mpdev.springboot.aoc2023.utils.Point
-import mpdev.springboot.aoc2023.utils.SGraph
+import mpdev.springboot.aoc2023.utils.allPaths
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -47,10 +46,11 @@ class Day23Test {
     @Order(3)
     fun `Identifies All Possible Paths`() {
         //  94 steps. (The other possible hikes you could have taken were 90, 86, 82, 82, and 74
-        val paths = trailMap.findAllPaths().also { it.println() }
-        paths.map { it.size }.println()
-        paths.maxOf { it.size - 1 }.println()
-        trailMap.findMaxPath1().println()
+        val graph = trailMap.initGraph(1)
+        val paths = graph.allPaths(trailMap.start, trailMap.end).map { it.size -1 }.also { it.println() }
+        val maxSteps = trailMap.findMaxPath1().also { it.println() }
+        assertThat(paths.sorted()).isEqualTo(listOf(74, 82, 82, 86, 90, 94))
+        assertThat(maxSteps).isEqualTo(94)
     }
 
     @Test
@@ -62,10 +62,8 @@ class Day23Test {
     @Test
     @Order(6)
     fun `Identifies Max Path - part 2`() {
-        //
-        val g2 = trailMap.initGraph(2)
-        val paths = trailMap.findMaxPath2().also { it.println() }
-
+        val maxSteps = trailMap.findMaxPath2().also { it.println() }
+        assertThat(maxSteps).isEqualTo(154)
     }
 
     @Test
