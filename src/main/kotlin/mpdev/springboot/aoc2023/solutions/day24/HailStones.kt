@@ -179,5 +179,4 @@ data class Stone(var position: Point3DL = Point3DL(0,0,0), var velocity: Point3D
         longArrayOf(velocity.x, velocity.y), longArrayOf(-other.velocity.x, -other.velocity.y),
         longArrayOf(other.position.x - position.x, other.position.y - position.y)
     )
-
 }
