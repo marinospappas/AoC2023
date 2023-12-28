@@ -47,7 +47,7 @@ class FarmPlan(input: List<String>) {
      *     and then every pattern size steps
      * the 9 x 9 super gird simulates the final grid successfully
      * and gives us the formulas to calculate the final number of each kind of tile
-     * For the solution though, a 5 x 5 super grid (factor 2) has been used for performance
+     * For the solution though, and to count the points in each kind of tile a 5 x 5 super grid (factor 2) has been used for performance
      * The tile indexes used below refer to the indexes in super_gir_simulation.txt in () - these are the indexes for the 5x5 grid
      */
     fun solvePart2(factor: Long): Long {
