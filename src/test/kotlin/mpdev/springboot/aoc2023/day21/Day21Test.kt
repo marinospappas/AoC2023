@@ -62,15 +62,20 @@ class Day21Test {
     @Test
     @Order(6)
     fun `Traverses Infinite Farm`() {
-        inputLines = File("src/main/resources/inputdata/input21.txt").readLines()
+        inputLines = File("src/test/resources/inputdata/input21_1.txt").readLines()
         farmPlan = FarmPlan(inputLines)
+        farmPlan.debug = true
         val result = farmPlan.solvePart2(farmPlan.simulationFactor.toLong()).also { it.println() }
-        assertThat(result).isEqualTo(312055)
+        assertThat(result).isEqualTo(710)
     }
 
     @Test
     @Order(8)
     fun `Solves Part 2`() {
-        // NA - assertThat(puzzleSolver.solvePart2().result).isEqualTo("")
+        // ensures that the calculated number for the simulaiton is the same as the total count of points in the simulation
+        inputLines = File("src/main/resources/inputdata/input21.txt").readLines()
+        farmPlan = FarmPlan(inputLines)
+        val result = farmPlan.solvePart2(farmPlan.simulationFactor.toLong()).also { it.println() }
+        assertThat(result).isEqualTo(96435)
     }
 }

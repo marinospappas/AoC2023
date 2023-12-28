@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 class FarmPlan(input: List<String>) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
+    var debug = false
 
     val grid = Grid(input, FarmPlot.mapper, border=0)
     val start = grid.getDataPoints().filter { it.value == START }.keys.firstOrNull()
@@ -15,7 +16,7 @@ class FarmPlan(input: List<String>) {
     private val patternSize = grid.getDimensions().first  // assumed square
     private val superGridSteps = 26_501_365L // 202300 * 131 + 65
     val FACTOR = (superGridSteps - patternSize/2) / patternSize   // 202300
-    val simulationFactor = 4
+    val simulationFactor = 2    // 5 x 5 super grid used for simulation (2 x 2 + 1)
 
     fun traverseGrid(start: Point, toLevel: Int, workGrid: Grid<FarmPlot> = grid): Set<Point> {
         val pointsReached = mutableSetOf<Point>()
@@ -46,7 +47,8 @@ class FarmPlan(input: List<String>) {
      *     and then every pattern size steps
      * the 9 x 9 super gird simulates the final grid successfully
      * and gives us the formulas to calculate the final number of each kind of tile
-     * The tile indexes used below refer to the indexes in super_gir_simulation.txt
+     * For the solution though, a 5 x 5 super grid (factor 2) has been used for performance
+     * The tile indexes used below refer to the indexes in super_gir_simulation.txt in () - these are the indexes for the 5x5 grid
      */
     fun solvePart2(factor: Long): Long {
         // numbers of different patterns
@@ -58,30 +60,38 @@ class FarmPlan(input: List<String>) {
         // counts of reached points in each pattern - simulate using a super grid of 9x9 pattern
         val simGrid = createSimualtionGrid(simulationFactor)
         val simStart = simGrid.getDataPoints().filter { it.value == START }.keys.first()
-        val simPoints = traverseGrid(simStart, simulationFactor * patternSize + patternSize / 2, simGrid)
+        // the numbers of steps to run for the simulation is the coordinate of the start as this is in the middle of the super grid
+        // and we want to simulate from the middle to the edge
+        val simPoints = traverseGrid(simStart, simStart.x, simGrid)
         log.info("simulation factor {}, points reached {}", simulationFactor, simPoints.count())
 
-        val pointsOdd = getCountOfTile(13, simulationFactor, simPoints)
-        val pointsEven = getCountOfTile(22, simulationFactor, simPoints)
-        val pointsTop = getCountOfTile(4, simulationFactor, simPoints)
-        val pointsRight = getCountOfTile(44, simulationFactor, simPoints)
-        val pointsBottom = getCountOfTile(76, simulationFactor, simPoints)
-        val pointsLeft = getCountOfTile(36, simulationFactor, simPoints)
-        val pointsA1 = getCountOfTile(12, simulationFactor, simPoints)
-        val pointsB1 = getCountOfTile(3, simulationFactor, simPoints)
-        val pointsA2 = getCountOfTile(14, simulationFactor, simPoints)
-        val pointsB2 = getCountOfTile(5, simulationFactor, simPoints)
-        val pointsA3 = getCountOfTile(52, simulationFactor, simPoints)
-        val pointsB3 = getCountOfTile(53, simulationFactor, simPoints)
-        val pointsA4 = getCountOfTile(46, simulationFactor, simPoints)
-        val pointsB4 = getCountOfTile(45, simulationFactor, simPoints)
+        if (debug) {
+            simPoints.forEach { p -> simGrid.setDataPoint(p, REACHED) }
+            simGrid.print()
+        }
+        val tilesIndex = mapOf( // the indexes of each kind of tile for different simulation steps
+            4 to intArrayOf(13, 22, 4, 44, 76, 36, 12, 3, 14, 5, 52, 53, 46, 45),    // for 9 x 9 super grid
+            2 to intArrayOf(7, 12, 2, 14, 22, 10, 6, 1, 8, 3, 18, 23, 16, 21)    // for 5 x 5 super grid
+        )
+        val pointsOdd = getCountOfTile(tilesIndex[simulationFactor]?.get(0)!!, simulationFactor, simPoints)
+        val pointsEven = getCountOfTile(tilesIndex[simulationFactor]?.get(1)!!, simulationFactor, simPoints)
+        val pointsTop = getCountOfTile(tilesIndex[simulationFactor]?.get(2)!!, simulationFactor, simPoints)
+        val pointsRight = getCountOfTile(tilesIndex[simulationFactor]?.get(3)!!, simulationFactor, simPoints)
+        val pointsBottom = getCountOfTile(tilesIndex[simulationFactor]?.get(4)!!, simulationFactor, simPoints)
+        val pointsLeft = getCountOfTile(tilesIndex[simulationFactor]?.get(5)!!, simulationFactor, simPoints)
+        val pointsA1 = getCountOfTile(tilesIndex[simulationFactor]?.get(6)!!, simulationFactor, simPoints)
+        val pointsB1 = getCountOfTile(tilesIndex[simulationFactor]?.get(7)!!, simulationFactor, simPoints)
+        val pointsA2 = getCountOfTile(tilesIndex[simulationFactor]?.get(8)!!, simulationFactor, simPoints)
+        val pointsB2 = getCountOfTile(tilesIndex[simulationFactor]?.get(9)!!, simulationFactor, simPoints)
+        val pointsA3 = getCountOfTile(tilesIndex[simulationFactor]?.get(10)!!, simulationFactor, simPoints)
+        val pointsB3 = getCountOfTile(tilesIndex[simulationFactor]?.get(11)!!, simulationFactor, simPoints)
+        val pointsA4 = getCountOfTile(tilesIndex[simulationFactor]?.get(12)!!, simulationFactor, simPoints)
+        val pointsB4 = getCountOfTile(tilesIndex[simulationFactor]?.get(13)!!, simulationFactor, simPoints)
 
-        val result = countOdd * pointsOdd + countEven * pointsEven +
+        return  countOdd * pointsOdd + countEven * pointsEven +
                 pointsTop + pointsRight + pointsBottom + pointsLeft +
                 countA * (pointsA1 + pointsA2 + pointsA3 + pointsA4) +
                 countB * (pointsB1 + pointsB2 + pointsB3 + pointsB4)
-
-        return result
     }
 
     fun getCountOfTile(tileIndx: Int, factor: Int, pointsSet: Set<Point>): Int {
