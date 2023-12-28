@@ -28,14 +28,14 @@ class Day21: PuzzleSolver() {
 
     override fun solvePart1(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = farmPlan.traverseGrid(farmPlan.start, 64).size + 1L
+            result = farmPlan.traverseGrid(farmPlan.start, 64).size.toLong()
         }
         return PuzzlePartSolution(1, result.toString(), elapsed, "milli-sec")
     }
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            result = farmPlan.solvePart2()
+            result = farmPlan.solvePart2(farmPlan.FACTOR)
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

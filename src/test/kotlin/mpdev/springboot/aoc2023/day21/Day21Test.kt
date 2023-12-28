@@ -48,9 +48,9 @@ class Day21Test {
     fun `Traverses Farm`() {
         val border = farmPlan.traverseGrid(farmPlan.start, 6).also { it.println() }
         border.size.println()
-        border.forEach { farmPlan.grid.setDataPoint(it, FarmPlot.BORDER) }
+        border.forEach { farmPlan.grid.setDataPoint(it, FarmPlot.REACHED) }
         farmPlan.grid.print()
-        assertThat(border.size).isEqualTo(15)
+        assertThat(border.size).isEqualTo(16)
     }
 
     @Test
@@ -62,15 +62,10 @@ class Day21Test {
     @Test
     @Order(6)
     fun `Traverses Infinite Farm`() {
-        inputLines = File("src/test/resources/inputdata/input21_1.txt").readLines()
+        inputLines = File("src/main/resources/inputdata/input21.txt").readLines()
         farmPlan = FarmPlan(inputLines)
-        val border = farmPlan.traverseGrid(farmPlan.start, 21).also { it.println() }
-        border.size.println()
-        border.forEach { farmPlan.grid.setDataPoint(it, FarmPlot.BORDER) }
-        farmPlan.grid.print()
-        println("total:  ${farmPlan.grid.getDimensions().let { it.first * it.second }}")
-        println("rocks:  ${farmPlan.grid.countOf(FarmPlot.ROCK)}")
-        println("border: ${farmPlan.grid.countOf(FarmPlot.BORDER)}")
+        val result = farmPlan.solvePart2(farmPlan.simulationFactor.toLong()).also { it.println() }
+        assertThat(result).isEqualTo(312055)
     }
 
     @Test
