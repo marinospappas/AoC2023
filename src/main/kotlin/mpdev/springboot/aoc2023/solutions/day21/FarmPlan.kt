@@ -58,7 +58,7 @@ class FarmPlan(input: List<String>) {
         val countB = factor
 
         // counts of reached points in each pattern - simulate using a super grid of 9x9 pattern
-        val simGrid = createSimualtionGrid(simulationFactor)
+        val simGrid = createSimualtionGrid()
         val simStart = simGrid.getDataPoints().filter { it.value == START }.keys.first()
         // the numbers of steps to run for the simulation is the coordinate of the start as this is in the middle of the super grid
         // and we want to simulate from the middle to the edge
@@ -73,20 +73,20 @@ class FarmPlan(input: List<String>) {
             4 to intArrayOf(13, 22, 4, 44, 76, 36, 12, 3, 14, 5, 52, 53, 46, 45),    // for 9 x 9 super grid
             2 to intArrayOf(7, 12, 2, 14, 22, 10, 6, 1, 8, 3, 18, 23, 16, 21)    // for 5 x 5 super grid
         )
-        val pointsOdd = getCountOfTile(tilesIndex[simulationFactor]?.get(0)!!, simulationFactor, simPoints)
-        val pointsEven = getCountOfTile(tilesIndex[simulationFactor]?.get(1)!!, simulationFactor, simPoints)
-        val pointsTop = getCountOfTile(tilesIndex[simulationFactor]?.get(2)!!, simulationFactor, simPoints)
-        val pointsRight = getCountOfTile(tilesIndex[simulationFactor]?.get(3)!!, simulationFactor, simPoints)
-        val pointsBottom = getCountOfTile(tilesIndex[simulationFactor]?.get(4)!!, simulationFactor, simPoints)
-        val pointsLeft = getCountOfTile(tilesIndex[simulationFactor]?.get(5)!!, simulationFactor, simPoints)
-        val pointsA1 = getCountOfTile(tilesIndex[simulationFactor]?.get(6)!!, simulationFactor, simPoints)
-        val pointsB1 = getCountOfTile(tilesIndex[simulationFactor]?.get(7)!!, simulationFactor, simPoints)
-        val pointsA2 = getCountOfTile(tilesIndex[simulationFactor]?.get(8)!!, simulationFactor, simPoints)
-        val pointsB2 = getCountOfTile(tilesIndex[simulationFactor]?.get(9)!!, simulationFactor, simPoints)
-        val pointsA3 = getCountOfTile(tilesIndex[simulationFactor]?.get(10)!!, simulationFactor, simPoints)
-        val pointsB3 = getCountOfTile(tilesIndex[simulationFactor]?.get(11)!!, simulationFactor, simPoints)
-        val pointsA4 = getCountOfTile(tilesIndex[simulationFactor]?.get(12)!!, simulationFactor, simPoints)
-        val pointsB4 = getCountOfTile(tilesIndex[simulationFactor]?.get(13)!!, simulationFactor, simPoints)
+        val pointsOdd = getCountOfTile(tilesIndex[simulationFactor]?.get(0)!!, simPoints)
+        val pointsEven = getCountOfTile(tilesIndex[simulationFactor]?.get(1)!!, simPoints)
+        val pointsTop = getCountOfTile(tilesIndex[simulationFactor]?.get(2)!!, simPoints)
+        val pointsRight = getCountOfTile(tilesIndex[simulationFactor]?.get(3)!!, simPoints)
+        val pointsBottom = getCountOfTile(tilesIndex[simulationFactor]?.get(4)!!, simPoints)
+        val pointsLeft = getCountOfTile(tilesIndex[simulationFactor]?.get(5)!!, simPoints)
+        val pointsA1 = getCountOfTile(tilesIndex[simulationFactor]?.get(6)!!, simPoints)
+        val pointsB1 = getCountOfTile(tilesIndex[simulationFactor]?.get(7)!!, simPoints)
+        val pointsA2 = getCountOfTile(tilesIndex[simulationFactor]?.get(8)!!, simPoints)
+        val pointsB2 = getCountOfTile(tilesIndex[simulationFactor]?.get(9)!!, simPoints)
+        val pointsA3 = getCountOfTile(tilesIndex[simulationFactor]?.get(10)!!, simPoints)
+        val pointsB3 = getCountOfTile(tilesIndex[simulationFactor]?.get(11)!!, simPoints)
+        val pointsA4 = getCountOfTile(tilesIndex[simulationFactor]?.get(12)!!, simPoints)
+        val pointsB4 = getCountOfTile(tilesIndex[simulationFactor]?.get(13)!!, simPoints)
 
         return  countOdd * pointsOdd + countEven * pointsEven +
                 pointsTop + pointsRight + pointsBottom + pointsLeft +
@@ -94,28 +94,28 @@ class FarmPlan(input: List<String>) {
                 countB * (pointsB1 + pointsB2 + pointsB3 + pointsB4)
     }
 
-    fun getCountOfTile(tileIndx: Int, factor: Int, pointsSet: Set<Point>): Int {
-        val row = tileIndx / (2*factor + 1)
-        val col = tileIndx % (2*factor + 1)
+    private fun getCountOfTile(tileIndx: Int, pointsSet: Set<Point>): Int {
+        val row = tileIndx / (2*simulationFactor + 1)
+        val col = tileIndx % (2*simulationFactor + 1)
         return pointsSet.count { p ->
             p.x in patternSize*col until patternSize*(col+1) && p.y in patternSize*row until patternSize*(row+1)
         }
     }
 
-    fun createSimualtionGrid(factor: Int): Grid<FarmPlot> {
+    private fun createSimualtionGrid(): Grid<FarmPlot> {
         val simMap = mutableMapOf<Point,FarmPlot>()
         // multiply to the right
         grid.getDataPoints().forEach { (p,v) ->
-            for (i in 0 until 2*factor + 1)
+            for (i in 0 until 2*simulationFactor + 1)
                 simMap[Point(p.x + i * patternSize, p.y)] = if (v == START) EMPTY else v
         }
         // multiply down
         simMap.toMap().forEach { (p,v) ->
-            for (i in 0 until 2*factor + 1)
+            for (i in 0 until 2*simulationFactor + 1)
                 simMap[Point(p.x, p.y + i * patternSize)] = v
         }
         val start = Point(
-            (2*factor + 1)/2 * patternSize + patternSize/2, (2*factor + 1)/2 * patternSize + patternSize/2
+            (2*simulationFactor + 1)/2 * patternSize + patternSize/2, (2*simulationFactor + 1)/2 * patternSize + patternSize/2
         )
         simMap[start] = START
         return Grid(simMap, FarmPlot.mapper, border=0)
