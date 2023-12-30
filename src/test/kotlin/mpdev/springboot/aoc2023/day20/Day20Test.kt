@@ -3,12 +3,12 @@ package mpdev.springboot.aoc2023.day20
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day20.*
 import mpdev.springboot.aoc2023.utils.InputUtils
-import mpdev.springboot.aoc2023.utils.divisors
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.io.File
 
 class Day20Test {
@@ -68,23 +68,15 @@ class Day20Test {
         assertThat(puzzleSolver.solvePart1().result).isEqualTo("11687500")
     }
 
-    // TODO: refactor to convert the Exel code to Kotlin
     @Test
     @Order(6)
     fun `Finds Pulse Cycle`() {
-        inputLines = File("src/mpdev.springboot.aoc2023.solutions.day22.main/resources/inputdata/input20.txt").readLines()
+        inputLines = File("src/main/resources/inputdata/input20.txt").readLines()
         pulseProcessor = PulseProcessor(inputLines)
-        repeat(1000000) {
-            pulseProcessor.processPulse("df")
+        pulseProcessor.debug2 = true
+        assertDoesNotThrow {
+            pulseProcessor.identifyighPulseCyclesForFinalConjuction().also { it.println() }
         }
-        println("end module inputs")
-        println(pulseProcessor.endStateInputs.keys)
-        for (i in pulseProcessor.endStateInputs.values.first().indices) {
-//            print("$i: ")
-  //          pulseProcessor.endStateInputs.values.forEach { print("${it[i]} ") }
-    //        println("")
-        }
-
     }
 
     @Test

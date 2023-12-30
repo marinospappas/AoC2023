@@ -2,7 +2,6 @@ package mpdev.springboot.aoc2023.solutions.day20
 
 import kotlinx.serialization.Serializable
 import mpdev.springboot.aoc2023.utils.*
-import kotlin.collections.ArrayDeque
 
 @Serializable
 @AocInClass(delimiters = ["->"])
@@ -16,51 +15,52 @@ data class AoCInput(
 
 class PulseProcessor(input: List<String>) {
 
+    companion object {
+        const val broadcaster = "broadcaster"
+        private val startPulse = Pulse(PulseType.LOW, "button", broadcaster)
+    }
     var debug = false
+    var debug2 = false
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
     val modules: Map<String,Module> = aocInputList.associate {
-        val id = if (it.sender.startsWith('b')) it.sender else it.sender.substring(1, it.sender.length)
-        id to Module(id, ModuleType.of(it.sender.first()), it.receivers)
+        val id = it.sender.substring(1, it.sender.length)
+        when (it.sender.first()) {
+            'b' -> broadcaster to Broadcaster(it.receivers)
+            '%' -> id to FlipFlop(id, it.receivers)
+            '&' -> id to Conjuction(id, it.receivers)
+            else -> throw AocException("invalid input data [$it]")
+        }
     }
-    private val startPulse = Pulse(PulseType.LOW, "button")
-    private val startModule = "broadcaster"
-    private val endModule = (modules.values.map { it.receivers }.flatten().distinct().toSet()
+    private val endModule = (modules.values.map { it.destinations }.flatten().distinct().toSet()
             - modules.keys).first()
-    val endStateInputs = mutableMapOf<String, MutableList<PulseType>>()
+    val endStateInputs = mutableListOf<Pair<Int,Pulse>>()
+    var cycleCount = 0
 
     init {
         updateConjState()
     }
 
-    fun processPulse(recordId: String = ""): Pair<Int,Int> {
-        val count = mutableMapOf(PulseType.LOW to 0, PulseType.HIGH to 0, PulseType.NA to 0)
-        count[startPulse.hl] =  count[startPulse.hl]?.plus(1)!!
-        val queue = ArrayDeque<Pair<Module,Pulse>>().also { q -> q.add(Pair(modules[startModule]!!, startPulse)) }
+    fun processPulse(watchModuleId: String = ""): Pair<Int,Int> {
+        val counts = mutableMapOf(PulseType.LOW to 0, PulseType.HIGH to 0, PulseType.NA to 0)
+        counts[startPulse.hl] =  counts[startPulse.hl]?.plus(1)!!
+        val queue = ArrayDeque<Pulse>().also { q -> q.add(startPulse) }
         while (queue.isNotEmpty()) {
-            val (curModule, input) = queue.removeFirst()
-            curModule.outPulse = curModule.output(input)
-            if (debug) println("module ${curModule.id} received ${input.hl} from ${input.sender}, new state ${curModule.state}")
-            for (rcvr in curModule.receivers) {
-                count[curModule.outPulse] = count[curModule.outPulse]?.plus(1)!!
-                if (modules[recordId] != null && modules[recordId]?.receivedFrom?.any { it.value == PulseType.HIGH } == true)
-                    println("H detected")
-
-                if (rcvr == endModule) {
-                    if (debug) println("module $endModule received ${curModule.outPulse} from ${curModule.id}")
+            val inputPulse = queue.removeFirst()
+            val curModuleId = inputPulse.destination
+            if (curModuleId == watchModuleId)
+                endStateInputs.add(Pair(cycleCount, inputPulse))
+            val outputPulses = modules[curModuleId]?.sendPulses(inputPulse)!!
+            if (debug) println("module $curModuleId received ${inputPulse.hl} from ${inputPulse.sender} - ${modules[curModuleId]}")
+            for (pulse in outputPulses) {
+                counts[pulse.hl] = counts[pulse.hl]?.plus(1)!!
+                if (pulse.destination == endModule) {
                     continue
                 }
-                if (curModule.outPulse != PulseType.NA)
-                    queue.add(Pair(modules[rcvr]!!, Pulse(curModule.outPulse, curModule.id)))
+                if (pulse.hl != PulseType.NA)
+                    queue.add(pulse)
             }
         }
-        if (modules[recordId] != null)
-            for ((id, pulse) in modules[recordId]?.receivedFrom!!) {
-                if (endStateInputs[id] == null)
-                    endStateInputs[id] = mutableListOf(pulse)
-                else
-                    endStateInputs[id]?.add(pulse)
-            }
-        return Pair(count[PulseType.LOW]!!, count[PulseType.HIGH]!!)
+        return Pair(counts[PulseType.LOW]!!, counts[PulseType.HIGH]!!)
     }
 
     fun countPulsesPart1(): Int {
@@ -72,42 +72,66 @@ class PulseProcessor(input: List<String>) {
         return countL * countH
     }
 
+    fun identifyighPulseCyclesForFinalConjuction(): Set<Long> {
+        val moduleToWatch = modules.values.first { it.destinations.contains(endModule) }.id
+        repeat(20000) {
+            cycleCount = it + 1
+            processPulse(moduleToWatch)
+        }
+        val inputCycles = endStateInputs.filter { it.second.hl == PulseType.HIGH }.groupBy { it.second.sender }
+        if (debug2) inputCycles.forEach { it.println() }
+        if (inputCycles.entries.size == (modules[moduleToWatch] as Conjuction).inputs.size &&
+            inputCycles.values.all { it.size >= 3 && it[1].first == it[0].first * 2 && it[2].first == it[0].first * 3 } )
+            return inputCycles.values.map { it[0].first.toLong() }.toSet()
+        throw AocException("could not identify cycle of high signals")
+    }
+
     private fun updateConjState() {
-        modules.values.filter { it.type == ModuleType.C }.forEach { conj ->
+        modules.values.filterIsInstance<Conjuction>().forEach { conj: Conjuction ->
             modules.values.forEach { mod ->
-                if (mod.receivers.contains(conj.id))
-                    conj.receivedFrom[mod.id] = PulseType.LOW
+                if (mod.destinations.contains(conj.id))
+                    conj.inputs[mod.id] = PulseType.LOW
             }
         }
     }
 }
 
-data class Module(val id: String, val type: ModuleType, val receivers: List<String>,
-                  var state: ModuleState = ModuleState.LOW, val receivedFrom: MutableMap<String,PulseType> = mutableMapOf()
-) {
-    var outPulse = PulseType.NA
-
-    fun output(input: Pulse): PulseType {
-        return when(type) {
-            ModuleType.F -> {
-                if (input.hl == PulseType.LOW) {
-                    state = state.invert()
-                    PulseType.of(state)
-                }
-                else
-                    PulseType.NA
-            }
-            ModuleType.C -> {
-                receivedFrom[input.sender] = input.hl
-                if (receivedFrom.values.all { it == PulseType.HIGH }) PulseType.LOW
-                else PulseType.HIGH
-            }
-            ModuleType.B -> input.hl
-        }
-    }
+class Broadcaster(receivers: List<String>): Module(PulseProcessor.broadcaster, receivers) {
+    override fun output(inPulse: Pulse): PulseType = inPulse.hl
 }
 
-data class Pulse(val hl:PulseType, val sender: String)
+class FlipFlop(id: String, receivers: List<String>): Module(id, receivers) {
+    private var state = ModuleState.LOW
+    override fun output(inPulse: Pulse): PulseType =
+        if (inPulse.hl == PulseType.LOW) {
+            state = state.invert()
+            PulseType.of(state)
+        }
+        else PulseType.NA
+    override fun toString() = "F/F ${super.toString()} state: $state"
+}
+
+class Conjuction(id: String, receivers: List<String>): Module(id, receivers) {
+    val inputs = mutableMapOf<String,PulseType>()
+    override fun output(inPulse: Pulse): PulseType {
+        inputs[inPulse.sender] = inPulse.hl
+        return if (inputs.values.all { it == PulseType.HIGH }) PulseType.LOW
+        else PulseType.HIGH
+    }
+    override fun toString() = "CON ${super.toString()} inputs: $inputs"
+}
+
+abstract class Module(val id: String, val destinations: List<String>) {
+    abstract fun output(inPulse: Pulse): PulseType
+    fun sendPulses(inPulse: Pulse): List<Pulse> {
+        val outPulse = output(inPulse)
+        return destinations.map { Pulse(outPulse, id, it) }
+    }
+    override fun toString(): String =
+        "[$$id], xmits to: $destinations"
+}
+
+data class Pulse(val hl:PulseType, val sender: String, val destination: String)
 
 enum class ModuleState(val value: UInt) {
     HIGH(1u),
