@@ -3,7 +3,9 @@ package mpdev.springboot.aoc2023.day18
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day18.AoCInput
 import mpdev.springboot.aoc2023.solutions.day18.Day18
+import mpdev.springboot.aoc2023.solutions.day18.DigInstr
 import mpdev.springboot.aoc2023.solutions.day18.DigPlan
+import mpdev.springboot.aoc2023.utils.GridUtils
 import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
@@ -58,7 +60,7 @@ class Day18Test {
     fun `Digs Trench`() {
         digPlan.digTrench()
         digPlan.grid.print()
-        val area = digPlan.digArea(digPlan.digDirections).also { it.println() }
+        val area = digPlan.digVolume(digPlan.digDirections).also { it.println() }
         assertThat(area).isEqualTo(62)
     }
 
@@ -66,6 +68,29 @@ class Day18Test {
     @Order(5)
     fun `Solves Part 1`() {
         assertThat(puzzleSolver.solvePart1().result).isEqualTo("62")
+    }
+
+    @Test
+    @Order(6)
+    fun `Calculates Dig Volume using Area from Picks Theorem`() {
+        var input = listOf(
+            DigInstr(GridUtils.Direction.RIGHT, 5),
+            DigInstr(GridUtils.Direction.DOWN, 4),
+            DigInstr(GridUtils.Direction.LEFT, 5),
+            DigInstr(GridUtils.Direction.UP, 4)
+        )
+        var area = digPlan.digVolume(input).also { it.println() }
+        assertThat(area).isEqualTo(30)
+        input = listOf(
+            DigInstr(GridUtils.Direction.RIGHT, 3),
+            DigInstr(GridUtils.Direction.DOWN, 4),
+            DigInstr(GridUtils.Direction.LEFT, 5),
+            DigInstr(GridUtils.Direction.UP, 2),
+            DigInstr(GridUtils.Direction.RIGHT, 2),
+            DigInstr(GridUtils.Direction.UP, 2)
+        )
+        area = digPlan.digVolume(input).also { it.println() }
+        assertThat(area).isEqualTo(26)
     }
 
     @Test

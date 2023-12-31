@@ -40,20 +40,28 @@ class DigPlan(input: List<String>) {
         return points
     }
 
-    fun digArea(digInstructions: List<DigInstr>): Long {
-        var area = 10L  // instead of using BigDecimal, use Long * 10 as we only have 1 dec.digit
-        var posX = 0L
-        digInstructions.forEach { dig ->
-            val dx = dig.length * dig.direction.increment.x
-            val dy = dig.length * dig.direction.increment.y
-            posX += dx
-            area += dy * posX * 10 + dig.length * 10 / 2
-        }
-        return area / 10
+    /**
+     * Pick's theorem
+     * P: number of points on the perimeter of the lattice polygon
+     * I: number of points inside the polygon
+     * A: area of the polygon
+     * A = I + P/2 - 1  (or  I = A - P/2 + 1)
+     * We need to calculate I + P as the digger digs a 1 cubic metre hole at every lattice point
+     * or (A - P/2 + 1) + (P) or A + P/2 + 1
+     */
+    fun digVolume(digInstructions: List<DigInstr>): Long {
+        val polygonArea = digInstructions.fold(Pair(0L,0L)) { acc, dig -> // the pair holds the current sum and the current x
+            val dx = dig.length * dig.direction.increment.x.toLong()
+            val dy = dig.length * dig.direction.increment.y.toLong()
+            val x = acc.second + dx
+            Pair(acc.first + x * dy, x)
+        }.first
+        val pointsOnPerimeter = digInstructions.sumOf { it.length }
+        return polygonArea + pointsOnPerimeter / 2 + 1
     }
 }
 
-data class DigInstr(val direction: GridUtils.Direction, val length: Int, val colour: Int)
+data class DigInstr(val direction: GridUtils.Direction, val length: Int, val colour: Int = 0)
 
 enum class Plot(val value: Char) {
     DUG_UP('#');
