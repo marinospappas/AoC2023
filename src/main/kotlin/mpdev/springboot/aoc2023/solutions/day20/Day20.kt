@@ -37,7 +37,7 @@ class Day20: PuzzleSolver() {
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
             pulseProcessor = PulseProcessor(inputData)
-            result = pulseProcessor.identifyighPulseCyclesForFinalConjuction().lcm()
+            result = pulseProcessor.identifyHighPulseCyclesForFinalConjunction().lcm()
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

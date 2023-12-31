@@ -75,7 +75,7 @@ class Day20Test {
         pulseProcessor = PulseProcessor(inputLines)
         pulseProcessor.debug2 = true
         assertDoesNotThrow {
-            pulseProcessor.identifyighPulseCyclesForFinalConjuction().also { it.println() }
+            pulseProcessor.identifyHighPulseCyclesForFinalConjunction().also { it.println() }
         }
     }
 

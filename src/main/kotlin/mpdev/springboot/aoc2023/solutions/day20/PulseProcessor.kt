@@ -27,14 +27,14 @@ class PulseProcessor(input: List<String>) {
         when (it.sender.first()) {
             'b' -> broadcaster to Broadcaster(it.receivers)
             '%' -> id to FlipFlop(id, it.receivers)
-            '&' -> id to Conjuction(id, it.receivers)
+            '&' -> id to Conjunction(id, it.receivers)
             else -> throw AocException("invalid input data [$it]")
         }
     }
     private val endModule = (modules.values.map { it.destinations }.flatten().distinct().toSet()
             - modules.keys).first()
-    val endStateInputs = mutableListOf<Pair<Int,Pulse>>()
-    var cycleCount = 0
+    private val endStateInputs = mutableListOf<Pair<Int,Pulse>>()
+    private var cycleCount = 0
 
     init {
         updateConjState()
@@ -53,9 +53,8 @@ class PulseProcessor(input: List<String>) {
             if (debug) println("module $curModuleId received ${inputPulse.hl} from ${inputPulse.sender} - ${modules[curModuleId]}")
             for (pulse in outputPulses) {
                 counts[pulse.hl] = counts[pulse.hl]?.plus(1)!!
-                if (pulse.destination == endModule) {
+                if (pulse.destination == endModule)
                     continue
-                }
                 if (pulse.hl != PulseType.NA)
                     queue.add(pulse)
             }
@@ -72,7 +71,7 @@ class PulseProcessor(input: List<String>) {
         return countL * countH
     }
 
-    fun identifyighPulseCyclesForFinalConjuction(): Set<Long> {
+    fun identifyHighPulseCyclesForFinalConjunction(): Set<Long> {
         val moduleToWatch = modules.values.first { it.destinations.contains(endModule) }.id
         repeat(20000) {
             cycleCount = it + 1
@@ -80,14 +79,14 @@ class PulseProcessor(input: List<String>) {
         }
         val inputCycles = endStateInputs.filter { it.second.hl == PulseType.HIGH }.groupBy { it.second.sender }
         if (debug2) inputCycles.forEach { it.println() }
-        if (inputCycles.entries.size == (modules[moduleToWatch] as Conjuction).inputs.size &&
+        if (inputCycles.entries.size == (modules[moduleToWatch] as Conjunction).inputs.size &&
             inputCycles.values.all { it.size >= 3 && it[1].first == it[0].first * 2 && it[2].first == it[0].first * 3 } )
             return inputCycles.values.map { it[0].first.toLong() }.toSet()
         throw AocException("could not identify cycle of high signals")
     }
 
     private fun updateConjState() {
-        modules.values.filterIsInstance<Conjuction>().forEach { conj: Conjuction ->
+        modules.values.filterIsInstance<Conjunction>().forEach { conj ->
             modules.values.forEach { mod ->
                 if (mod.destinations.contains(conj.id))
                     conj.inputs[mod.id] = PulseType.LOW
@@ -111,7 +110,7 @@ class FlipFlop(id: String, receivers: List<String>): Module(id, receivers) {
     override fun toString() = "F/F ${super.toString()} state: $state"
 }
 
-class Conjuction(id: String, receivers: List<String>): Module(id, receivers) {
+class Conjunction(id: String, receivers: List<String>): Module(id, receivers) {
     val inputs = mutableMapOf<String,PulseType>()
     override fun output(inPulse: Pulse): PulseType {
         inputs[inPulse.sender] = inPulse.hl
@@ -125,7 +124,7 @@ abstract class Module(val id: String, val destinations: List<String>) {
     abstract fun output(inPulse: Pulse): PulseType
     fun sendPulses(inPulse: Pulse): List<Pulse> {
         val outPulse = output(inPulse)
-        return destinations.map { Pulse(outPulse, id, it) }
+        return destinations.map { dest -> Pulse(outPulse, id, dest) }
     }
     override fun toString(): String =
         "[$$id], xmits to: $destinations"
@@ -133,27 +132,14 @@ abstract class Module(val id: String, val destinations: List<String>) {
 
 data class Pulse(val hl:PulseType, val sender: String, val destination: String)
 
-enum class ModuleState(val value: UInt) {
-    HIGH(1u),
-    LOW(0u);
+enum class ModuleState {
+    HIGH, LOW;
     fun invert(): ModuleState = if (this == HIGH) LOW else HIGH
 }
 
-enum class PulseType(val value: UInt) {
-    HIGH(1u),
-    LOW(0u),
-    NA(UInt.MAX_VALUE);
+enum class PulseType {
+    HIGH, LOW, NA;
     companion object {
         fun of(state: ModuleState) = if (state == ModuleState.HIGH) HIGH else LOW
-    }
-}
-
-enum class ModuleType(val value: Char) {
-    F('%'),
-    C('&'),
-    B('b');
-    companion object {
-        fun of(c: Char): ModuleType = ModuleType.values().firstOrNull { it.value == c }
-            ?: throw AocException("invalid module type [$c]")
     }
 }
