@@ -47,7 +47,8 @@ class DigPlan(input: List<String>) {
      * A: area of the polygon
      * A = I + P/2 - 1  (or  I = A - P/2 + 1)
      * We need to calculate I + P as the digger digs a 1 cubic metre hole at every lattice point
-     * or (A - P/2 + 1) + (P) or A + P/2 + 1
+     * or (A - P/2 + 1) + (P) or >> A + P/2 + 1 <<
+     *   the area can be calculated as the sum of currentX * dy for each of the fig points
      */
     fun digVolume(digInstructions: List<DigInstr>): Long {
         val polygonArea = digInstructions.fold(Pair(0L,0L)) { acc, dig -> // the pair holds the running area sum and the current x
