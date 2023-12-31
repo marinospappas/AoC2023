@@ -52,10 +52,8 @@ class DigPlan(input: List<String>) {
      */
     fun digVolume(digInstructions: List<DigInstr>): Long {
         val polygonArea = digInstructions.fold(Pair(0L,0L)) { acc, dig -> // the pair holds the running area sum and the current x
-            val dx = dig.length * dig.direction.increment.x.toLong()
-            val dy = dig.length * dig.direction.increment.y.toLong()
-            val x = acc.second + dx
-            val area = acc.first + x * dy
+            val x = acc.second + dig.length * dig.direction.increment.x
+            val area = acc.first + x * dig.length * dig.direction.increment.y
             Pair(area, x)
         }.first
         val pointsOnPerimeter = digInstructions.sumOf { it.length }
