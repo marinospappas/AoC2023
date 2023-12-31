@@ -24,93 +24,90 @@ class MachineParts(input: List<String>) {
     private val startWf = "in"
 
     init {
-        val (input1, input2) = splitInput(input)
-        workflows = processInput1(input1)
-        aocInputList = InputUtils(AoCInput::class.java).readAoCInput(input2)
+        val (input1, input2) = input.joinToString("|").split("||")
+        workflows = processInput1(input1.split("|"))
+        aocInputList = InputUtils(AoCInput::class.java).readAoCInput(input2.split("|"))
         partsList = aocInputList.map { MPart(it.x, it.m, it.a, it.s) }
     }
 
-    fun runWorkFlows(part: MPart): WFRes {
+    fun runWorkFlows(part: MPart): RuleResult {
         var wfId = startWf
         while (true) {
             val wf = workflows[wfId]!!
             var ruleRes: Any = wf.defRes
             for (rule in wf.rules) {
-                if (rule.test(part.get(rule.param1))) {
+                if (rule.test(part[rule.param1])) {
                     ruleRes = rule.result
                     break
                 }
             }
-            if (ruleRes is WFRes)
+            if (ruleRes is RuleResult)
                 return ruleRes
             wfId = ruleRes as String
         }
     }
 
     fun sumOfAcceptedAttributes() = "xmas".toCharArray().map { partsList
-        .filter { part -> runWorkFlows(part) == WFRes.A } .map { part -> part.get(it) }
+        .filter { part -> runWorkFlows(part) == RuleResult.A }
+        .map { part -> part[it] }
     }.flatten().sum()
 
-    private val startRange = mutableMapOf('x' to 1 .. 4000, 'm' to 1 .. 4000, 'a' to 1 .. 4000, 's' to 1 .. 4000)
+    private val startRanges = mutableMapOf('x' to 1 .. 4000, 'm' to 1 .. 4000, 'a' to 1 .. 4000, 's' to 1 .. 4000)
     val acceptedRanges = mutableListOf<Map<Char,IntRange>>()
 
-    fun rangeCountCombis(range: Map<Char,IntRange>) =
-        range.values.fold(1L) { acc, r -> acc * (r.last - r.first + 1)  }
+    /**
+     * calculates the total number of individual values combinations from the map of 4 ranges (for the xmas attributes)
+     */
+    fun countCombinationsFromRanges(ranges: Map<Char,IntRange>) =
+        ranges.values.fold(1L) { acc, rng -> acc * (rng.last - rng.first + 1)  }
 
-    // TODO simplify below function
-    fun processRanges(range: Map<Char,IntRange> = startRange, wfId: String = startWf) {
-        var thisRange = range.toMap()
+    /**
+     * identifies the range for each of the "xmas" attributes that result in "Accepted"
+     * runs each rule of each workflow in the chain starting with the start ranges 1..4000 for all 4
+     * it then restricts the input ranges to those that result in A
+     * by calculating the 2 sub-ranges that succeed and fail each rule
+     */
+    fun identifyAcceptedRanges(ranges: Map<Char,IntRange> = startRanges, wfId: String = startWf) {
+        var thisRanges = ranges.toMap()
         val wf = workflows[wfId]!!
         val ruleRes: Any = wf.defRes
         for (rule in wf.rules) {
-            val (rangeT, rangeF) = findRangeTFforRule(range, rule)
-            if (rule.result == WFRes.A)
-                acceptedRanges.add(rangeT)
+            val (rangesTrue, rangesFalse) = findRangeTFforRule(thisRanges, rule)
+            if (rule.result == RuleResult.A)
+                acceptedRanges.add(rangesTrue)
             else if (rule.result is String)
-                processRanges(rangeT, rule.result)
-            if (rangeF[rule.param1]?.first!! < 0)
+                identifyAcceptedRanges(rangesTrue, rule.result)
+            if (rangesFalse[rule.param1]?.first!! < 0)  // if the rule always succeeds stop the loop
                 break
-            thisRange = rangeF
+            thisRanges = rangesFalse.toMap()   // else continue into the next rule using the ranges that failed this rule
         }
-        if (ruleRes == WFRes.A)
-            acceptedRanges.add(thisRange)
+        if (ruleRes == RuleResult.A)
+            acceptedRanges.add(thisRanges)  // accepted
         else if (ruleRes is String)
-            processRanges(thisRange, ruleRes)
+            identifyAcceptedRanges(thisRanges, ruleRes)  // send to next workflow
     }
 
-    fun findRangeTFforRule(range: Map<Char,IntRange>, rule: WFRule):
-            Pair<Map<Char,IntRange>, Map<Char,IntRange>> {
+    // identify the two ranges for each attribute that make a rule succeed or fail
+    private fun findRangeTFforRule(ranges: Map<Char,IntRange>, rule: WFRule): Pair<Map<Char,IntRange>, Map<Char,IntRange>> {
         var rangeT = IntRange(-2, -1)
         var rangeF = IntRange(-2, -1)
-        val r = range[rule.param1]!!
+        val range = ranges[rule.param1]!!
         if (rule.compare == Comparison.GT) {
-            if (rule.param2 < r.last) {
-                rangeT = IntRange(max(r.first, rule.param2 + 1), r.last)
-                if (rule.param2 > r.first)
-                    rangeF = IntRange(r.first, rule.param2)
+            if (rule.param2 < range.last) {
+                rangeT = IntRange(max(range.first, rule.param2 + 1), range.last)
+                if (rule.param2 > range.first)
+                    rangeF = IntRange(range.first, rule.param2)
             }
         }
         else {
-            if (rule.param2 > r.first) {
-                rangeT = IntRange(r.first, min(rule.param2 - 1, r.last))
-                if (rule.param2 < r.last)
-                    rangeF = IntRange(rule.param2, r.last)
+            if (rule.param2 > range.first) {
+                rangeT = IntRange(range.first, min(rule.param2 - 1, range.last))
+                if (rule.param2 < range.last)
+                    rangeF = IntRange(rule.param2, range.last)
             }
         }
-        return Pair(range.toMutableMap().also { it[rule.param1] = rangeT },
-            range.toMutableMap().also { it[rule.param1] = rangeF })
-    }
-
-    private fun splitInput(input: List<String>): Pair<List<String>, List<String>> {
-        val input1 = mutableListOf<String>()
-        val input2 = mutableListOf<String>()
-        var state = 0
-        input.forEach { line ->
-            if (line.isEmpty()) { ++state; return@forEach }
-            if (state == 0) input1.add(line)
-            else input2.add(line)
-        }
-        return Pair(input1, input2)
+        return Pair(ranges.toMutableMap().also { it[rule.param1] = rangeT },
+            ranges.toMutableMap().also { it[rule.param1] = rangeF })
     }
 
     private fun processInput1(input1: List<String>): Map<String,Workflow> {
@@ -119,14 +116,14 @@ class MachineParts(input: List<String>) {
             val fields = line.removeSuffix("}").split("{")
             val rules = fields[1].split(",").toMutableList().also { it.removeLast() }.map { WFRule.of(it) }
             val defRes = fields[1].split(",").last()
-            wList[fields[0]] = Workflow(fields[0], rules, if (defRes == "A" || defRes == "R") WFRes.valueOf(defRes) else defRes)
+            wList[fields[0]] = Workflow(fields[0], rules, if (defRes == "A" || defRes == "R") RuleResult.valueOf(defRes) else defRes)
         }
         return wList
     }
 }
 
 data class MPart(val x: Int, val m: Int, val a: Int, val s: Int) {
-    fun get(f: Char) = when (f) {
+    operator fun get(f: Char) = when (f) {
         'x' -> x; 'm' -> m; 'a' -> a; 's' -> s
         else -> -1
     }
@@ -135,7 +132,7 @@ data class MPart(val x: Int, val m: Int, val a: Int, val s: Int) {
 data class Workflow(val id: String, val rules: List<WFRule>, val defRes: Any)
 
 data class WFRule(val param1: Char, val param2: Int, val compare: Comparison, val result: Any) {
-    fun test(value: Int) =
+    fun test(value: Int): Boolean =
         if (compare == Comparison.GT)
             value > param2
         else
@@ -148,7 +145,7 @@ data class WFRule(val param1: Char, val param2: Int, val compare: Comparison, va
                 val (param1, comp, param2, res) = match!!.destructured
                 return WFRule(param1.first(), param2.toInt(),
                     if (comp == "<") Comparison.LT else Comparison.GT,
-                    if (res == "A" || res == "R") WFRes.valueOf(res) else res
+                    if (res == "A" || res == "R") RuleResult.valueOf(res) else res
                 )
             } catch (e: Exception) {
                 throw AocException("invalid input $s")
@@ -160,6 +157,6 @@ data class WFRule(val param1: Char, val param2: Int, val compare: Comparison, va
 enum class Comparison {
     GT, LT
 }
-enum class WFRes {
-    A, R, W
+enum class RuleResult {
+    A, R, W     // accept, reject, or send to further workflow
 }

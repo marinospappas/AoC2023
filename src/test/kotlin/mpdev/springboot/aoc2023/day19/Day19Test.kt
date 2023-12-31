@@ -4,12 +4,13 @@ import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day19.Day19
 import mpdev.springboot.aoc2023.solutions.day19.MPart
 import mpdev.springboot.aoc2023.solutions.day19.MachineParts
-import mpdev.springboot.aoc2023.solutions.day19.WFRes
+import mpdev.springboot.aoc2023.solutions.day19.RuleResult
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 class Day19Test {
 
@@ -52,9 +53,9 @@ class Day19Test {
             machineParts.runWorkFlows(part).println()
         }
         val wfResult = machineParts.partsList.map { machineParts.runWorkFlows(it) }
-        assertThat(wfResult).isEqualTo(listOf(WFRes.A, WFRes.R, WFRes.A, WFRes.R, WFRes.A))
+        assertThat(wfResult).isEqualTo(listOf(RuleResult.A, RuleResult.R, RuleResult.A, RuleResult.R, RuleResult.A))
         val sumOfAttr = "xmas".toCharArray().map { machineParts.partsList
-            .filter { part -> machineParts.runWorkFlows(part) == WFRes.A } .map { part -> part.get(it) }
+            .filter { part -> machineParts.runWorkFlows(part) == RuleResult.A } .map { part -> part.get(it) }
         }.flatten().sum() .also { it.println() }
         assertThat(sumOfAttr).isEqualTo(19114)
     }
@@ -68,17 +69,25 @@ class Day19Test {
     @Test
     @Order(6)
     fun `Processes All Ranges to find Acceptable ones`() {
-        machineParts.processRanges()
+        machineParts.identifyAcceptedRanges()
         machineParts.acceptedRanges.println()
-        machineParts.acceptedRanges.sumOf { machineParts.rangeCountCombis(it) }.println()
+        machineParts.acceptedRanges.sumOf { machineParts.countCombinationsFromRanges(it) }.println()
+        println("-- Assert for each accepted range that the Start, the End and a random number in Between results in Accepted")
         machineParts.acceptedRanges.forEach { r ->
             print("verifying range group: $r : ")
             var check = machineParts.runWorkFlows(MPart(r['x']?.first!!, r['m']?.first!!, r['a']?.first!!, r['s']?.first!!))
-                .also { print("start: $it end: ") }
-            assertThat(check).isEqualTo(WFRes.A)
+                .also { print("start: $it ") }
+            assertThat(check).isEqualTo(RuleResult.A)
             check = machineParts.runWorkFlows(MPart(r['x']?.last!!, r['m']?.last!!, r['a']?.last!!, r['s']?.last!!))
-                .also { it.println() }
-            assertThat(check).isEqualTo(WFRes.A)
+                .also { print("end: $it ") }
+            assertThat(check).isEqualTo(RuleResult.A)
+            val randomX = Random.nextInt(r['x']?.first!!, r['x']?.last!!)
+            val randomM = Random.nextInt(r['m']?.first!!, r['m']?.last!!)
+            val randomA = Random.nextInt(r['a']?.first!!, r['a']?.last!!)
+            val randomS = Random.nextInt(r['s']?.first!!, r['s']?.last!!)
+            check = machineParts.runWorkFlows(MPart(randomX, randomM, randomA, randomS))
+                .also { println("in between: $it ") }
+            assertThat(check).isEqualTo(RuleResult.A)
         }
     }
 

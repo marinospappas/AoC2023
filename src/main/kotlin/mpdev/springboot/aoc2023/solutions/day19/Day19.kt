@@ -35,8 +35,8 @@ class Day19: PuzzleSolver() {
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            machineParts.processRanges()
-            result = machineParts.acceptedRanges.sumOf { machineParts.rangeCountCombis(it) }
+            machineParts.identifyAcceptedRanges()
+            result = machineParts.acceptedRanges.sumOf { machineParts.countCombinationsFromRanges(it) }
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }
