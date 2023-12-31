@@ -79,8 +79,8 @@ class Day18Test {
             DigInstr(GridUtils.Direction.LEFT, 5),
             DigInstr(GridUtils.Direction.UP, 4)
         )
-        var area = digPlan.digVolume(input).also { it.println() }
-        assertThat(area).isEqualTo(30)
+        var volume = digPlan.digVolume(input).also { it.println() }
+        assertThat(volume).isEqualTo(30)
         input = listOf(
             DigInstr(GridUtils.Direction.RIGHT, 3),
             DigInstr(GridUtils.Direction.DOWN, 4),
@@ -89,8 +89,8 @@ class Day18Test {
             DigInstr(GridUtils.Direction.RIGHT, 2),
             DigInstr(GridUtils.Direction.UP, 2)
         )
-        area = digPlan.digVolume(input).also { it.println() }
-        assertThat(area).isEqualTo(26)
+        volume = digPlan.digVolume(input).also { it.println() }
+        assertThat(volume).isEqualTo(26)
     }
 
     @Test
