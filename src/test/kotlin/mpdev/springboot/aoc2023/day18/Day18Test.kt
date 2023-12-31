@@ -60,8 +60,8 @@ class Day18Test {
     fun `Digs Trench`() {
         digPlan.digTrench()
         digPlan.grid.print()
-        val area = digPlan.digVolume(digPlan.digDirections).also { it.println() }
-        assertThat(area).isEqualTo(62)
+        val volume = digPlan.digVolume(digPlan.digDirections).also { it.println() }
+        assertThat(volume).isEqualTo(62)
     }
 
     @Test
