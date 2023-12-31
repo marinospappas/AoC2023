@@ -72,6 +72,7 @@ class PulseProcessor(input: List<String>) {
     }
 
     fun identifyHighPulseCyclesForFinalConjunction(): Set<Long> {
+        // this is the conjunction module that feeds the final module
         val moduleToWatch = modules.values.first { it.destinations.contains(endModule) }.id
         repeat(20000) {
             cycleCount = it + 1
