@@ -5,7 +5,8 @@ package mpdev.springboot.aoc2023.utils
  * nodes: map of node_id to (map connected_node_id to weight)
  */
 //TODO replace the Int weight with Weight<U> to be able to implement custom compare
-class SGraph<T: Comparable<T>>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf()) {
+class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf(),
+    val getConnected: (T) -> Set<Pair<T,Int>> = {id -> (nodes[id] ?: emptyMap()).map { Pair(it.key, it.value) }.toSet()}) {
 
     constructor(nodesList: List<Pair<T, MutableSet<T>>>):
             this (nodesList.map { (id, conn) ->
@@ -35,8 +36,6 @@ class SGraph<T: Comparable<T>>(var nodes: MutableMap<T, MutableMap<T, Int>> = mu
             connected.forEach { (cId, v) -> addNode(cId, mapOf(id to v)) }
     }
 
-    fun getConnected(id: T): Set<Pair<T,Int>> = (nodes[id] ?: emptyMap()).map { Pair(it.key, it.value) }.toSet()
-
     fun getAllConnectedPairs(): Set<Set<T>> {
         return nodes.map { n -> n.value.map { c -> setOf(n.key, c.key) } }.flatten().toSet()
     }
@@ -44,6 +43,8 @@ class SGraph<T: Comparable<T>>(var nodes: MutableMap<T, MutableMap<T, Int>> = mu
     fun removeConnection(a: T, b: T) {
         removeConnection(setOf(a, b))
     }
+
+    fun getCost(a:T, b:T) = nodes[a]?.get(b)!!
 
     fun removeConnection(edge: Set<T>) {
         nodes[edge.first()]?.remove(edge.last())
