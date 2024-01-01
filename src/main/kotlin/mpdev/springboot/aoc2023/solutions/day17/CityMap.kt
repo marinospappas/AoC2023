@@ -14,6 +14,15 @@ class CityMap(input: List<String>) {
 
     fun findMinPath(): MinCostPath<GraphState> = graph.dijkstra(GraphState(start)) { state -> state.point == end }
 
+    //TODO: handle the two possible starts (right or down) for part two in a more robust way
+    fun findMinPath2(): MinCostPath<GraphState> {
+        val result1 = graph.dijkstra(GraphState(start)) { state -> state.point == end }
+        val result2 = graph.dijkstra(GraphState(start, DOWN)) { state -> state.point == end }
+        result1.minCost.println()
+        result2.minCost.println()
+        return result2
+    }
+
     //TODO: make the below function less verbose
     private fun getNeighbourPoints(location: GraphState): Set<Pair<GraphState,Int>> {
         val neighbours = mutableSetOf<Pair<GraphState,Int>>()

@@ -37,7 +37,7 @@ class Day17: PuzzleSolver() {
         val elapsed = measureTimeMillis {
             cityMap.minStraightSteps = 4
             cityMap.maxStraightSteps = 10
-            result = cityMap.findMinPath().minCost
+            result = cityMap.findMinPath2().minCost
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }
