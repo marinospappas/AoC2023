@@ -104,6 +104,7 @@ object GridUtils {
             fun of(c: Char): Direction = of(c.toString())
             fun of(inc: Point): Direction =
                 values().firstOrNull { it.increment == inc } ?: throw AocException("invalid Direction increment: [$inc]")
+            fun oppositeOf(d: Direction) = when (d) { UP -> DOWN; RIGHT -> LEFT; DOWN -> UP; LEFT -> RIGHT }
         }
     }
 }

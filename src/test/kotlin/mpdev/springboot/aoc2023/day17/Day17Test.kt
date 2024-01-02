@@ -68,6 +68,8 @@ class Day17Test {
     @Test
     @Order(8)
     fun `Solves Part 2`() {
+        puzzleSolver.cityMap.minStraightSteps = 4
+        puzzleSolver.cityMap.maxStraightSteps = 10
         puzzleSolver.cityMap.findMinPath().print()
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("94")
     }

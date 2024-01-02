@@ -9,69 +9,68 @@ class CityMap(input: List<String>) {
     val graph = SGraph(getConnected = ::getNeighbourPoints)
     private val start = Point(0,0)
     private val end = Point(grid.getMinMaxXY().x2, grid.getMinMaxXY().x4)
+    // map: key Point and Direction, value GraphSate(Point/Direction/1) and Cost
+    private val nextNeighbours: Map<Pair<Point,GridUtils.Direction>, Set<Pair<GraphState,Int>>>
     var maxStraightSteps = 3
     var minStraightSteps = 0
 
+    init {
+        val nextPtsMap = mutableMapOf<Pair<Point,GridUtils.Direction>, Set<Pair<GraphState,Int>>>()
+        for (point in grid.getDataPoints().keys)
+            for (direction in GridUtils.Direction.values()) {
+                nextPtsMap[Pair(point, direction)] =
+                    (GridUtils.Direction.values().toSet() - GridUtils.Direction.oppositeOf(direction))
+                        .map { it.increment }
+                        .map { Pair(GraphState(point + it, GridUtils.Direction.of(it), 1), grid.getDataPoint(point+it) ?: 1) }
+                        .filter { grid.isInsideGrid(it.first.point) }
+                        .toSet()
+            }
+        nextNeighbours = nextPtsMap.toMap()
+    }
+
     fun findMinPath(): MinCostPath<GraphState> = graph.dijkstra(GraphState(start)) { state -> state.point == end }
 
-    //TODO: handle the two possible starts (right or down) for part two in a more robust way
-    fun findMinPath2(): MinCostPath<GraphState> {
-        val result1 = graph.dijkstra(GraphState(start)) { state -> state.point == end }
-        val result2 = graph.dijkstra(GraphState(start, DOWN)) { state -> state.point == end }
-        result1.minCost.println()
-        result2.minCost.println()
-        return result2
-    }
-
-    //TODO: make the below function less verbose
-    private fun getNeighbourPoints(location: GraphState): Set<Pair<GraphState,Int>> {
-        val neighbours = mutableSetOf<Pair<GraphState,Int>>()
-        if (location.straightCount < minStraightSteps-1) {
+    private fun getNeighbourPoints(location: GraphState): Set<Pair<GraphState, Int>> {
+        val neighbours = mutableSetOf<Pair<GraphState, Int>>()
+        if (location.point == start) {  // at the start, try both ways right and down
+            for (dir in setOf(RIGHT, DOWN))
+                neighbours.add(
+                    Pair(
+                        GraphState(start + dir.increment, dir, 1),
+                        grid.getDataPoint(start + dir.increment) ?: 1
+                    )
+                )
+        } else if (location.straightCount < minStraightSteps) {   // if we don't have the minimum straight steps, keep going straight
             val nextPoint = location.point + location.direction.increment
-            if (nextPoint != end || location.straightCount >= minStraightSteps-2)
-            neighbours.add(Pair(GraphState(nextPoint, location.direction, location.straightCount + 1),
-                    grid.getDataPoint(nextPoint) ?: 0))
-        }
-        else
-            when (location.direction) {
-                RIGHT -> {
-                    neighbours.add(Pair(GraphState(location.point + RIGHT.increment, RIGHT, location.straightCount+1),
-                        grid.getDataPoint(location.point + RIGHT.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + UP.increment, UP, 0),
-                        grid.getDataPoint(location.point + UP.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + DOWN.increment, DOWN, 0),
-                        grid.getDataPoint(location.point + DOWN.increment)?:0))
+            neighbours.add(
+                Pair(
+                    GraphState(nextPoint, location.direction, location.straightCount + 1),
+                    grid.getDataPoint(nextPoint) ?: 1
+                )
+            )
+        } else {
+            neighbours.addAll((GridUtils.Direction.values()
+                .toSet() - GridUtils.Direction.oppositeOf(location.direction))
+                .map { it.increment }
+                .map {
+                    Pair(GraphState(location.point + it, GridUtils.Direction.of(it), 1),
+                        grid.getDataPoint(location.point + it) ?: 1)
                 }
-                DOWN -> {
-                    neighbours.add(Pair(GraphState(location.point + DOWN.increment, DOWN, location.straightCount+1),
-                        grid.getDataPoint(location.point + DOWN.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + LEFT.increment, LEFT, 0),
-                        grid.getDataPoint(location.point + LEFT.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + RIGHT.increment, RIGHT, 0),
-                        grid.getDataPoint(location.point + RIGHT.increment)?:0))
-                }
-                LEFT -> {
-                    neighbours.add(Pair(GraphState(location.point + LEFT.increment, LEFT, location.straightCount+1),
-                        grid.getDataPoint(location.point + LEFT.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + UP.increment, UP, 0),
-                        grid.getDataPoint(location.point + UP.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + DOWN.increment, DOWN, 0),
-                        grid.getDataPoint(location.point + DOWN.increment)?:0))
-                }
-                UP -> {
-                    neighbours.add(Pair(GraphState(location.point + UP.increment, UP, location.straightCount+1),
-                        grid.getDataPoint(location.point + UP.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + LEFT.increment, LEFT, 0),
-                        grid.getDataPoint(location.point + LEFT.increment)?:0))
-                    neighbours.add(Pair(GraphState(location.point + RIGHT.increment, RIGHT, 0),
-                        grid.getDataPoint(location.point + RIGHT.increment)?:0))
-                }
+                .filter { grid.isInsideGrid(it.first.point) }
+                .toSet())
+            //neighbours.addAll(nextNeighbours[Pair(location.point, location.direction)]?.toMutableSet() ?: throw AocException("ERROR in neighbours for $location \n $nextNeighbours"))
+            neighbours.forEach {
+                it.first.straightCount = if (it.first.direction == location.direction)
+                    location.straightCount + 1
+                else 1
             }
-        val result = neighbours.filter { grid.isInsideGrid(it.first.point) }
-            .filter { it.first.straightCount < maxStraightSteps }
-            .toSet()
-        return result
+        }
+        // we can oly reach the end only if we have done the minimum number of straight steps
+        neighbours.removeIf { it.first.point == end && it.first.straightCount < minStraightSteps }
+        neighbours.removeIf { !grid.isInsideGrid(it.first.point) }      // make sure we stay inside the grid
+        // we cannot exceed the maximum number of straight steps
+        return neighbours.filter { it.first.straightCount <= maxStraightSteps }.toSet()
     }
 
-    data class GraphState(var point: Point, var direction: GridUtils.Direction = RIGHT, var straightCount: Int = 0)
+    data class GraphState(val point: Point, val direction: GridUtils.Direction = RIGHT, var straightCount: Int = 0)
 }
