@@ -44,7 +44,7 @@ class Day17Test {
     @Test
     @Order(3)
     fun `Finds Min Loss Path`() {
-        val result: MinCostPath<CityMap.GraphState> = cityMap.findMinPath().also { it.print() }
+        val result: MinCostPath<CityMap.GraphState> = cityMap.findMinPath().also { it.printPath() }
         assertThat(result.minCost).isEqualTo(102)
     }
 
@@ -61,7 +61,7 @@ class Day17Test {
         cityMap = CityMap(inputLines)
         cityMap.minStraightSteps = 4
         cityMap.maxStraightSteps = 10
-        val result: MinCostPath<CityMap.GraphState> = cityMap.findMinPath().also { it.print() }
+        val result: MinCostPath<CityMap.GraphState> = cityMap.findMinPath().also { it.printPath() }
         assertThat(result.minCost).isEqualTo(71)
     }
 
@@ -70,13 +70,14 @@ class Day17Test {
     fun `Solves Part 2`() {
         puzzleSolver.cityMap.minStraightSteps = 4
         puzzleSolver.cityMap.maxStraightSteps = 10
-        puzzleSolver.cityMap.findMinPath().print()
+        puzzleSolver.cityMap.findMinPath().printPath()
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("94")
     }
 
-    private fun MinCostPath<CityMap.GraphState>.print() {
+    private fun MinCostPath<CityMap.GraphState>.printPath() {
         println("path,cost: $path")
         println("min cost: $minCost")
-        Grid(path.map { it.first.point }.toTypedArray(), mapOf('x' to 0), border = 0).print()
+        Grid(path.associate { it.first.point to it.first.direction.ordinal },
+            listOf('^','>','v','<').let { l -> l.associateWith { l.indexOf(it) } }, border = 0).print()
     }
 }

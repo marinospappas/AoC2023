@@ -92,6 +92,11 @@ object GridUtils {
         RIGHT(Point(1, 0)),
         DOWN(Point(0, 1)),
         LEFT(Point(-1, 0));
+        fun toString1() = when (this) { UP -> "U"; RIGHT -> "R"; DOWN -> "D"; LEFT -> "L" }
+        fun toString2() = when (this) { UP -> "UP"; RIGHT -> "RIGHT"; DOWN -> "DOWN"; LEFT -> "LEFT" }
+        fun toString3() = when (this) { UP -> "N"; RIGHT -> "E"; DOWN -> "S"; LEFT -> "W" }
+        fun toString4() = when (this) { UP -> "NORTH"; RIGHT -> "EAST"; DOWN -> "SOUTH"; LEFT -> "WEST" }
+        fun toString5() = when (this) { UP -> "^"; RIGHT -> ">"; DOWN -> "v"; LEFT -> "<" }
         companion object {
             fun of(s: String): Direction =
                 when (s) {

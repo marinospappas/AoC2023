@@ -87,7 +87,7 @@ class MinCostPath<T> {
     var path: List<Pair<T,Int>> = listOf()
     var minCost: Int = Int.MAX_VALUE
     var numberOfIterations: Int = 0
-    inline fun <reified T> print(minCostPath: MinCostPath<T>) {
+    inline fun <reified T> printPath(minCostPath: MinCostPath<T>) {
         println("path,cost: ${minCostPath.path}")
         println("min cost: ${minCostPath.minCost}")
         if (T::class.java == Point::class.java)

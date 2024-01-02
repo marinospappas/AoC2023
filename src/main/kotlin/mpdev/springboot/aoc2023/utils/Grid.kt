@@ -140,8 +140,8 @@ open class Grid<T>(inputGridVisual: List<String> = emptyList(),
         return grid
     }
 
-    protected fun map2Char(t: T) = mapper.entries.firstOrNull { e -> e.value == t }?.key ?:
-    if (t is Int) '0' + t%10 else 'x'
+    protected fun map2Char(t: T) =
+        mapper.entries.firstOrNull { e -> e.value == t }?.key ?: if (t is Int) '0' + t%10 else 'x'
 
     open fun print() {
         printGrid(data2Grid())
