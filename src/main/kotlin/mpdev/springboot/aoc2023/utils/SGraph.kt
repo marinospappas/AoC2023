@@ -6,7 +6,8 @@ package mpdev.springboot.aoc2023.utils
  */
 //TODO replace the Int weight with Weight<U> to be able to implement custom compare
 class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf(),
-    val getConnected: (T) -> Set<Pair<T,Int>> = {id -> (nodes[id] ?: emptyMap()).map { Pair(it.key, it.value) }.toSet()}) {
+    val getConnected: (T) -> Set<Pair<T,Int>> = {id -> (nodes[id] ?: emptyMap()).map { Pair(it.key, it.value) }.toSet()},
+    val heuristic: (T) -> Int? = { null }) {
 
     constructor(nodesList: List<Pair<T, MutableSet<T>>>):
             this (nodesList.map { (id, conn) ->
@@ -75,6 +76,7 @@ class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf(),
     }
 
     companion object {
+        var aStarAlgorithm = false      // flag used to distinguish between A* and Dijkstra algorithm for min cost path
         inline fun <reified T: Comparable<T>> of(g: SGraph<T>): SGraph<T> {
             val newGraph = SGraph<T>()
             for ((id, connxns) in g.nodes) {
@@ -84,4 +86,6 @@ class SGraph<T>(var nodes: MutableMap<T, MutableMap<T, Int>> = mutableMapOf(),
             return newGraph
         }
     }
+
+    enum class Algorithm { Dijkstra, AStar }
 }

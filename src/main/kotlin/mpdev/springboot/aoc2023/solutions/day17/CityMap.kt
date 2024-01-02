@@ -11,7 +11,7 @@ class CityMap(input: List<String>) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     val grid = Grid(input, ('0'..'9').associateWith { it.digitToInt() }, border = 0)
-    val graph = SGraph(getConnected = ::getNeighbourPoints)
+    val graph = SGraph(getConnected = ::getNeighbourPoints, heuristic = ::heuristic)
     private val start = Point(0, 0)
     private val maxX = grid.getMinMaxXY().x2
     private val maxY = grid.getMinMaxXY().x4
@@ -20,16 +20,20 @@ class CityMap(input: List<String>) {
     var maxStraightSteps = 3
     var minStraightSteps = 0
 
+    private fun heuristic(state: GraphState): Int {
+        return state.point.manhattan(end)
+    }
+
     fun findMinPath(): MinCostPath<GraphState> {
         totalTimeSpentInGetConnected = 0L
-        return (graph.dijkstra(GraphState(start)) { state -> state.point == end })
+        //return (graph.dijkstra(GraphState(start)) { state -> state.point == end })
+        return (graph.aStar(GraphState(start)) { state -> state.point == end })
             .also {
                 log.info("number of iterations: {}", it.numberOfIterations)
                 log.info("time in getConnected: {} milli-sec", totalTimeSpentInGetConnected / 1000000)
             }
     }
 
-    // TODO: save the connected points to map to improve performance
     private var totalTimeSpentInGetConnected = 0L
 
     private fun getNeighbourPoints(location: GraphState): Set<Pair<GraphState, Int>> {
