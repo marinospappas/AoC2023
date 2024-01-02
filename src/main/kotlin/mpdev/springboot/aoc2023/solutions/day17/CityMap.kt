@@ -25,7 +25,7 @@ class CityMap(input: List<String>) {
         return (graph.dijkstra(GraphState(start)) { state -> state.point == end })
             .also {
                 log.info("number of iterations: {}", it.numberOfIterations)
-                log.info("avg time in getConnected: {} milli-sec", totalTimeSpentInGetConnected / 1000000)
+                log.info("time in getConnected: {} milli-sec", totalTimeSpentInGetConnected / 1000000)
             }
     }
 
