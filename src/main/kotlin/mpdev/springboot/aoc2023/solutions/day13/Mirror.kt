@@ -8,7 +8,8 @@ import kotlin.math.min
 
 class Mirror(input: List<String>) {
 
-    var reflections: List<Reflection> = processInput(input)
+    private val inputList = input.joinToString("|").split("||").map { s -> s.split("|") }
+    val reflections: List<Reflection> = inputList.map { l -> Reflection(Grid(l, ReflectionDatum.mapper, 0)) }
 
     fun checkReflection(obj: Reflection, comparator: (List<Int>, List<Int>) -> Boolean) {
         val grid = obj.grid
@@ -52,24 +53,7 @@ class Mirror(input: List<String>) {
         return countEq == list1.size - 1 && countOffBy1Bit == 1
     }
 
-    fun Int.isPowerOf2() = this.toString(2).count { it == '1' } == 1
-
-    ////////////////////////////////////////////////////////////
-
-    private fun processInput(input: List<String>): List<Reflection> {
-        val reflList = mutableListOf<Reflection>()
-        val gridData = mutableListOf<String>()
-        input.forEach { line ->
-            if (line.isEmpty()) {
-                reflList.add(Reflection(Grid(gridData, ReflectionDatum.mapper, 0)))
-                gridData.clear()
-                return@forEach
-            }
-            gridData.add(line)
-        }
-        reflList.add(Reflection(Grid(gridData, ReflectionDatum.mapper, 0)))
-        return reflList
-    }
+    private fun Int.isPowerOf2() = this.toString(2).count { it == '1' } == 1
 }
 
 data class Reflection(val grid: Grid<ReflectionDatum>, var reflType: ReflectionType = NONE,
