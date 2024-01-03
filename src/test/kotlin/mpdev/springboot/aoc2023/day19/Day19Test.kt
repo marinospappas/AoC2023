@@ -1,10 +1,8 @@
 package mpdev.springboot.aoc2023.day19
 
 import mpdev.springboot.aoc2023.input.InputDataReader
-import mpdev.springboot.aoc2023.solutions.day19.Day19
-import mpdev.springboot.aoc2023.solutions.day19.MPart
-import mpdev.springboot.aoc2023.solutions.day19.MachineParts
-import mpdev.springboot.aoc2023.solutions.day19.RuleResult
+import mpdev.springboot.aoc2023.solutions.day19.*
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -37,6 +35,16 @@ class Day19Test {
     @Test
     @Order(3)
     fun `Reads Input ans sets Parts set and Rules set`() {
+        println("input to json")
+        val (input1, input2) = inputLines.joinToString("|").split("||")
+        input1.split("|").map { InputUtils(AoCInput1::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput1::class.java).toJson(it) }
+            .println()
+        input2.split("|").map { InputUtils(AoCInput2::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput2::class.java).toJson(it) }
+            .println()
         println("Workflows")
         machineParts.workflows.forEach { it.println() }
         println("Machine Parts")

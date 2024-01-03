@@ -6,8 +6,16 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Serializable
+@AocInClass(delimiters = ["\\{"], removePatterns = ["\\}"])
+data class AoCInput1(
+    // rfg{s<537:gd,x>2440:R,A}
+    // 0   1
+    @AocInField(0) val wfId: String,
+    @AocInField(1, delimiters = [","]) val rules: List<String>
+)
+@Serializable
 @AocInClass(delimiters = [","], removePatterns = ["\\{", "\\}", "x=", "m=", "a=", "s="])
-data class AoCInput(
+data class AoCInput2(
     // {x=787,m=2655,a=1222,s=2876}
     //    0   1      2        3
     @AocInField(0) val x: Int,
@@ -18,16 +26,22 @@ data class AoCInput(
 
 class MachineParts(input: List<String>) {
 
-    private val aocInputList: List<AoCInput>
+    private val aocInputList1: List<AoCInput1>
+    private val aocInputList2: List<AoCInput2>
     val workflows: Map<String,Workflow>
     val partsList: List<MPart>
     private val startWf = "in"
 
     init {
         val (input1, input2) = input.joinToString("|").split("||")
-        workflows = processInput1(input1.split("|"))
-        aocInputList = InputUtils(AoCInput::class.java).readAoCInput(input2.split("|"))
-        partsList = aocInputList.map { MPart(it.x, it.m, it.a, it.s) }
+        aocInputList1 = InputUtils(AoCInput1::class.java).readAoCInput(input1.split("|"))
+        workflows = aocInputList1.map { rec ->
+            val rules = rec.rules.toMutableList().also { it.removeLast() }.map { WFRule.of(it) }
+            val defRes = rec.rules.last()
+            Workflow(rec.wfId, rules, if (defRes == "A" || defRes == "R") RuleResult.valueOf(defRes) else defRes)
+        }.associateBy { wf -> wf.id }
+        aocInputList2 = InputUtils(AoCInput2::class.java).readAoCInput(input2.split("|"))
+        partsList = aocInputList2.map { MPart(it.x, it.m, it.a, it.s) }
     }
 
     fun runWorkFlows(part: MPart): RuleResult {
@@ -108,17 +122,6 @@ class MachineParts(input: List<String>) {
         }
         return Pair(ranges.toMutableMap().also { it[rule.param1] = rangeT },
             ranges.toMutableMap().also { it[rule.param1] = rangeF })
-    }
-
-    private fun processInput1(input1: List<String>): Map<String,Workflow> {
-        val wList = mutableMapOf<String,Workflow>()
-        input1.forEach { line ->
-            val fields = line.removeSuffix("}").split("{")
-            val rules = fields[1].split(",").toMutableList().also { it.removeLast() }.map { WFRule.of(it) }
-            val defRes = fields[1].split(",").last()
-            wList[fields[0]] = Workflow(fields[0], rules, if (defRes == "A" || defRes == "R") RuleResult.valueOf(defRes) else defRes)
-        }
-        return wList
     }
 }
 
