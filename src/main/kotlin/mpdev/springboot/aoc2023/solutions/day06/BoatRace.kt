@@ -1,16 +1,25 @@
 package mpdev.springboot.aoc2023.solutions.day06
 
-import mpdev.springboot.aoc2023.utils.QuadraticEq
-import mpdev.springboot.aoc2023.utils.pairWith
+import kotlinx.serialization.Serializable
+import mpdev.springboot.aoc2023.utils.*
 import kotlin.math.ceil
 import kotlin.math.floor
 
+@Serializable
+@AocInClass(delimiters = ["Distance: *"], removePatterns = ["Time: *"])
+//@AocInReplacePatterns([" +", ","])
+data class AoCInput(
+    // Time:      7  15   30
+    // Distance:  9  40  200
+    @AocInField(0, delimiters = [" +"]) val times: List<Long>,
+    @AocInField(1, delimiters = [" +"]) val distances: List<Long>
+)
+
 class BoatRace(input: List<String>) {
 
-    val races = processInput(input).map { Race(it.first, it.second) }
-
-    init {
-        processInput(input)
+    private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(listOf(input.joinToString("" )))
+    val races = (0 .. aocInputList[0].times.lastIndex).map {
+        Race(aocInputList[0].times[it], aocInputList[0].distances[it])
     }
 
     fun minMaxChargeTime(race: Race): Pair<Long,Long> {
@@ -22,12 +31,6 @@ class BoatRace(input: List<String>) {
     }
 
     fun setupLongRace() = races.reduce(Race::concat)
-
-    private fun processInput(input: List<String>): List<Pair<Long,Long>> {
-        val times = input[0].removePrefix("Time:").trim().split(Regex(" +")).map { it.trim().toLong() }
-        val distances = input[1].removePrefix("Distance:").trim().split(Regex(" +")).map { it.trim().toLong() }
-        return times.pairWith(distances)
-    }
 }
 
 data class Race(val time: Long, val distance: Long) {

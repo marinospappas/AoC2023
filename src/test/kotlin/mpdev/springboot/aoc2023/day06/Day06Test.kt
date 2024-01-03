@@ -3,6 +3,8 @@ package mpdev.springboot.aoc2023.day06
 import mpdev.springboot.aoc2023.input.InputDataReader
 import mpdev.springboot.aoc2023.solutions.day06.Day06
 import mpdev.springboot.aoc2023.solutions.day06.BoatRace
+import mpdev.springboot.aoc2023.solutions.day06.AoCInput
+import mpdev.springboot.aoc2023.utils.InputUtils
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -34,6 +36,12 @@ class Day06Test {
     @Test
     @Order(2)
     fun `Reads Input ans sets Races`() {
+        println("input to json")
+        listOf(inputLines.joinToString("")).map { InputUtils(AoCInput::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
+            .println()
+        println("Races")
         val boatRace = BoatRace(inputLines)
         boatRace.races.forEach { it.println() }
         assertThat(boatRace.races.size).isEqualTo(3)
