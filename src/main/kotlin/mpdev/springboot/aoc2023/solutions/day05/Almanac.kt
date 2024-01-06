@@ -30,7 +30,7 @@ class Almanac(input: List<String>) {
         aocInputList.forEach { e ->
             tempMaps.getOrPut(MapId.of(e.mapId)) { mutableListOf() }.add(Pair(LongRange(e.values[1], e.values[1] + e.values[2] - 1), e.values[0] - e.values[1]))
         }
-        // the ranges in each map are continuous (the start of each range is the end of the previous range + 1)
+        // the ranges in each map are not overlapping (the start of each range is > than the end of the previous range)
         maps = tempMaps.entries.associate { e -> e.key to e.value.sortedBy { it.first.first } }
     }
 
@@ -150,6 +150,7 @@ class Almanac(input: List<String>) {
                     else -> continue
                 }
             }
+            // TODO more debugging needed
             if (startEnd == 1) {  // looking for the end
                 when {
                     range.last <= xformRanges[i].last -> {

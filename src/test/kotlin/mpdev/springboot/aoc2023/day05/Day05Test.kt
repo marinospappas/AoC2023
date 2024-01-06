@@ -111,6 +111,10 @@ class Day05Test {
             Arguments.of(20L..30L, listOf(Pair(22L..39L, 2L), Pair(50L..59L, 5L)), listOf(20L..21L, 24L..32L)),
             Arguments.of(20L..30L, listOf(Pair(0L..5L, 2L), Pair(15L..25L, 5L)), listOf(25L..30L, 26L..30L)),
             Arguments.of(20L..30L, listOf(Pair(0L..5L, 2L), Pair(15L..22L, 5L), Pair(23L..25L, 1L), Pair(26L..35L, 6)),
+                listOf(24L..26L, 25L..27L, 32L..36L)),
+            Arguments.of(25L..35L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 5L), Pair(50L..60L, 10L)),
+                listOf(24L..26L, 25L..27L, 32L..36L)),
+            Arguments.of(25L..45L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 5L), Pair(50L..60L, 10L)),
                 listOf(24L..26L, 25L..27L, 32L..36L))
         )
 
