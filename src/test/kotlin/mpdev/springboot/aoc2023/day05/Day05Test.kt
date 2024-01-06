@@ -9,10 +9,17 @@ import mpdev.springboot.aoc2023.utils.InputUtils.Companion.skipEmptyLines
 import mpdev.springboot.aoc2023.utils.InputUtils.Companion.skipLines
 import mpdev.springboot.aoc2023.utils.println
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Day05Test {
 
     private val day = 5                                     ///////// Update this for a new dayN test
@@ -39,16 +46,21 @@ class Day05Test {
     @Order(2)
     fun `Reads Input ans sets Mappings`() {
         println("input transformed")
-        val inputTransformed = inputLines.stream().skip(skipLines.toLong()).toList()
+        val inputTransformed = inputLines.subList(1, inputLines.size).stream().skip(skipLines.toLong()).toList()
             .map { InputUtils(AoCInput::class.java).transform(it) }
             .filterNot { skipEmptyLines && it.isEmpty() }.also { it.forEach { s -> s.println() } }
         println("input to json")
         inputTransformed.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
         println("seeds list")
         almanac.seedsList.println()
-        Almanac.State.values().forEach { state ->
+        Almanac.MapId.values().forEach { state ->
             println(state)
             almanac.maps[state]?.forEach { it.println() }
+        }
+        almanac.maps.values.forEach { l ->
+            for (i in 0 .. l.lastIndex-1) {
+                assertTrue(l[i].first.last < l[i+1].first.first)
+            }
         }
     }
 
@@ -66,12 +78,10 @@ class Day05Test {
             val seed = almanac.seedsList[indx]
             print("seed $seed: ")
             var current = seed
-            Almanac.State.values().forEach { state ->
-                if (state != Almanac.State.Seeds) {
-                    current = almanac.getMapping(state, current)
-                    print("$state $current, ")
-                    assertThat(current).isEqualTo(expected[indx][state.ordinal-1])
-                }
+            Almanac.MapId.values().forEach { map ->
+                current = almanac.getMapping(map, current)
+                print("$map $current, ")
+                assertThat(current).isEqualTo(expected[indx][map.ordinal])
             }
             println("")
         }
@@ -85,9 +95,44 @@ class Day05Test {
         assertThat(puzzleSolver.solvePart1().result).isEqualTo("35")
     }
 
+    @ParameterizedTest
+    @MethodSource("transformRangeArguments")
+    @Order(6)
+    fun `Transforms a Range`(inputRange: LongRange, xformMap: List<Pair<LongRange,Long>>, expected: List<LongRange>) {
+        val result = almanac.transformRange(inputRange, xformMap).also { it.println() }
+        assertThat(result).isEqualTo(expected)
+    }
+
+    private fun transformRangeArguments(): Stream<Arguments> =
+        Stream.of(
+            Arguments.of(20L..30L, listOf(Pair(40L..49L, 1L), Pair(50L..59L, 2L)), listOf(20L..30L)),
+            Arguments.of(20L..30L, listOf(Pair(5L..9L, 1L), Pair(12L..16L, 2L)), listOf(20L..30L)),
+            Arguments.of(20L..30L, listOf(Pair(10L..39L, 2L), Pair(50L..59L, 5L)), listOf(22L..32L)),
+            Arguments.of(20L..30L, listOf(Pair(22L..39L, 2L), Pair(50L..59L, 5L)), listOf(20L..21L, 24L..32L)),
+            Arguments.of(20L..30L, listOf(Pair(0L..5L, 2L), Pair(15L..25L, 5L)), listOf(25L..30L, 26L..30L)),
+            Arguments.of(20L..30L, listOf(Pair(0L..5L, 2L), Pair(15L..22L, 5L), Pair(23L..25L, 1L), Pair(26L..35L, 6)),
+                listOf(24L..26L, 25L..27L, 32L..36L))
+        )
+
+    @Test
+    @Order(6)
+    fun `Transforms a List of Ranges via Multiple Reference Maps`() {
+        var ranges = almanac.seedRanges
+        for (mapId in Almanac.MapId.values()) {
+            println(mapId)
+            val result = almanac.transformRangeList(ranges, almanac.maps[mapId]!!).also { it.println() }
+            val expected = ranges.map { r ->
+                r.map { seed -> almanac.getMapping(mapId, seed) }
+            }.also { it.println() }
+            assertThat(result.map { it.toList() }.flatten().sorted()).isEqualTo(expected.flatten().sorted())
+            ranges = result
+        }
+    }
+
     @Test
     @Order(8)
     fun `Solves Part 2`() {
         assertThat(puzzleSolver.solvePart2().result).isEqualTo("46")
+        assertThat(almanac.getMinLocationFromRange()).isEqualTo(46)
     }
 }

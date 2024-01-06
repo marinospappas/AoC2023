@@ -35,8 +35,7 @@ class Day05: PuzzleSolver() {
 
     override fun solvePart2(): PuzzlePartSolution {
         val elapsed = measureTimeMillis {
-            almanac.seedToRanges()
-            result = almanac.getMinLocationFromRange()
+            result = almanac.transformRangesThroughAllMaps().first().first
         }
         return PuzzlePartSolution(2, result.toString(), elapsed, "milli-sec")
     }

@@ -123,11 +123,18 @@ class InputUtils(inputClazz: Class<*>) {
     }
 
     // remove noise from input string and convert it to list of values
-    fun transform(s: String): String {
-        var s1 = s
+    fun transform(s: String): String =
+        s.retainPatterns().removePatterns().replacePatterns().processDelimiters()
+
+    private fun String.removePatterns(): String {
+        var s1 = this
         for (pattern in removePatterns)
             s1 = s1.replace(Regex(pattern), "")
+        return s1
+    }
 
+    private fun String.replacePatterns(): String {
+        var s1 = this
         for (i in replacePatterns.indices) {
             if (s1.isEmpty())
                 break
@@ -143,7 +150,11 @@ class InputUtils(inputClazz: Class<*>) {
             else
                 s1 = s1.replace(Regex(replacePatterns[i].first), replacement)
         }
+        return s1
+    }
 
+    private fun String.retainPatterns(): String {
+        val s1 = this
         for (i in retainPatterns.indices) {
             val pattern = retainPatterns[i]
             val match = Regex(pattern).find(s1)
@@ -152,7 +163,11 @@ class InputUtils(inputClazz: Class<*>) {
                 retainedValues[i] = value
             } catch (ignore: Exception) {}
         }
+        return s1
+    }
 
+    private fun String.processDelimiters(): String {
+        var s1 = this
         return if (delimiters.isEmpty())
             s1
         else {

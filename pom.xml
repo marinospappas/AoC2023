@@ -172,6 +172,7 @@
           	<args>
             	<arg>-Xjsr305=strict</arg>
           	</args>
+            <languageVersion>1.8</languageVersion>
         </configuration>
         <dependencies>
           	<dependency>
