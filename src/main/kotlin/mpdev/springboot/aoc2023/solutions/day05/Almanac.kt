@@ -21,14 +21,16 @@ class Almanac(input: List<String>) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input.subList(1, input.size))
+    private val aocInputList: List<AoCInput> =
+        InputUtils(AoCInput::class.java).readAoCInput(input.subList(1, input.size))
     val seedsList: List<Long> = input[0].removePrefix("seeds: ").split(" ").map { it.toLong() }
     val maps: Map<MapId, List<Pair<LongRange, Long>>>
 
     init {
         val tempMaps: MutableMap<MapId, MutableList<Pair<LongRange, Long>>> = mutableMapOf()
         aocInputList.forEach { e ->
-            tempMaps.getOrPut(MapId.of(e.mapId)) { mutableListOf() }.add(Pair(LongRange(e.values[1], e.values[1] + e.values[2] - 1), e.values[0] - e.values[1]))
+            tempMaps.getOrPut(MapId.of(e.mapId)) { mutableListOf() }
+                .add(Pair(LongRange(e.values[1], e.values[1] + e.values[2] - 1), e.values[0] - e.values[1]))
         }
         // the ranges in each map are not overlapping (the start of each range is > than the end of the previous range)
         maps = tempMaps.entries.associate { e -> e.key to e.value.sortedBy { it.first.first } }
@@ -79,7 +81,7 @@ class Almanac(input: List<String>) {
         return current
     }
 
-    fun transformRangeList(ranges: List<LongRange>, xformMap: List<Pair<LongRange,Long>>): List<LongRange> {
+    fun transformRangeList(ranges: List<LongRange>, xformMap: List<Pair<LongRange, Long>>): List<LongRange> {
         val newRanges = mutableListOf<LongRange>()
         for (range in ranges)
             newRanges.addAll(transformRange(range, xformMap))
@@ -92,11 +94,12 @@ class Almanac(input: List<String>) {
         do {
             var combineMore = false
             val tmpRange = current.toMutableList()
-            outerFor@for (range in current) {
+            outerFor@ for (range in current) {
                 for (other in mutableListOf<LongRange>().also { it.addAll(current) }.also { it.remove(range) }) {
                     if (range.last in other || range.last + 1L == other.first) {
-                        val combinedRange = LongRange(kotlin.math.min(range.first, other.first),
-                            kotlin.math.max(range.last, other.last))
+                        val combinedRange = LongRange(
+                            kotlin.math.min(range.first, other.first), kotlin.math.max(range.last, other.last)
+                        )
                         tmpRange.remove(range)
                         tmpRange.remove(other)
                         tmpRange.add(combinedRange)
@@ -106,7 +109,7 @@ class Almanac(input: List<String>) {
                 }
             }
             current = tmpRange.toList()
-        } while(combineMore)
+        } while (combineMore)
         return current.sortedBy { it.first }
     }
 
@@ -123,42 +126,23 @@ class Almanac(input: List<String>) {
     //                            ----e
     //                                 --------e
     //                                                      -------e
-
-    fun transformRange(range: LongRange, xformMap: List<Pair<LongRange,Long>>): List<LongRange> {
+    fun transformRange(range: LongRange, xformMap: List<Pair<LongRange, Long>>): List<LongRange> {
         val xformRanges = xformMap.map { it.first }
-        val factors = xformMap.map { it.second }
         var startEnd = 0
         val result = mutableListOf<LongRange>()
         for (i in xformRanges.indices) {
             if (startEnd == 0) { // looking for the start
-                when {
-                    range.first < xformRanges[i].first -> {
-                        if (range.last < xformRanges[i].first)
-                            return listOf(range)
-                        else
-                            result.add(LongRange(range.first, xformRanges[i].first - 1))
-                        startEnd = 1
-                    }
-                    range.first < xformRanges[i].last -> {
-                        if (range.last <= xformRanges[i].last)
-                            return listOf(LongRange(range.first + factors[i], range.last + factors[i]))
-                        else
-                            result.add(LongRange(range.first + factors[i], xformRanges[i].last + factors[i]))
-                        startEnd = 1
-                        continue
-                    }
-                    else -> continue
+                @Suppress("UNCHECKED_CAST")   // checkStartForRange will return either Int or List<LongRange>
+                when (val startResult = checkStartOfRange(range, xformMap, i, result)) {
+                    is List<*> -> return startResult as List<LongRange>
+                    -1 -> break
+                    0 -> continue
+                    1 -> startEnd = 1
                 }
-            }
-            // TODO more debugging needed
-            if (startEnd == 1) {  // looking for the end
-                when {
-                    range.last <= xformRanges[i].last -> {
-                        result.add(LongRange(xformRanges[i].first + factors[i], range.last + factors[i]))
-                        break
-                    }
-                    else ->
-                        result.add(LongRange(xformRanges[i].first + factors[i], xformRanges[i].last + factors[i]))
+            } else {  // looking for the end
+                when (checkEndOfRange(range, xformMap, i, result)) {
+                    -1 -> break
+                    0 -> continue
                 }
             }
         }
@@ -167,8 +151,60 @@ class Almanac(input: List<String>) {
                 return listOf(range)
             else
                 result.add(LongRange(xformRanges.last().last + 1, range.last))
-        return result
-            .sortedBy { it.first }
+        return result.sortedBy { it.first }
+    }
+
+    private fun checkStartOfRange(range: LongRange, xformMap: List<Pair<LongRange, Long>>, index: Int, resultRanges: MutableList<LongRange>)
+    : Any {
+        val xformRanges = xformMap.map { it.first }
+        val factors = xformMap.map { it.second }
+        when {
+            range.first < xformRanges[index].first -> {
+                if (range.last < xformRanges[index].first)
+                    return listOf(range)
+                else {
+                    resultRanges.add(LongRange(range.first, xformRanges[index].first - 1))
+                    // in this scenario need to also check if the end is within the xform range
+                    if (range.last <= xformRanges[index].last) {
+                        resultRanges.add(LongRange(xformRanges[index].first + factors[index], range.last + factors[index]))
+                        return -1
+                    } else
+                        resultRanges.add(LongRange(xformRanges[index].first + factors[index], xformRanges[index].last + factors[index]))
+                }
+                return 1
+            }
+            range.first < xformRanges[index].last -> {
+                if (range.last <= xformRanges[index].last)
+                    return listOf(LongRange(range.first + factors[index], range.last + factors[index]))
+                else
+                    resultRanges.add(LongRange(range.first + factors[index], xformRanges[index].last + factors[index]))
+                return 1
+            }
+        }
+        return 0   // continue the loop
+    }
+
+    private fun checkEndOfRange(range: LongRange, xformMap: List<Pair<LongRange,Long>>, index: Int, resultRanges: MutableList<LongRange>)
+    : Int {
+        val xformRanges = xformMap.map { it.first }
+        val factors = xformMap.map { it.second }
+        when {
+            range.last < xformRanges[index].first -> {
+                resultRanges.add(LongRange(xformRanges[index - 1].last + 1, range.last))
+                return -1   // break the loop
+            }
+            range.last <= xformRanges[index].last -> {
+                resultRanges.add(LongRange(xformRanges[index - 1].last + 1, xformRanges[index].first - 1))
+                resultRanges.add(LongRange(xformRanges[index].first + factors[index], range.last + factors[index]))
+                return -1   // break the loop
+            }
+            else -> {
+                if (!resultRanges.contains(LongRange(xformRanges[index - 1].last + 1, xformRanges[index].first - 1)))
+                    resultRanges.add(LongRange(xformRanges[index - 1].last + 1, xformRanges[index].first - 1))
+                resultRanges.add(LongRange(xformRanges[index].first + factors[index], xformRanges[index].last + factors[index]))
+            }
+        }
+        return 0   // continue the loop
     }
 
     enum class MapId {

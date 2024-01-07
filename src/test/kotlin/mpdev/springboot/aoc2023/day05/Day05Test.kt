@@ -105,17 +105,81 @@ class Day05Test {
 
     private fun transformRangeArguments(): Stream<Arguments> =
         Stream.of(
-            Arguments.of(20L..30L, listOf(Pair(40L..49L, 1L), Pair(50L..59L, 2L)), listOf(20L..30L)),
-            Arguments.of(20L..30L, listOf(Pair(5L..9L, 1L), Pair(12L..16L, 2L)), listOf(20L..30L)),
-            Arguments.of(20L..30L, listOf(Pair(10L..39L, 2L), Pair(50L..59L, 5L)), listOf(22L..32L)),
-            Arguments.of(20L..30L, listOf(Pair(22L..39L, 2L), Pair(50L..59L, 5L)), listOf(20L..21L, 24L..32L)),
-            Arguments.of(20L..30L, listOf(Pair(0L..5L, 2L), Pair(15L..25L, 5L)), listOf(25L..30L, 26L..30L)),
-            Arguments.of(20L..30L, listOf(Pair(0L..5L, 2L), Pair(15L..22L, 5L), Pair(23L..25L, 1L), Pair(26L..35L, 6)),
-                listOf(24L..26L, 25L..27L, 32L..36L)),
-            Arguments.of(25L..35L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 5L), Pair(50L..60L, 10L)),
-                listOf(24L..26L, 25L..27L, 32L..36L)),
-            Arguments.of(25L..45L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 5L), Pair(50L..60L, 10L)),
-                listOf(24L..26L, 25L..27L, 32L..36L))
+            // 1 range returned
+            Arguments.of(2L..6L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(2L..6L)),
+            Arguments.of(22L..26L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(22L..26L)),
+            Arguments.of(42L..46L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(42L..46L)),
+            Arguments.of(62L..66L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(62L..66L)),
+
+            Arguments.of(13L..15L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(15L..17L)),
+            Arguments.of(33L..40L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(37L..44L)),
+            Arguments.of(53L..55L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(59L..61L)),
+
+            // 2 ranges returned
+            Arguments.of(5L..15L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(5L..9L, 12L..17L)),
+            Arguments.of(25L..40L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(25L..29L, 34L..44L)),
+            Arguments.of(45L..55L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(45L..49L, 56L..61L)),
+
+            Arguments.of(15L..25L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(17L..22L, 21L..25L)),
+            Arguments.of(30L..45L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(34L..44L, 41L..45L)),
+            Arguments.of(55L..65L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(61L..66L, 61L..65L)),
+
+            // 3 ranges returned
+            Arguments.of(5L..25L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(5L..9L, 12L..22L, 21L..25L)),
+            Arguments.of(25L..45L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(25L..29L, 34L..44L, 41L..45L)),
+            Arguments.of(45L..65L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(45L..49L, 56L..66L, 61L..65L)),
+
+            Arguments.of(15L..40L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(17L..22L, 21L..29L, 34L..44L)),
+            Arguments.of(35L..55L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(39L..44L, 41L..49L, 56L..61L)),
+
+            // 4 ranges returned
+            Arguments.of(5L..35L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(5L..9L, 12L..22L, 21L..29L, 34L..39L)),
+            Arguments.of(25L..55L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(25L..29L, 34L..44L, 41L..49L, 56L..61L)),
+
+            Arguments.of(15L..45L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(17L..22L, 21L..29L, 34L..44L, 41L..45L)),
+            Arguments.of(35L..65L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(39L..44L, 41L..49L, 56L..66L, 61L..65L)),
+
+            // 5 ranges returned
+            Arguments.of(5L..45L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(5L..9L, 12L..22L, 21L..29L, 34L..44L, 41L..45L)),
+            Arguments.of(25L..65L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(25L..29L, 34L..44L, 41L..49L, 56L..66L, 61L..65L)),
+
+            Arguments.of(15L..55L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(17L..22L, 21L..29L, 34L..44L, 41L..49L, 56L..61L)),
+
+            // 6 ranges returned
+            Arguments.of(5L..55L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(5L..9L, 12L..22L, 21L..29L, 34L..44L, 41L..49L, 56L..61L)),
+
+            Arguments.of(15L..65L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(17L..22L, 21L..29L, 34L..44L, 41L..49L, 56L..66L, 61L..65L)),
+
+            // 7 ranges returned
+            Arguments.of(5L..65L, listOf(Pair(10L..20L, 2L), Pair(30L..40L, 4L), Pair(50L..60L, 6L)),
+                listOf(5L..9L, 12L..22L, 21L..29L, 34L..44L, 41L..49L, 56L..66L, 61L..65L))
         )
 
     @Test
