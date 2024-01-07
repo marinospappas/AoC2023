@@ -14,8 +14,6 @@ data class AoCInput(
 
 class JengaBricks(input: List<String>) {
 
-    // TODO refactor this class to make it less verbose
-
     var debug = false
     private val aocInputList: List<AoCInput> = InputUtils(AoCInput::class.java).readAoCInput(input)
     val bricks: List<Brick> = aocInputList.sortedBy { it.coord1[2] }

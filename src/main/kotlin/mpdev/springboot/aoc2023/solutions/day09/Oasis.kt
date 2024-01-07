@@ -33,7 +33,6 @@ class Oasis(input: List<String>) {
         val firstDigitList = mutableListOf(current.first())
         while (current.any { it != 0L })
             current = current.elementDiffs().also { firstDigitList.add(it.first()) }
-        // for (d in firstDigitList.reversed()) result = d - result
         // the past value is the sum of all the first digits but with alternating sign (+, -, +, -, +, ...)
         var sign = -1
         return firstDigitList.sumOf { sign = -sign; sign * it }

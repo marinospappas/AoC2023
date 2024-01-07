@@ -14,7 +14,6 @@ data class AoCInput(
     @AocInField(1, delimiters = [" "]) val connections: List<String>
 )
 
-// TODO: review the below to see if performance can be improved
 class WiringDiagram(val input: List<String>) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
