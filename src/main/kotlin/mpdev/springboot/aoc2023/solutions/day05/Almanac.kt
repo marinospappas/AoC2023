@@ -139,13 +139,15 @@ class Almanac(input: List<String>) {
                     0 -> continue
                     1 -> startEnd = 1
                 }
-            } else {  // looking for the end
+            }
+            else {  // looking for the end
                 when (checkEndOfRange(range, xformMap, i, result)) {
                     -1 -> break
                     0 -> continue
                 }
             }
         }
+        // check if the input range extends beyond the end of the mapping ranges
         if (range.last > xformRanges.last().last)
             if (range.first > xformRanges.last().last)
                 return listOf(range)
@@ -167,18 +169,18 @@ class Almanac(input: List<String>) {
                     // in this scenario need to also check if the end is within the xform range
                     if (range.last <= xformRanges[index].last) {
                         resultRanges.add(LongRange(xformRanges[index].first + factors[index], range.last + factors[index]))
-                        return -1
+                        return -1   //  break the loop
                     } else
                         resultRanges.add(LongRange(xformRanges[index].first + factors[index], xformRanges[index].last + factors[index]))
                 }
-                return 1
+                return 1   // go on and check the end of the range
             }
             range.first < xformRanges[index].last -> {
                 if (range.last <= xformRanges[index].last)
                     return listOf(LongRange(range.first + factors[index], range.last + factors[index]))
                 else
                     resultRanges.add(LongRange(range.first + factors[index], xformRanges[index].last + factors[index]))
-                return 1
+                return 1   // go on and check the end of the range
             }
         }
         return 0   // continue the loop
@@ -202,9 +204,9 @@ class Almanac(input: List<String>) {
                 if (!resultRanges.contains(LongRange(xformRanges[index - 1].last + 1, xformRanges[index].first - 1)))
                     resultRanges.add(LongRange(xformRanges[index - 1].last + 1, xformRanges[index].first - 1))
                 resultRanges.add(LongRange(xformRanges[index].first + factors[index], xformRanges[index].last + factors[index]))
+                return 0   // continue the loop
             }
         }
-        return 0   // continue the loop
     }
 
     enum class MapId {
