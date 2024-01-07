@@ -121,7 +121,7 @@ class Almanac(input: List<String>) {
     //         |       |       |                                  s----e   outside the end (also with end
     //         |       |       |
     // End:    s--e    |       |                                           before the beginning (also with start)
-    //                 s--e    |                                           inside a range (also with start)
+    //                 s-e     |                                           inside a range (also with start)
     //                         s---e                                       between ranges (also with start)
     //                            ----e
     //                                 --------e
