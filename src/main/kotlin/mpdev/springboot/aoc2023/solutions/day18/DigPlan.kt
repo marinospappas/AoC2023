@@ -5,7 +5,8 @@ import mpdev.springboot.aoc2023.utils.*
 import mpdev.springboot.aoc2023.utils.GridUtils.Direction.*
 
 @Serializable
-@AocInClass(delimiters = [" "], removePatterns = ["\\(#", "\\)"])
+@AocInClass(delimiters = [" "])
+@AocInRemovePatterns(["\\(#", "\\)"])
 data class AoCInput(
     // R 6 (#70c710)
     // 0 1   2

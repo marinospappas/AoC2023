@@ -38,7 +38,10 @@ class Day07Test {
         println("input transformed")
         inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
         println("input to json")
-        inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
+        inputLines.map { InputUtils(AoCInput::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
+            .println()
         camelCards.handsList.forEach { it.println() }
         assertThat(camelCards.handsList.size).isEqualTo(5)
         assertThat(camelCards.handsList.sumOf { it.bid }).isEqualTo(2180)

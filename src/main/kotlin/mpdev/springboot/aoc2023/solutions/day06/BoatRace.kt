@@ -6,8 +6,8 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 @Serializable
-@AocInClass(delimiters = ["Distance: *"], removePatterns = ["Time: *"])
-//@AocInReplacePatterns([" +", ","])
+@AocInClass(delimiters = ["Distance: *"])
+@AocInRemovePatterns(["Time: *"])
 data class AoCInput(
     // Time:      7  15   30
     // Distance:  9  40  200

@@ -5,6 +5,7 @@ import mpdev.springboot.aoc2023.solutions.day02.Cube.*
 import mpdev.springboot.aoc2023.utils.ListType.*
 import mpdev.springboot.aoc2023.utils.AocInClass
 import mpdev.springboot.aoc2023.utils.AocInField
+import mpdev.springboot.aoc2023.utils.AocInRemovePatterns
 import mpdev.springboot.aoc2023.utils.InputUtils
 
 class CubeGame(input: List<String>) {
@@ -26,7 +27,8 @@ class CubeGame(input: List<String>) {
 }
 
 @Serializable
-@AocInClass(delimiters = [":"], removePatterns = ["Game"])
+@AocInClass(delimiters = [":"])
+@AocInRemovePatterns(["Game"])
 data class AoCInput(
     @AocInField(0) val id: Int,
     @AocInField(1, delimiters = [";", ",", " "], listType = [list, pair]) val cubeList: List<List<Pair<Int,Cube>>>

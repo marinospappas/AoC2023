@@ -36,7 +36,10 @@ class Day02Test {
         println("input transformed")
         inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
         println("input to json")
-        inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
+        inputLines.map { InputUtils(AoCInput::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
+            .println()
         println(cubeGame.gameCubes)
         cubeGame.games.forEach { it.println() }
         assertThat(cubeGame.games.size).isEqualTo(5)

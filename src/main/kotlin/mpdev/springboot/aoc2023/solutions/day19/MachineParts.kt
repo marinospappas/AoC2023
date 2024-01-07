@@ -6,7 +6,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Serializable
-@AocInClass(delimiters = ["\\{"], removePatterns = ["\\}"])
+@AocInClass(delimiters = ["\\{"])
+@AocInRemovePatterns(["\\}"])
 data class AoCInput1(
     // rfg{s<537:gd,x>2440:R,A}
     // 0   1
@@ -14,7 +15,8 @@ data class AoCInput1(
     @AocInField(1, delimiters = [","]) val rules: List<String>
 )
 @Serializable
-@AocInClass(delimiters = [","], removePatterns = ["\\{", "\\}", "x=", "m=", "a=", "s="])
+@AocInClass(delimiters = [","])
+@AocInRemovePatterns(["\\{", "\\}", "x=", "m=", "a=", "s="])
 data class AoCInput2(
     // {x=787,m=2655,a=1222,s=2876}
     //    0   1      2        3

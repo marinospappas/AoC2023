@@ -13,8 +13,7 @@ import mpdev.springboot.aoc2023.utils.ListType.*
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class AocInClass(val delimiters: Array<String> = [" "], val removePatterns: Array<String> = [],
-                            val skipLines: Int = 0, val skipEmptyLines: Boolean = true)
+annotation class AocInClass(val delimiters: Array<String> = [" "], val skipLines: Int = 0, val skipEmptyLines: Boolean = true)
 
 /**
  * List of patterns to be replaced with the patterns of the second list
@@ -76,7 +75,6 @@ class InputUtils(inputClazz: Class<*>) {
             val delims = clazz.getAnnotation(AocInClass::class.java).delimiters
             delimiters = Array(delims.size) { delims[it] }
             skipLines = clazz.getAnnotation(AocInClass::class.java).skipLines
-            removePatterns = clazz.getAnnotation(AocInClass::class.java).removePatterns.toList()
             skipEmptyLines = clazz.getAnnotation(AocInClass::class.java).skipEmptyLines
             mappings = getFieldMappings()
             if (mappings.size == 1)

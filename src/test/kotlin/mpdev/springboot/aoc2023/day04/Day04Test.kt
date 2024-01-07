@@ -40,7 +40,10 @@ class Day04Test {
         println("input transformed")
         inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
         println("input to json")
-        inputLines.forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
+        inputLines.map { InputUtils(AoCInput::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
+            .println()
         scratchCardGame.cards.forEach { it.println()}
         assertThat(scratchCardGame.cards.size).isEqualTo(6)
         assertThat(scratchCardGame.cards.keys).isEqualTo(setOf(1,2,3,4,5,6))

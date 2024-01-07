@@ -6,7 +6,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @Serializable
-@AocInClass(delimiters = ["=", ","], skipLines = 1, removePatterns = ["\\(", "\\)"])
+@AocInClass(delimiters = ["=", ","], skipLines = 1)
+@AocInRemovePatterns(["\\(", "\\)"])
 data class AoCInput(
     // AAA = (BBB, CCC)
     // 0      1    2

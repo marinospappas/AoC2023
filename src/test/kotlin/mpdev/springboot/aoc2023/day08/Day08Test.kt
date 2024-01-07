@@ -38,7 +38,11 @@ class Day08Test {
         println("input transformed")
         inputLines.forEach { InputUtils(AoCInput::class.java).transform(it).println() }
         println("input to json")
-        inputLines.stream().skip(2).forEach { InputUtils(AoCInput::class.java).toJson(it).println() }
+        inputLines.subList(1, inputLines.size)
+            .map { InputUtils(AoCInput::class.java).transform(it) }
+            .filterNot { InputUtils.skipEmptyLines && it.isEmpty() }
+            .joinToString(",", "[", "]") { InputUtils(AoCInput::class.java).toJson(it) }
+            .println()
         instructionMap.instructions.println()
         instructionMap.steps.forEach { it.println() }
         assertThat(instructionMap.instructions).isEqualTo(listOf('R','L'))
