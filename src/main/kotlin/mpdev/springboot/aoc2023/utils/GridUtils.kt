@@ -92,24 +92,55 @@ object GridUtils {
         RIGHT(Point(1, 0)),
         DOWN(Point(0, 1)),
         LEFT(Point(-1, 0));
-        fun toString1() = when (this) { UP -> "U"; RIGHT -> "R"; DOWN -> "D"; LEFT -> "L" }
-        fun toString2() = when (this) { UP -> "UP"; RIGHT -> "RIGHT"; DOWN -> "DOWN"; LEFT -> "LEFT" }
-        fun toString3() = when (this) { UP -> "N"; RIGHT -> "E"; DOWN -> "S"; LEFT -> "W" }
-        fun toString4() = when (this) { UP -> "NORTH"; RIGHT -> "EAST"; DOWN -> "SOUTH"; LEFT -> "WEST" }
-        fun toString5() = when (this) { UP -> "^"; RIGHT -> ">"; DOWN -> "v"; LEFT -> "<" }
+
+        fun turn(leftRight: Int) = if (leftRight == 1) turnRight() else turnLeft()
+
+        fun turnRight() = when (this) {
+            UP -> RIGHT; RIGHT -> DOWN;DOWN -> LEFT; LEFT -> UP
+        }
+
+        fun turnLeft() = when (this) {
+            UP -> LEFT; LEFT -> DOWN; DOWN -> RIGHT; RIGHT -> UP
+        }
+
+        fun reverse() = when (this) {
+            UP -> DOWN; RIGHT -> LEFT; DOWN -> UP; LEFT -> RIGHT
+        }
+
+        fun toString1() = when (this) {
+            UP -> "U"; RIGHT -> "R"; DOWN -> "D"; LEFT -> "L"
+        }
+
+        fun toString2() = when (this) {
+            UP -> "UP"; RIGHT -> "RIGHT"; DOWN -> "DOWN"; LEFT -> "LEFT"
+        }
+
+        fun toString3() = when (this) {
+            UP -> "N"; RIGHT -> "E"; DOWN -> "S"; LEFT -> "W"
+        }
+
+        fun toString4() = when (this) {
+            UP -> "NORTH"; RIGHT -> "EAST"; DOWN -> "SOUTH"; LEFT -> "WEST"
+        }
+
+        fun toString5() = when (this) {
+            UP -> "^"; RIGHT -> ">"; DOWN -> "v"; LEFT -> "<"
+        }
+
         companion object {
             fun of(s: String): Direction =
                 when (s) {
-                    "U","UP",   "N","NORTH","^" -> UP
-                    "R","RIGHT","E","EAST", ">" -> RIGHT
-                    "D","DOWN", "S","SOUTH","v" -> DOWN
-                    "L","LEFT", "W","WEST", "<" -> LEFT
+                    "U", "UP", "N", "NORTH", "^" -> UP
+                    "R", "RIGHT", "E", "EAST", ">" -> RIGHT
+                    "D", "DOWN", "S", "SOUTH", "v" -> DOWN
+                    "L", "LEFT", "W", "WEST", "<" -> LEFT
                     else -> throw AocException("invalid Direction: [$s]")
                 }
+
             fun of(c: Char): Direction = of(c.toString())
             fun of(inc: Point): Direction =
-                values().firstOrNull { it.increment == inc } ?: throw AocException("invalid Direction increment: [$inc]")
-            fun oppositeOf(d: Direction) = when (d) { UP -> DOWN; RIGHT -> LEFT; DOWN -> UP; LEFT -> RIGHT }
+                values().firstOrNull { it.increment == inc }
+                    ?: throw AocException("invalid Direction increment: [$inc]")
         }
     }
 }
