@@ -49,7 +49,7 @@ class CityMap(input: List<String>) {
                 )
             } else {
                 for (dir in GridUtils.Direction.values()) {
-                    if (dir == Companion.oppositeOf(location.direction))   // we cannot backtrack
+                    if (dir == location.direction.reverse())   // we cannot backtrack
                         continue
                     val newPoint = location.point + dir.increment
                     if (newPoint.x < 0 || newPoint.x > maxX || newPoint.y < 0 || newPoint.y > maxY)
