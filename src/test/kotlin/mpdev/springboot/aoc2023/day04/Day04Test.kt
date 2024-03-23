@@ -83,7 +83,7 @@ class Day04Test {
                 assertThat(copiesWon.map { it.first }).isEqualTo(expected[id - 1])
             }
         }
-        println("elapsed no cache: ${elapsedNoCache/1000} microsecs")
+        println("elapsed no cache: ${elapsedNoCache/1000} microseconds")
         val elapsedWithCache = measureNanoTime {
             scratchCardGame.cards.forEach { (id, card) ->
                 println("card $id")
@@ -92,7 +92,7 @@ class Day04Test {
                 assertThat(copiesWon.map { it.first }).isEqualTo(expected[id - 1])
             }
         }
-        println("elapsed with cache: ${elapsedWithCache/1000} microsecs")
+        println("elapsed with cache: ${elapsedWithCache/1000} microseconds")
         assertTrue(elapsedWithCache < elapsedNoCache)
     }
 
